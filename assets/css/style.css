@@ -51,7 +51,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 }
 .navbar .container{display:flex;align-items:center;justify-content:space-between;height:72px}
 .navbar-logo{display:flex;align-items:center;gap:.8rem}
-.navbar-logo img{height:40px;width:auto}
+.navbar-logo img{height:44px;width:auto;filter:brightness(0) invert(1)}
 .logo-wordmark .name{font-size:1rem;font-weight:700;color:#fff;letter-spacing:.02em;line-height:1.25}
 .logo-wordmark .name-en{font-size:.62rem;color:var(--accent);letter-spacing:.07em;margin-top:2px}
 .navbar-nav{display:flex;gap:1.75rem;align-items:center}
