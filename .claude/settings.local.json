@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\Johnny\\\\Desktop\\\\Agent\\\\永旭網站\\\\assets\\\\css\")",
+      "Bash(Out-Null)",
+      "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\Johnny\\\\Desktop\\\\Agent\\\\永旭網站\\\\assets\\\\js\")",
+      "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\Johnny\\\\Desktop\\\\Agent\\\\永旭網站\\\\assets\\\\img\")",
+      "Bash(Write-Host \"目錄建立完成\")",
+      "Bash(powershell.exe *)",
+      "WebSearch",
+      "WebFetch(domain:www.taie.com.tw)",
+      "WebFetch(domain:www.wpto.com.tw)",
+      "WebFetch(domain:www.paperstreet.com)",
+      "WebFetch(domain:www.joupo.com)",
+      "WebFetch(domain:www.awa.com)",
+      "WebFetch(domain:www.sternekessler.com)",
+      "Bash(git --version)",
+      "Bash(gh --version)",
+      "Bash(gh auth *)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ]
+  }
+}
