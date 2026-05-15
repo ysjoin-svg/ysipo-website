@@ -1,0 +1,245 @@
+- generic [active] [ref=e1]:
+  - generic:
+    - link "Skip to main content" [ref=e2] [cursor=pointer]:
+      - /url: "#main-content"
+    - banner [ref=e3]:
+      - generic [ref=e5]:
+        - link "Yong Syu Intellectual Property Office — Home" [ref=e6] [cursor=pointer]:
+          - /url: /en/index.html
+          - img "Yong Syu Intellectual Property Office" [ref=e7]
+          - generic [ref=e8]:
+            - generic [ref=e9]: 永旭智慧財產事務所
+            - generic [ref=e10]: Yong Syu Intellectual Property Office
+        - navigation "Main navigation" [ref=e11]:
+          - link "Home" [ref=e12] [cursor=pointer]:
+            - /url: /en/index.html
+          - link "About" [ref=e13] [cursor=pointer]:
+            - /url: /en/about.html
+          - link "Services" [ref=e14] [cursor=pointer]:
+            - /url: /en/services.html
+          - link "IP Insights" [ref=e15] [cursor=pointer]:
+            - /url: /en/insights.html
+          - link "News" [ref=e16] [cursor=pointer]:
+            - /url: /en/news.html
+          - link "Contact" [ref=e17] [cursor=pointer]:
+            - /url: /en/contact.html
+          - group "Language selection" [ref=e18]:
+            - button "切換為繁體中文" [ref=e19] [cursor=pointer]: 繁中
+            - generic [ref=e20]: /
+            - button "Currently viewing in English" [ref=e21] [cursor=pointer]: EN
+  - main [ref=e22]:
+    - region "About Us" [ref=e23]:
+      - generic [ref=e24]:
+        - navigation "Breadcrumb" [ref=e25]:
+          - link "Home" [ref=e26] [cursor=pointer]:
+            - /url: index.html
+          - generic [ref=e27]: ›
+          - generic [ref=e28]: About Us
+        - generic [ref=e29]:
+          - generic [ref=e30]: 永旭智慧財產事務所
+          - generic [ref=e31]: Yong Syu Intellectual Property Office
+        - generic [ref=e32]: About YSIPO
+        - heading "About Us" [level=1] [ref=e33]
+        - paragraph [ref=e34]: Sustained Excellence · Quality First — 25 Years of IP Practice | Boutique Firm Est. 2010
+    - region "Committed to IP Excellence" [ref=e35]:
+      - generic [ref=e38]:
+        - generic [ref=e39]: Our Story
+        - heading "Committed to IP Excellence" [level=2] [ref=e40]
+        - paragraph [ref=e42]: Yong Syu Intellectual Property Office was founded in 2010 by Dr. Li Tsung-Ying, an Electronics Engineering PhD whose IP practice began in 2001. What started as a Kaohsiung-based firm has grown into a dual-office operation spanning southern and northern Taiwan, with a client base that extends to over 50 countries worldwide.
+        - paragraph [ref=e43]: "Our philosophy is simple: boutique quality, partner-level attention. Every matter is handled directly by one of our two principals. We do not delegate client work to junior staff. This commitment to personal accountability has earned YSIPO a consistent position among Taiwan's Top-20 trademark applicant firms and a strong reputation in patent prosecution across multiple technology domains."
+        - paragraph [ref=e44]: From semiconductor patents to brand protection for consumer goods, from Taiwan-only filings to coordinated global portfolios — YSIPO brings deep technical and legal expertise to every engagement, with the responsiveness and personal attention that only a boutique firm can offer.
+    - region "Our Principals" [ref=e45]:
+      - generic [ref=e46]:
+        - generic [ref=e47]:
+          - generic [ref=e48]: Leadership
+          - heading "Our Principals" [level=2] [ref=e49]
+          - paragraph [ref=e51]: Two senior IP professionals leading Kaohsiung HQ and Taipei Branch respectively, each with deep domain expertise and direct client accountability.
+        - generic [ref=e52]:
+          - generic [ref=e53]:
+            - generic [ref=e54]:
+              - img "Li Tsung-Ying — Principal of YSIPO Kaohsiung" [ref=e55]
+              - generic [ref=e56]:
+                - heading "Li Tsung-Ying" [level=3] [ref=e57]
+                - paragraph [ref=e58]: Johnny Li ｜ Principal · Kaohsiung HQ
+                - paragraph [ref=e59]: PhD in Electronics Engineering
+                - link "dr.li@ysipo.com.tw" [ref=e60] [cursor=pointer]:
+                  - /url: mailto:dr.li@ysipo.com.tw
+            - paragraph [ref=e61]: Dr. Li holds a PhD in Electronics Engineering and has practiced IP law for over 25 years. He was personally invited by the Industrial Technology Research Institute (ITRI) to serve as a patent drafting instructor — a credential that reflects the technical depth he brings to every patent engagement. He also holds a registered Copyright Agent qualification (Reg. No. 著代字 100-3010, 2011) issued by the Taiwan Institute of Economic and Scientific Development.
+            - generic [ref=e62]:
+              - paragraph [ref=e63]: Key Experience
+              - list [ref=e64]:
+                - listitem [ref=e65]:
+                  - img [ref=e66]
+                  - text: Founded YSIPO (2010); IP practice since 2001 (25+ years)
+                - listitem [ref=e68]:
+                  - img [ref=e69]
+                  - text: Invited ITRI patent drafting instructor
+                - listitem [ref=e71]:
+                  - img [ref=e72]
+                  - text: Copyright Agent — Reg. No. 著代字 100-3010 (2011, Taiwan Institute of Economic and Scientific Development)
+                - listitem [ref=e74]:
+                  - img [ref=e75]
+                  - text: Multiple Top-20 Taiwan trademark firm rankings
+            - generic [ref=e77]:
+              - paragraph [ref=e78]: Areas of Expertise
+              - list [ref=e79]:
+                - listitem [ref=e80]:
+                  - img [ref=e81]
+                  - text: Patent prosecution & specification drafting
+                - listitem [ref=e83]:
+                  - img [ref=e84]
+                  - text: Cross-domain technology — Electronics, Semiconductors, Communications, Mechanical, Software, Biomedical
+                - listitem [ref=e86]:
+                  - img [ref=e87]
+                  - text: Copyright registration & dispute resolution
+                - listitem [ref=e89]:
+                  - img [ref=e90]
+                  - text: IP strategy consulting & portfolio management
+          - generic [ref=e92]:
+            - generic [ref=e93]:
+              - img "Lin Chia-Chun — Principal of YSIPO Taipei" [ref=e94]
+              - generic [ref=e95]:
+                - heading "Lin Chia-Chun" [level=3] [ref=e96]
+                - paragraph [ref=e97]: Esmé Lin ｜ Principal · Taipei Branch
+                - paragraph [ref=e98]: Master, NTUST Graduate Institute of Patent
+                - link "esme@ysipo.com.tw" [ref=e99] [cursor=pointer]:
+                  - /url: mailto:esme@ysipo.com.tw
+            - paragraph [ref=e100]: Principal Lin leads YSIPO's Taipei Branch, serving clients across northern Taiwan and international brand owners entering the Taiwan market. As a registered trademark agent with deep expertise in prosecution and dispute handling, Lin brings a meticulous, client-centered approach to every brand protection matter.
+            - generic [ref=e101]:
+              - paragraph [ref=e102]: Key Experience
+              - list [ref=e103]:
+                - listitem [ref=e104]:
+                  - img [ref=e105]
+                  - text: Master's degree from National Taiwan University of Science and Technology (NTUST), Graduate Institute of Patent — Taiwan's first graduate institute dedicated to patent engineering
+                - listitem [ref=e107]:
+                  - img [ref=e108]
+                  - text: Registered Trademark Agent (Republic of China)
+                - listitem [ref=e110]:
+                  - img [ref=e111]
+                  - text: Certified IP Professional — Patent Technology Engineering & Patent Search Analysis (Taiwan Intellectual Property Training Academy, Ministry of Economic Affairs)
+                - listitem [ref=e113]:
+                  - img [ref=e114]
+                  - text: 10+ years of trademark practice; led numerous successful trademark prosecutions, oppositions, and disputes
+            - generic [ref=e116]:
+              - paragraph [ref=e117]: Areas of Expertise
+              - list [ref=e118]:
+                - listitem [ref=e119]:
+                  - img [ref=e120]
+                  - text: Taiwan & international trademark prosecution
+                - listitem [ref=e122]:
+                  - img [ref=e123]
+                  - text: Office action responses & appeal proceedings
+                - listitem [ref=e125]:
+                  - img [ref=e126]
+                  - text: Madrid System filings & management
+                - listitem [ref=e128]:
+                  - img [ref=e129]
+                  - text: Brand portfolio strategy consulting
+    - region "Let YSIPO Protect Your IP Assets" [ref=e131]:
+      - generic [ref=e132]:
+        - generic [ref=e133]: Work With Us
+        - heading "Let YSIPO Protect Your IP Assets" [level=2] [ref=e134]
+        - paragraph [ref=e135]: First consultation is complimentary. Contact us to discuss your IP needs and how our principal-level expertise can help.
+        - generic [ref=e136]:
+          - link "Free Consultation" [ref=e137] [cursor=pointer]:
+            - /url: contact.html
+          - link "Our Services" [ref=e138] [cursor=pointer]:
+            - /url: services.html
+  - generic [ref=e139]:
+    - contentinfo [ref=e140]:
+      - generic [ref=e142]:
+        - generic [ref=e143]:
+          - link "Yong Syu Intellectual Property Office — Home" [ref=e144] [cursor=pointer]:
+            - /url: /en/index.html
+            - img "Yong Syu Intellectual Property Office" [ref=e145]
+            - generic [ref=e146]:
+              - generic [ref=e147]: 永旭智慧財產事務所
+              - generic [ref=e148]: Yong Syu Intellectual Property Office
+          - paragraph [ref=e149]: Boutique IP practice led by an Electronics PhD and an NTUST Patent Institute Master — 25 years of experience, every matter handled at the principal level.
+        - generic [ref=e150]:
+          - heading "Services" [level=3] [ref=e151]
+          - list [ref=e152]:
+            - listitem [ref=e153]:
+              - link "Patent Services" [ref=e154] [cursor=pointer]:
+                - /url: /en/services.html#patent
+            - listitem [ref=e155]:
+              - link "Trademark Services" [ref=e156] [cursor=pointer]:
+                - /url: /en/services.html#trademark
+            - listitem [ref=e157]:
+              - link "Copyright Services" [ref=e158] [cursor=pointer]:
+                - /url: /en/services.html#copyright
+            - listitem [ref=e159]:
+              - link "IP Strategy Consulting" [ref=e160] [cursor=pointer]:
+                - /url: /en/services.html#strategy
+            - listitem [ref=e161]:
+              - link "International Filing" [ref=e162] [cursor=pointer]:
+                - /url: /en/services.html#global
+        - generic [ref=e163]:
+          - heading "Quick Links" [level=3] [ref=e164]
+          - list [ref=e165]:
+            - listitem [ref=e166]:
+              - link "About YSIPO" [ref=e167] [cursor=pointer]:
+                - /url: /en/about.html
+            - listitem [ref=e168]:
+              - link "IP Insights" [ref=e169] [cursor=pointer]:
+                - /url: /en/insights.html
+            - listitem [ref=e170]:
+              - link "News & Updates" [ref=e171] [cursor=pointer]:
+                - /url: /en/news.html
+            - listitem [ref=e172]:
+              - link "Contact Us" [ref=e173] [cursor=pointer]:
+                - /url: /en/contact.html
+            - listitem [ref=e174]:
+              - link "繁體中文" [ref=e175] [cursor=pointer]:
+                - /url: /index.html
+        - generic [ref=e176]:
+          - heading "Contact" [level=3] [ref=e177]
+          - generic [ref=e178]:
+            - paragraph [ref=e179]: Kaohsiung HQ
+            - generic [ref=e180]:
+              - img [ref=e181]
+              - generic [ref=e184]: 2F-3, No. 116, Zihua Rd., Zuoying Dist., Kaohsiung
+            - generic [ref=e185]:
+              - img [ref=e186]
+              - generic [ref=e188]:
+                - text: "TEL:"
+                - link "+886-7-345-3388" [ref=e189] [cursor=pointer]:
+                  - /url: tel:+88673453388
+                - text: "/ FAX: +886-7-345-2122"
+          - generic [ref=e190]:
+            - paragraph [ref=e191]: Taipei Branch
+            - generic [ref=e192]:
+              - img [ref=e193]
+              - generic [ref=e196]: 1F, No. 47, Juguang Rd., Zhongzheng Dist., Taipei
+            - generic [ref=e197]:
+              - img [ref=e198]
+              - generic [ref=e200]:
+                - text: "TEL:"
+                - link "+886-2-2579-6961" [ref=e201] [cursor=pointer]:
+                  - /url: tel:+886225796961
+                - text: "/ FAX: +886-2-2579-6932"
+            - generic [ref=e202]:
+              - img [ref=e203]
+              - generic [ref=e205]:
+                - text: "Direct:"
+                - link "+886-956-264-578" [ref=e206] [cursor=pointer]:
+                  - /url: tel:+886956264578
+            - generic [ref=e207]:
+              - img [ref=e208]
+              - link "contact@ysipo.com.tw" [ref=e210] [cursor=pointer]:
+                - /url: mailto:contact@ysipo.com.tw
+            - generic [ref=e211]:
+              - paragraph [ref=e212]: Official LINE
+              - link "Add YSIPO on LINE @640yotwe" [ref=e213] [cursor=pointer]:
+                - /url: https://line.me/R/ti/p/@640yotwe
+                - img [ref=e214]
+                - text: "LINE ID: @640yotwe"
+      - paragraph [ref=e218]:
+        - text: ©
+        - text: Yong Syu Intellectual Property Office. All rights reserved. |
+        - link "Contact Us" [ref=e219] [cursor=pointer]:
+          - /url: /en/contact.html
+    - link "Add YSIPO on Official LINE" [ref=e220] [cursor=pointer]:
+      - /url: https://line.me/R/ti/p/@640yotwe
+      - img [ref=e221]
+      - generic [ref=e223]: LINE Chat

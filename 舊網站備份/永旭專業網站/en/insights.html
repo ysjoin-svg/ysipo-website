@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <title>IP Insights | Yong Syu Intellectual Property Office</title>
+  <meta name="description" content="IP knowledge articles from YSIPO's principal team: patent prosecution, trademark disputes, copyright practice, and international IP strategy — written from 25+ years of real-world experience.">
+  <link rel="canonical" href="https://ysipo.com.tw/en/insights.html">
+  <link rel="alternate" hreflang="zh-TW" href="https://ysipo.com.tw/insights.html">
+  <link rel="alternate" hreflang="en"    href="https://ysipo.com.tw/en/insights.html">
+
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="https://ysipo.com.tw/en/insights.html">
+  <meta property="og:title"       content="IP Insights | YSIPO">
+  <meta property="og:description" content="Patent, trademark, copyright, and international IP knowledge from YSIPO — written by principals with 25+ years of practice.">
+  <meta property="og:image"       content="https://ysipo.com.tw/assets/img/og-image.jpg">
+  <meta property="og:locale"      content="en_US">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;600;700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+  <link rel="stylesheet" href="../assets/css/main.css">
+
+  <style>
+    .insights-search { position: relative; margin-bottom: var(--space-4); }
+    .search-input { width: 100%; padding: 0.6rem 1rem 0.6rem 2.8rem; border: 1px solid var(--color-border); border-radius: var(--radius-full); font-size: var(--text-sm); color: var(--color-text-primary); background: var(--color-bg-white); transition: border-color var(--transition-fast), box-shadow var(--transition-fast); box-sizing: border-box; }
+    .search-input:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px rgba(200,169,107,0.15); }
+    .search-icon { position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--color-text-muted); }
+    .category-filter { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-6); }
+    .category-btn { padding: 0.5rem var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-full); font-size: var(--text-sm); color: var(--color-text-secondary); cursor: pointer; transition: all var(--transition-fast); }
+    .category-btn:hover, .category-btn.active { background: var(--color-primary); border-color: var(--color-primary); color: white; }
+    .insights-layout { display: grid; grid-template-columns: 1fr; gap: var(--space-8); align-items: start; }
+    @media (min-width: 1024px) { .insights-layout { grid-template-columns: 1fr 300px; } }
+    .sidebar-widget { background: var(--color-bg-cream); border: 1px solid var(--color-border-light); border-radius: var(--radius-lg); padding: var(--space-5); margin-bottom: var(--space-4); }
+    .sidebar-widget h3 { font-size: var(--text-base); margin-bottom: var(--space-3); padding-bottom: var(--space-2); border-bottom: 1px solid var(--color-border); }
+  </style>
+</head>
+
+<body>
+
+  <div id="site-header-placeholder"></div>
+
+  <main id="main-content">
+
+    <!-- PAGE HERO -->
+    <section class="page-hero" aria-labelledby="page-title">
+      <div class="container">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="index.html">Home</a>
+          <span class="breadcrumb-sep" aria-hidden="true">›</span>
+          <span class="breadcrumb-current" aria-current="page">IP Insights</span>
+        </nav>
+        <span class="section-label" style="position: relative; z-index: 1;">IP Insights</span>
+        <h1 id="page-title">IP Knowledge Column</h1>
+        <p>
+          Written by the YSIPO principal team — drawing on 25+ years of hands-on experience in patent, trademark, copyright, and international IP practice.
+        </p>
+      </div>
+    </section>
+
+
+    <!-- Main Content -->
+    <section class="section" aria-label="Article list">
+      <div class="container">
+        <div class="insights-layout">
+
+          <!-- Article List (Main) -->
+          <div>
+
+            <!-- Search Bar -->
+            <div class="insights-search" role="search" aria-label="Search articles">
+              <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/>
+              </svg>
+              <input type="text" id="article-search" class="search-input"
+                     placeholder="Search by title or keyword..."
+                     aria-label="Search articles">
+            </div>
+
+            <!-- Category Filter -->
+            <div class="category-filter" role="group" aria-label="Filter articles by category">
+              <button class="category-btn active" data-category="all">All</button>
+              <button class="category-btn" data-category="patent">Patent</button>
+              <button class="category-btn" data-category="trademark">Trademark</button>
+              <button class="category-btn" data-category="copyright">Copyright</button>
+              <button class="category-btn" data-category="international">International IP</button>
+            </div>
+
+            <!-- Article Cards Grid -->
+            <div class="grid grid-2" style="gap: var(--space-5);" id="articles-grid">
+
+              <!-- Article 1 — Patent -->
+              <article class="article-card" data-category="patent" data-aos="fade-up" data-aos-delay="0">
+                <div class="article-card__img" style="background: linear-gradient(135deg, var(--color-primary) 0%, #1a3a5c 100%); display:flex; align-items:center; justify-content:center; min-height:160px;">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(200,169,107,0.7)" stroke-width="1.2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
+                </div>
+                <div class="article-card__body">
+                  <span class="article-tag">Patent</span>
+                  <h2 style="font-size: var(--text-lg);">
+                    <a href="../insights/article-1.html" style="color: inherit;">
+                      5 Key Elements of a Strong Patent Specification: Maximizing Protection for Your Invention
+                    </a>
+                  </h2>
+                  <p style="font-size: var(--text-sm); color: var(--color-text-secondary); line-height: var(--lh-relaxed);">A high-quality patent specification is the cornerstone of invention protection. This article walks through five critical elements — problem definition, prior art description, invention summary, claim strategy, and drawing requirements — explaining why specification quality directly determines the breadth of protection and litigation outcomes.</p>
+                  <div class="article-meta">
+                    <time datetime="2026-04-15">April 15, 2026</time>
+                    <span>~8 min read</span>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Article 2 — Trademark -->
+              <article class="article-card" data-category="trademark" data-aos="fade-up" data-aos-delay="60">
+                <div class="article-card__img" style="background: linear-gradient(135deg, #2d1f0f 0%, #4a3520 100%); display:flex; align-items:center; justify-content:center; min-height:160px;">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(200,169,107,0.7)" stroke-width="1.2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z"/></svg>
+                </div>
+                <div class="article-card__body">
+                  <span class="article-tag">Trademark</span>
+                  <h2 style="font-size: var(--text-lg);">
+                    <a href="../insights/article-2.html" style="color: inherit;">
+                      Trademark Refused? Three Appeal Routes Explained
+                    </a>
+                  </h2>
+                  <p style="font-size: var(--text-sm); color: var(--color-text-secondary); line-height: var(--lh-relaxed);">A trademark refusal does not mean the application is over. This article details three available remedies — response, re-examination, and administrative appeal — covering when to use each, key deadlines, and the strategic considerations that determine success at each stage.</p>
+                  <div class="article-meta">
+                    <time datetime="2026-03-20">March 20, 2026</time>
+                    <span>~6 min read</span>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Article 3 — International IP -->
+              <article class="article-card" data-category="international" data-aos="fade-up" data-aos-delay="120">
+                <div class="article-card__img" style="background: linear-gradient(135deg, #0d2d3a 0%, #1a4a5c 100%); display:flex; align-items:center; justify-content:center; min-height:160px;">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(200,169,107,0.7)" stroke-width="1.2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253"/></svg>
+                </div>
+                <div class="article-card__body">
+                  <span class="article-tag">International IP</span>
+                  <h2 style="font-size: var(--text-lg);">
+                    <a href="../insights/article-3.html" style="color: inherit;">
+                      PCT International Patent Applications: A Complete Guide for Taiwan Businesses
+                    </a>
+                  </h2>
+                  <p style="font-size: var(--text-sm); color: var(--color-text-secondary); line-height: var(--lh-relaxed);">The Patent Cooperation Treaty (PCT) is one of the most important IP tools for entering international markets. This guide covers the PCT filing process, the 30-month national phase delay advantage, cost structure, and how to make the best country-entry decisions — helping Taiwan companies efficiently secure protection across 156 jurisdictions.</p>
+                  <div class="article-meta">
+                    <time datetime="2026-02-28">February 28, 2026</time>
+                    <span>~10 min read</span>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Article 4 — Coming Soon -->
+              <article class="article-card" data-category="trademark" data-aos="fade-up" data-aos-delay="180" style="opacity:0.7; pointer-events:none;">
+                <div class="article-card__img" style="background: var(--color-bg-cream); display:flex; align-items:center; justify-content:center; min-height:160px;">
+                  <span style="font-size:var(--text-sm);color:var(--color-text-muted);font-weight:var(--fw-semibold);letter-spacing:0.1em;">Coming Soon</span>
+                </div>
+                <div class="article-card__body">
+                  <span class="article-tag">Trademark</span>
+                  <h2 style="font-size: var(--text-lg); color: var(--color-text-muted);">
+                    What Counts as Distinctiveness? Analyzing Refusal Grounds &amp; Response Strategies
+                  </h2>
+                  <p style="font-size: var(--text-sm); color: var(--color-text-muted);">A deep dive into how TIPO evaluates trademark distinctiveness, the common "merely descriptive" refusal ground, and how to build a compelling response using secondary meaning arguments and evidence of use.</p>
+                  <div class="article-meta">
+                    <span style="color:var(--color-text-muted);">Coming Soon</span>
+                    <span>~7 min read</span>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Article 5 — Coming Soon -->
+              <article class="article-card" data-category="patent" data-aos="fade-up" data-aos-delay="240" style="opacity:0.7; pointer-events:none;">
+                <div class="article-card__img" style="background: var(--color-bg-cream); display:flex; align-items:center; justify-content:center; min-height:160px;">
+                  <span style="font-size:var(--text-sm);color:var(--color-text-muted);font-weight:var(--fw-semibold);letter-spacing:0.1em;">Coming Soon</span>
+                </div>
+                <div class="article-card__body">
+                  <span class="article-tag">Patent</span>
+                  <h2 style="font-size: var(--text-lg); color: var(--color-text-muted);">
+                    Design-Around in Practice: Navigating Competitor Patent Barriers
+                  </h2>
+                  <p style="font-size: var(--text-sm); color: var(--color-text-muted);">When product development hits a competitor's patent wall, design-around is the go-to strategy. This article introduces how to analyze a competitor's patent scope — from claim interpretation to product modification — with a complete methodology.</p>
+                  <div class="article-meta">
+                    <span style="color:var(--color-text-muted);">Coming Soon</span>
+                    <span>~9 min read</span>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Article 6 — Coming Soon -->
+              <article class="article-card" data-category="copyright" data-aos="fade-up" data-aos-delay="300" style="opacity:0.7; pointer-events:none;">
+                <div class="article-card__img" style="background: var(--color-bg-cream); display:flex; align-items:center; justify-content:center; min-height:160px;">
+                  <span style="font-size:var(--text-sm);color:var(--color-text-muted);font-weight:var(--fw-semibold);letter-spacing:0.1em;">Coming Soon</span>
+                </div>
+                <div class="article-card__body">
+                  <span class="article-tag">Copyright</span>
+                  <h2 style="font-size: var(--text-lg); color: var(--color-text-muted);">
+                    Code, Designs, Marketing Assets — A Complete Digital Copyright Guide
+                  </h2>
+                  <p style="font-size: var(--text-sm); color: var(--color-text-muted);">In the digital age, copyright infringement is easier than ever. This article explains the scope of protection for various types of digital works, infringement standards, and how businesses can build a copyright management framework — from registration to contracts.</p>
+                  <div class="article-meta">
+                    <span style="color:var(--color-text-muted);">Coming Soon</span>
+                    <span>~6 min read</span>
+                  </div>
+                </div>
+              </article>
+
+            </div><!-- /#articles-grid -->
+
+            <!-- Load More (placeholder) -->
+            <div style="text-align: center; margin-top: var(--space-8);">
+              <button class="btn btn--outline-dark">Load More Articles</button>
+            </div>
+
+          </div><!-- /main article list -->
+
+
+          <!-- Sidebar -->
+          <aside aria-label="Sidebar">
+
+            <!-- Free Consultation Widget -->
+            <div class="sidebar-widget" style="background: var(--color-primary); color: white; border-color: var(--color-primary);">
+              <h3 style="color: var(--color-accent); border-color: rgba(200,169,107,0.3);">Free Consultation</h3>
+              <p style="font-size: var(--text-sm); color: rgba(255,255,255,0.75); margin-bottom: var(--space-3); line-height: var(--lh-relaxed);">
+                Still have questions after reading? Consult directly with our principal — free initial assessment.
+              </p>
+              <a href="contact.html" class="btn btn--primary" style="width: 100%; justify-content: center;">Contact Us</a>
+            </div>
+
+            <!-- Categories Widget -->
+            <div class="sidebar-widget">
+              <h3>Categories</h3>
+              <ul class="footer-links">
+                <li>
+                  <button class="category-btn footer-link" data-category="patent" style="color: var(--color-text-secondary); display: flex; justify-content: space-between; background:none; border:none; width:100%; cursor:pointer; padding:0.25rem 0; font-size:var(--text-sm);">
+                    <span>Patent</span><span style="color: var(--color-text-muted);">2 articles</span>
+                  </button>
+                </li>
+                <li>
+                  <button class="category-btn footer-link" data-category="trademark" style="color: var(--color-text-secondary); display: flex; justify-content: space-between; background:none; border:none; width:100%; cursor:pointer; padding:0.25rem 0; font-size:var(--text-sm);">
+                    <span>Trademark</span><span style="color: var(--color-text-muted);">2 articles</span>
+                  </button>
+                </li>
+                <li>
+                  <button class="category-btn footer-link" data-category="copyright" style="color: var(--color-text-secondary); display: flex; justify-content: space-between; background:none; border:none; width:100%; cursor:pointer; padding:0.25rem 0; font-size:var(--text-sm);">
+                    <span>Copyright</span><span style="color: var(--color-text-muted);">1 article</span>
+                  </button>
+                </li>
+                <li>
+                  <button class="category-btn footer-link" data-category="international" style="color: var(--color-text-secondary); display: flex; justify-content: space-between; background:none; border:none; width:100%; cursor:pointer; padding:0.25rem 0; font-size:var(--text-sm);">
+                    <span>International IP</span><span style="color: var(--color-text-muted);">1 article</span>
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            <!-- FAQ Widget -->
+            <div class="sidebar-widget">
+              <h3>FAQ</h3>
+              <div data-accordion-group style="margin: 0;">
+                <div class="accordion-item" style="margin-bottom: var(--space-1);">
+                  <div class="accordion-header" role="button" tabindex="0" aria-expanded="false">
+                    <h3 style="font-size: var(--text-sm);">How long does a patent take to grant in Taiwan?</h3>
+                    <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 9-7 7-7-7"/></svg>
+                  </div>
+                  <div class="accordion-body">
+                    <div class="accordion-body-inner" style="font-size: var(--text-xs); line-height: var(--lh-relaxed); color: var(--color-text-secondary);">
+                      Taiwan invention patents average 2–3 years for substantive examination. Utility model patents (formal review only) take around 6–10 months. Design patents average 12–18 months. PPH (Patent Prosecution Highway) can accelerate invention patents to approximately 1 year.
+                    </div>
+                  </div>
+                </div>
+                <div class="accordion-item" style="margin-bottom: var(--space-1);">
+                  <div class="accordion-header" role="button" tabindex="0" aria-expanded="false">
+                    <h3 style="font-size: var(--text-sm);">Is a trademark refusal the end of the road?</h3>
+                    <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 9-7 7-7-7"/></svg>
+                  </div>
+                  <div class="accordion-body">
+                    <div class="accordion-body-inner" style="font-size: var(--text-xs); line-height: var(--lh-relaxed); color: var(--color-text-secondary);">
+                      Not at all. After a refusal, you still have response, re-examination, administrative appeal, and even administrative litigation available. YSIPO has a strong track record of reversing refusals through strategic arguments — many marks our clients were told were "impossible" were ultimately registered.
+                    </div>
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <div class="accordion-header" role="button" tabindex="0" aria-expanded="false">
+                    <h3 style="font-size: var(--text-sm);">Do I need to register my copyright in Taiwan?</h3>
+                    <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 9-7 7-7-7"/></svg>
+                  </div>
+                  <div class="accordion-body">
+                    <div class="accordion-body-inner" style="font-size: var(--text-xs); line-height: var(--lh-relaxed); color: var(--color-text-secondary);">
+                      Under Taiwan's Copyright Act, copyright protection is automatic upon creation — no registration required. However, copyright registration serves as valuable evidence in disputes. For commercially important works, registration is still advisable.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </aside>
+
+        </div><!-- /.insights-layout -->
+      </div>
+    </section>
+
+
+    <!-- CTA -->
+    <section class="cta-section" aria-labelledby="insights-cta-heading">
+      <div class="container" style="position: relative; z-index: 1;">
+        <span class="section-label">Professional Advice</span>
+        <h2 id="insights-cta-heading">Knowledge Is the Starting Point. Strategy Is What Protects You.</h2>
+        <p>
+          Reading about IP is the first step. Real protection requires tailored strategy. Schedule a consultation with our principal and let 25+ years of experience work for you.
+        </p>
+        <div class="cta-buttons">
+          <a href="contact.html" class="btn btn--primary btn--lg">Book a Consultation</a>
+          <a href="services.html" class="btn btn--outline btn--lg">Our Services</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="site-footer-placeholder"></div>
+
+  <!-- Category Filter Script -->
+  <script>
+    document.querySelectorAll('.category-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const cat = btn.dataset.category;
+        document.querySelectorAll('#articles-grid .article-card').forEach(card => {
+          card.style.display = (cat === 'all' || card.dataset.category === cat) ? '' : 'none';
+        });
+      });
+    });
+  </script>
+
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="../assets/js/main.js"></script>
+
+</body>
+</html>

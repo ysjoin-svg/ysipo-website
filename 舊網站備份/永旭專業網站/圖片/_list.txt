@@ -1,0 +1,14 @@
+﻿
+Name        Length
+----        ------
+logo.jpg    409338
+logo.png    134770
+logo2.png    54274
+sshot-1.jpg 266351
+sshot-3.jpg  48152
+_list.txt        0
+李宗穎.jpg     103254
+李宗穎名片.jpg   294228
+林家均.jpg      52651
+
+

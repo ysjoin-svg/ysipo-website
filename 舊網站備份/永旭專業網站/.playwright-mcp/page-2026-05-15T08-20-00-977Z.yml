@@ -1,0 +1,323 @@
+- generic [active] [ref=e1]:
+  - generic:
+    - link "跳至主要內容" [ref=e2] [cursor=pointer]:
+      - /url: "#main-content"
+    - banner [ref=e3]:
+      - generic [ref=e5]:
+        - link "永旭智慧財產事務所 回首頁" [ref=e6] [cursor=pointer]:
+          - /url: index.html
+          - img "永旭智慧財產事務所" [ref=e7]
+          - generic [ref=e8]:
+            - generic [ref=e9]: 永旭智慧財產事務所
+            - generic [ref=e10]: Yong Syu Intellectual Property Office
+        - navigation "主選單" [ref=e11]:
+          - link "首頁" [ref=e12] [cursor=pointer]:
+            - /url: index.html
+          - link "關於我們" [ref=e13] [cursor=pointer]:
+            - /url: about.html
+          - link "服務項目" [ref=e14] [cursor=pointer]:
+            - /url: services.html
+          - link "智財知識" [ref=e15] [cursor=pointer]:
+            - /url: insights.html
+          - link "新聞動態" [ref=e16] [cursor=pointer]:
+            - /url: news.html
+          - link "聯絡我們" [ref=e17] [cursor=pointer]:
+            - /url: contact.html
+          - group "語系切換" [ref=e18]:
+            - button "切換為繁體中文" [ref=e19] [cursor=pointer]: 繁中
+            - generic [ref=e20]: /
+            - button "Switch to English" [ref=e21] [cursor=pointer]: EN
+  - main [ref=e22]:
+    - region "聯絡我們" [ref=e23]:
+      - generic [ref=e24]:
+        - navigation "麵包屑導覽" [ref=e25]:
+          - link "首頁" [ref=e26] [cursor=pointer]:
+            - /url: index.html
+          - generic [ref=e27]: ›
+          - generic [ref=e28]: 聯絡我們
+        - generic [ref=e29]: Contact Us
+        - heading "聯絡我們" [level=1] [ref=e30]
+        - paragraph [ref=e31]: 高雄・台北雙據點，所長級顧問親自為您評估智財需求
+    - region "聯絡資訊與表單" [ref=e32]:
+      - generic [ref=e34]:
+        - generic [ref=e35]:
+          - heading "與我們聯繫" [level=2] [ref=e36]
+          - generic [ref=e37]:
+            - heading "高雄總部" [level=3] [ref=e38]:
+              - img [ref=e39]
+              - text: 高雄總部
+            - generic [ref=e42]:
+              - img [ref=e43]
+              - generic [ref=e46]: 高雄市左營區子華路 116 號 2 樓之 3
+            - generic [ref=e47]:
+              - img [ref=e48]
+              - generic [ref=e50]:
+                - link "(07) 345-3388" [ref=e51] [cursor=pointer]:
+                  - /url: tel:+88673453388
+                - generic [ref=e52]: 電話
+            - generic [ref=e53]:
+              - img [ref=e54]
+              - generic [ref=e56]:
+                - text: (07) 345-2122
+                - generic [ref=e57]: 傳真
+            - generic [ref=e58]:
+              - img [ref=e59]
+              - generic [ref=e61]:
+                - link "dr.li@ysipo.com.tw" [ref=e62] [cursor=pointer]:
+                  - /url: mailto:dr.li@ysipo.com.tw
+                - generic [ref=e63]: 李所長直聯信箱
+          - separator [ref=e64]
+          - generic [ref=e65]:
+            - heading "台北分所" [level=3] [ref=e66]:
+              - img [ref=e67]
+              - text: 台北分所
+            - generic [ref=e69]:
+              - img [ref=e70]
+              - generic [ref=e73]: 台北市中正區莒光路 47 號 1 樓
+            - generic [ref=e74]:
+              - img [ref=e75]
+              - generic [ref=e77]:
+                - link "(02) 2579-6961" [ref=e78] [cursor=pointer]:
+                  - /url: tel:+886225796961
+                - generic [ref=e79]: 電話
+            - generic [ref=e80]:
+              - img [ref=e81]
+              - generic [ref=e83]:
+                - link "0956-264-578" [ref=e84] [cursor=pointer]:
+                  - /url: tel:+886956264578
+                - generic [ref=e85]: 主管直撥（台北所聯絡專線）
+            - generic [ref=e86]:
+              - img [ref=e87]
+              - generic [ref=e89]:
+                - link "contact@ysipo.com.tw" [ref=e90] [cursor=pointer]:
+                  - /url: mailto:contact@ysipo.com.tw
+                - generic [ref=e91]: Email（高雄・台北共用）
+            - generic [ref=e92]:
+              - img [ref=e93]
+              - generic [ref=e95]:
+                - link "esme@ysipo.com.tw" [ref=e96] [cursor=pointer]:
+                  - /url: mailto:esme@ysipo.com.tw
+                - generic [ref=e97]: 林負責人直聯信箱
+          - separator [ref=e98]
+          - generic [ref=e99]:
+            - heading "服務時間" [level=3] [ref=e100]:
+              - img [ref=e101]
+              - text: 服務時間
+            - generic [ref=e103]:
+              - paragraph [ref=e104]: 週一至週五：08:30 – 17:30
+              - paragraph [ref=e105]: 週六、週日：可透過官方 LINE 預約諮詢
+              - generic [ref=e106]:
+                - heading "官方 LINE" [level=4] [ref=e107]:
+                  - img [ref=e108]
+                  - text: 官方 LINE
+                - generic [ref=e110]:
+                  - generic [ref=e111]:
+                    - paragraph [ref=e112]:
+                      - text: LINE ID：
+                      - strong [ref=e113]: "@640yotwe"
+                    - link "加入 LINE 好友" [ref=e114] [cursor=pointer]:
+                      - /url: https://line.me/R/ti/p/@640yotwe
+                      - img [ref=e115]
+                      - text: 加入 LINE 好友
+                  - img "永旭智慧財產事務所官方 LINE QR Code" [ref=e117]
+              - paragraph [ref=e118]:
+                - text: 如有緊急智財事宜，歡迎致電台北所專線
+                - link "0956-264-578" [ref=e119] [cursor=pointer]:
+                  - /url: tel:+886956264578
+        - generic [ref=e120]:
+          - heading "線上諮詢" [level=2] [ref=e121]
+          - paragraph [ref=e122]: 填寫諮詢需求，我們將於 1-2 個工作日內回覆您。
+          - form "線上諮詢表單" [ref=e123]:
+            - generic [ref=e124]:
+              - generic [ref=e125]:
+                - generic [ref=e126]: 姓名 *
+                - textbox "姓名 必填" [ref=e127]:
+                  - /placeholder: 您的姓名
+              - generic [ref=e128]:
+                - generic [ref=e129]: 公司/單位
+                - textbox "公司/單位" [ref=e130]:
+                  - /placeholder: 公司或單位名稱（選填）
+            - generic [ref=e131]:
+              - generic [ref=e132]:
+                - generic [ref=e133]: Email *
+                - textbox "Email 必填" [ref=e134]:
+                  - /placeholder: your@email.com
+              - generic [ref=e135]:
+                - generic [ref=e136]: 聯絡電話
+                - textbox "聯絡電話" [ref=e137]:
+                  - /placeholder: 02-xxxx-xxxx 或 09xx-xxx-xxx
+            - generic [ref=e138]:
+              - generic [ref=e139]: 諮詢服務類別
+              - group "諮詢服務類別選擇" [ref=e140]:
+                - generic [ref=e141]:
+                  - checkbox "專利申請" [ref=e142]
+                  - text: 專利申請
+                - generic [ref=e143]:
+                  - checkbox "商標申請" [ref=e144]
+                  - text: 商標申請
+                - generic [ref=e145]:
+                  - checkbox "著作權服務" [ref=e146]
+                  - text: 著作權服務
+                - generic [ref=e147]:
+                  - checkbox "商標爭議處理" [ref=e148]
+                  - text: 商標爭議處理
+                - generic [ref=e149]:
+                  - checkbox "專利爭議處理" [ref=e150]
+                  - text: 專利爭議處理
+                - generic [ref=e151]:
+                  - checkbox "著作權爭議" [ref=e152]
+                  - text: 著作權爭議
+                - generic [ref=e153]:
+                  - checkbox "智財侵權處理" [ref=e154]
+                  - text: 智財侵權處理
+                - generic [ref=e155]:
+                  - checkbox "智財授權合約" [ref=e156]
+                  - text: 智財授權合約
+                - generic [ref=e157]:
+                  - checkbox "國際智財申請" [ref=e158]
+                  - text: 國際智財申請
+                - generic [ref=e159]:
+                  - checkbox "智財策略顧問" [ref=e160]
+                  - text: 智財策略顧問
+                - generic [ref=e161]:
+                  - checkbox "其他（請於諮詢內容說明）" [ref=e162]
+                  - text: 其他（請於諮詢內容說明）
+            - generic [ref=e163]:
+              - generic [ref=e164]: 諮詢內容 *
+              - textbox "諮詢內容 必填" [ref=e165]:
+                - /placeholder: 請簡述您的需求，例如：想申請發明專利，技術領域為…／商標核駁收到通知，需要協助答辯…
+            - generic [ref=e166]:
+              - paragraph [ref=e167]: 偏好洽詢據點
+              - radiogroup "偏好洽詢據點" [ref=e168]:
+                - generic [ref=e169] [cursor=pointer]:
+                  - radio "不指定，由事務所安排" [checked] [ref=e170]
+                  - text: 不指定，由事務所安排
+                - generic [ref=e171] [cursor=pointer]:
+                  - radio "高雄總部（李所長）" [ref=e172]
+                  - text: 高雄總部（李所長）
+                - generic [ref=e173] [cursor=pointer]:
+                  - radio "台北分所（林負責人）" [ref=e174]
+                  - text: 台北分所（林負責人）
+            - paragraph [ref=e175]: 您的個人資料將依個人資料保護法規定妥善保存，僅用於本次諮詢服務使用。
+            - button "送出諮詢" [ref=e176] [cursor=pointer]:
+              - text: 送出諮詢
+              - img [ref=e177]
+    - region "辦公室地圖" [ref=e179]:
+      - generic [ref=e180]:
+        - heading "辦公室位置" [level=2] [ref=e181]
+        - generic [ref=e182]:
+          - generic [ref=e183]:
+            - heading "高雄總部" [level=3] [ref=e184]
+            - paragraph [ref=e185]: 高雄市左營區子華路 116 號 2 樓之 3（郵遞區號 813）
+            - iframe [ref=e187]:
+              
+            - paragraph [ref=e188]:
+              - link "在 Google Maps 中開啟 →" [ref=e189] [cursor=pointer]:
+                - /url: https://maps.google.com/?q=高雄市左營區子華路116號
+          - generic [ref=e190]:
+            - heading "台北分所" [level=3] [ref=e191]
+            - paragraph [ref=e192]: 台北市中正區莒光路 47 號 1 樓（郵遞區號 108）
+            - iframe [ref=e194]:
+              
+            - paragraph [ref=e195]:
+              - link "在 Google Maps 中開啟 →" [ref=e196] [cursor=pointer]:
+                - /url: https://maps.google.com/?q=台北市中正區莒光路47號
+  - generic [ref=e197]:
+    - contentinfo [ref=e198]:
+      - generic [ref=e200]:
+        - generic [ref=e201]:
+          - link "永旭智慧財產事務所 回首頁" [ref=e202] [cursor=pointer]:
+            - /url: index.html
+            - img "永旭智慧財產事務所" [ref=e203]
+            - generic [ref=e204]:
+              - generic [ref=e205]: 永旭智慧財產事務所
+              - generic [ref=e206]: Yong Syu Intellectual Property Office
+          - paragraph [ref=e207]: 致力於以 25 年實務積累與電子博士的技術深度，守護客戶的創新成果與品牌資產。精品智財服務，值得您信賴的長期夥伴。
+        - generic [ref=e208]:
+          - heading "服務項目" [level=3] [ref=e209]
+          - list [ref=e210]:
+            - listitem [ref=e211]:
+              - link "專利服務" [ref=e212] [cursor=pointer]:
+                - /url: services.html#patent
+            - listitem [ref=e213]:
+              - link "商標服務" [ref=e214] [cursor=pointer]:
+                - /url: services.html#trademark
+            - listitem [ref=e215]:
+              - link "著作權服務" [ref=e216] [cursor=pointer]:
+                - /url: services.html#copyright
+            - listitem [ref=e217]:
+              - link "智財策略顧問" [ref=e218] [cursor=pointer]:
+                - /url: services.html#strategy
+            - listitem [ref=e219]:
+              - link "國際申請服務" [ref=e220] [cursor=pointer]:
+                - /url: services.html#global
+        - generic [ref=e221]:
+          - heading "快速連結" [level=3] [ref=e222]
+          - list [ref=e223]:
+            - listitem [ref=e224]:
+              - link "關於我們" [ref=e225] [cursor=pointer]:
+                - /url: about.html
+            - listitem [ref=e226]:
+              - link "智財知識" [ref=e227] [cursor=pointer]:
+                - /url: insights.html
+            - listitem [ref=e228]:
+              - link "新聞動態" [ref=e229] [cursor=pointer]:
+                - /url: news.html
+            - listitem [ref=e230]:
+              - link "聯絡我們" [ref=e231] [cursor=pointer]:
+                - /url: contact.html
+            - listitem [ref=e232]:
+              - link "English" [ref=e233] [cursor=pointer]:
+                - /url: en/index.html
+        - generic [ref=e234]:
+          - heading "聯絡資訊" [level=3] [ref=e235]
+          - generic [ref=e236]:
+            - paragraph [ref=e237]: 高雄總部
+            - generic [ref=e238]:
+              - img [ref=e239]
+              - generic [ref=e242]: 高雄市左營區子華路 116 號 2 樓之 3
+            - generic [ref=e243]:
+              - img [ref=e244]
+              - generic [ref=e246]:
+                - text: TEL：
+                - link "(07) 345-3388" [ref=e247] [cursor=pointer]:
+                  - /url: tel:+88673453388
+                - text: ／ FAX：(07) 345-2122
+          - generic [ref=e248]:
+            - paragraph [ref=e249]: 台北分所
+            - generic [ref=e250]:
+              - img [ref=e251]
+              - generic [ref=e254]: 台北市中正區莒光路 47 號 1 樓
+            - generic [ref=e255]:
+              - img [ref=e256]
+              - generic [ref=e258]:
+                - text: TEL：
+                - link "(02) 2579-6961" [ref=e259] [cursor=pointer]:
+                  - /url: tel:+886225796961
+                - text: ／ FAX：(02) 2579-6932
+            - generic [ref=e260]:
+              - img [ref=e261]
+              - generic [ref=e263]:
+                - text: 專線：
+                - link "0956-264-578" [ref=e264] [cursor=pointer]:
+                  - /url: tel:+886956264578
+                - text: （台北所直撥）
+            - generic [ref=e265]:
+              - img [ref=e266]
+              - link "contact@ysipo.com.tw" [ref=e268] [cursor=pointer]:
+                - /url: mailto:contact@ysipo.com.tw
+            - generic [ref=e269]:
+              - paragraph [ref=e270]: 官方 LINE
+              - link "加入永旭官方 LINE @640yotwe" [ref=e271] [cursor=pointer]:
+                - /url: https://line.me/R/ti/p/@640yotwe
+                - img [ref=e272]
+                - text: LINE ID：@640yotwe
+      - paragraph [ref=e276]:
+        - text: ©
+        - text: 永旭智慧財產事務所 Yong Syu Intellectual Property Office. 版權所有。 |
+        - link "聯絡我們" [ref=e277] [cursor=pointer]:
+          - /url: contact.html
+    - link "加入永旭智慧財產事務所官方 LINE" [ref=e278] [cursor=pointer]:
+      - /url: https://line.me/R/ti/p/@640yotwe
+      - img [ref=e279]
+      - generic [ref=e281]: 加 LINE 諮詢

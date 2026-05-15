@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!-- TODO: 每篇文章需要客製化以下 meta -->
+  <title>[文章標題] | 永旭智慧財產事務所</title>
+  <meta name="description" content="[文章摘要，120字以內，包含主要關鍵字]">
+  <link rel="canonical" href="https://ysipo.com.tw/insights/[article-slug].html">
+
+  <meta property="og:type"        content="article">
+  <meta property="og:url"         content="https://ysipo.com.tw/insights/[article-slug].html">
+  <meta property="og:title"       content="[文章標題] | 永旭智慧財產事務所">
+  <meta property="og:description" content="[文章摘要]">
+  <meta property="og:image"       content="https://ysipo.com.tw/assets/img/[article-og-image].jpg">
+  <meta property="article:author" content="永旭智慧財產事務所">
+  <meta property="article:published_time" content="[YYYY-MM-DD]">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;600;700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+  <link rel="stylesheet" href="../assets/css/main.css">
+
+  <!-- Article-specific JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "[文章標題]",
+    "description": "[文章摘要]",
+    "image": "https://ysipo.com.tw/assets/img/[article-image].jpg",
+    "datePublished": "[YYYY-MM-DD]",
+    "dateModified": "[YYYY-MM-DD]",
+    "author": {
+      "@type": "Person",
+      "name": "李宗穎",
+      "jobTitle": "永旭智慧財產事務所所長"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "永旭智慧財產事務所",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://ysipo.com.tw/assets/img/logo.svg"
+      }
+    }
+  }
+  </script>
+
+  <style>
+    /* Article Page Styles */
+    .article-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+      align-items: start;
+      padding: var(--space-12) 0;
+    }
+
+    @media (min-width: 1024px) {
+      .article-layout {
+        grid-template-columns: 1fr 280px;
+      }
+    }
+
+    .article-body {
+      max-width: 72ch;
+    }
+
+    .article-body h2 {
+      font-size: var(--text-2xl);
+      color: var(--color-primary);
+      margin-top: var(--space-8);
+      margin-bottom: var(--space-3);
+      padding-bottom: var(--space-2);
+      border-bottom: 2px solid var(--color-accent);
+    }
+
+    .article-body h3 {
+      font-size: var(--text-xl);
+      color: var(--color-primary);
+      margin-top: var(--space-6);
+      margin-bottom: var(--space-2);
+    }
+
+    .article-body p {
+      font-size: var(--text-md);
+      line-height: var(--lh-loose);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-4);
+    }
+
+    .article-body ul,
+    .article-body ol {
+      margin-bottom: var(--space-4);
+      padding-left: var(--space-4);
+    }
+
+    .article-body ul {
+      list-style: disc;
+    }
+
+    .article-body ol {
+      list-style: decimal;
+    }
+
+    .article-body li {
+      font-size: var(--text-md);
+      color: var(--color-text-secondary);
+      line-height: var(--lh-relaxed);
+      margin-bottom: var(--space-1);
+      padding-left: var(--space-1);
+    }
+
+    .article-body blockquote {
+      border-left: 4px solid var(--color-accent);
+      padding: var(--space-3) var(--space-5);
+      background: var(--color-bg-cream);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      margin: var(--space-6) 0;
+      font-style: italic;
+      color: var(--color-text-secondary);
+    }
+
+    .article-body .highlight-box {
+      background: rgba(26, 40, 69, 0.04);
+      border: 1px solid var(--color-border);
+      border-left: 4px solid var(--color-primary);
+      border-radius: var(--radius-md);
+      padding: var(--space-4) var(--space-5);
+      margin: var(--space-5) 0;
+    }
+
+    .article-body .highlight-box p {
+      margin: 0;
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+    }
+
+    .article-body .highlight-box strong {
+      color: var(--color-primary);
+      font-weight: var(--fw-semibold);
+    }
+
+    .article-header {
+      margin-bottom: var(--space-8);
+      padding-bottom: var(--space-6);
+      border-bottom: 1px solid var(--color-border-light);
+    }
+
+    .article-hero-img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-8);
+      background: var(--color-bg-section);
+    }
+
+    .article-footer {
+      margin-top: var(--space-10);
+      padding-top: var(--space-6);
+      border-top: 1px solid var(--color-border-light);
+    }
+
+    /* Sidebar */
+    .article-sidebar .sidebar-widget {
+      background: var(--color-bg-cream);
+      border: 1px solid var(--color-border-light);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      margin-bottom: var(--space-4);
+    }
+
+    .article-sidebar .sidebar-widget h3 {
+      font-size: var(--text-base);
+      margin-bottom: var(--space-3);
+      padding-bottom: var(--space-2);
+      border-bottom: 1px solid var(--color-border);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="site-header-placeholder"></div>
+
+  <main id="main-content">
+
+    <!-- Minimal Hero (for articles — lighter than service pages) -->
+    <div style="background: var(--color-primary); padding-top: calc(var(--nav-height-desktop) + var(--space-6)); padding-bottom: var(--space-6);">
+      <div class="container">
+        <nav class="breadcrumb" aria-label="麵包屑導覽">
+          <a href="../index.html">首頁</a>
+          <span class="breadcrumb-sep" aria-hidden="true">›</span>
+          <a href="../insights.html">智財知識</a>
+          <span class="breadcrumb-sep" aria-hidden="true">›</span>
+          <span class="breadcrumb-current" aria-current="page">[文章分類]</span>
+        </nav>
+      </div>
+    </div>
+
+
+    <!-- Article Main Content -->
+    <div class="container">
+      <div class="article-layout">
+
+        <!-- Main Article Body -->
+        <article class="article-body">
+
+          <!-- Article Header -->
+          <header class="article-header">
+
+            <!-- Category Tag -->
+            <span class="article-tag" style="margin-bottom: var(--space-3); display: inline-block;">
+              [TODO: 文章分類 — 專利 / 商標 / 著作權 / 國際智財]
+            </span>
+
+            <!-- Article Title -->
+            <h1 style="font-size: var(--text-4xl); color: var(--color-primary); margin-bottom: var(--space-3); line-height: var(--lh-tight);">
+              [TODO: 文章標題]
+            </h1>
+
+            <!-- Meta Info -->
+            <div style="display: flex; align-items: center; gap: var(--space-4); font-size: var(--text-sm); color: var(--color-text-muted); flex-wrap: wrap; margin-bottom: var(--space-4);">
+              <span style="display: flex; align-items: center; gap: var(--space-1);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                  <path d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/>
+                </svg>
+                [TODO: 作者姓名 — 李宗穎 / 林家均]
+              </span>
+              <span style="display: flex; align-items: center; gap: var(--space-1);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                  <path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/>
+                </svg>
+                <time datetime="[YYYY-MM-DD]">[YYYY 年 MM 月 DD 日]</time>
+              </span>
+              <span style="display: flex; align-items: center; gap: var(--space-1);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                  <path d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                </svg>
+                閱讀約 [N] 分鐘
+              </span>
+            </div>
+
+            <!-- Lead / Introduction -->
+            <p style="font-size: var(--text-lg); color: var(--color-text-secondary); line-height: var(--lh-relaxed); font-style: italic; border-left: 3px solid var(--color-accent); padding-left: var(--space-4);">
+              [TODO: 文章導言 — 1-2句，概括文章核心要點，吸引讀者繼續閱讀]
+            </p>
+
+          </header>
+
+
+          <!-- Hero Image (optional) -->
+          <!-- TODO: 待文章配圖
+          <img class="article-hero-img"
+               src="../assets/img/insights/[image-filename].jpg"
+               alt="[圖片說明]"
+               loading="lazy">
+          -->
+          <div class="article-hero-img" style="display:flex;align-items:center;justify-content:center;color:var(--color-text-muted);font-size:var(--text-sm);">
+            [TODO: 文章封面圖 — 請提供 1200x675px 以上的圖片]
+          </div>
+
+
+          <!-- Article Content -->
+          <section aria-label="文章內容">
+
+            <h2>[TODO: 大標 1 — 第一個段落主題]</h2>
+
+            <p>[TODO: 段落文字 1]</p>
+            <p>[TODO: 段落文字 2]</p>
+
+            <div class="highlight-box">
+              <p><strong>重點提示：</strong>[TODO: 重點提示內容 — 條框起來的關鍵知識點]</p>
+            </div>
+
+            <h2>[TODO: 大標 2]</h2>
+
+            <p>[TODO: 段落文字 3]</p>
+
+            <h3>[TODO: 小標 2.1]</h3>
+            <p>[TODO: 段落文字 4]</p>
+
+            <ul>
+              <li>[TODO: 列點 1]</li>
+              <li>[TODO: 列點 2]</li>
+              <li>[TODO: 列點 3]</li>
+            </ul>
+
+            <h2>[TODO: 大標 3]</h2>
+
+            <p>[TODO: 段落文字 5]</p>
+
+            <blockquote>
+              [TODO: 引用文字 — 法條、案例引述、或名言]
+            </blockquote>
+
+            <p>[TODO: 段落文字 6]</p>
+
+            <h2>結語</h2>
+
+            <p>[TODO: 文章結論段落]</p>
+
+          </section>
+
+
+          <!-- Article Footer: Tags + Author Box + CTA -->
+          <footer class="article-footer">
+
+            <!-- Tags -->
+            <div style="display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-6);">
+              <span style="font-size: var(--text-sm); color: var(--color-text-muted); margin-right: var(--space-1);">標籤：</span>
+              <a href="../insights.html?category=patent" class="tag tag--outline">[TODO: 標籤 1]</a>
+              <a href="../insights.html?category=patent" class="tag tag--outline">[TODO: 標籤 2]</a>
+              <a href="../insights.html?category=patent" class="tag tag--outline">[TODO: 標籤 3]</a>
+            </div>
+
+            <!-- Author Box -->
+            <div style="display: flex; gap: var(--space-4); align-items: flex-start; padding: var(--space-5); background: var(--color-bg-cream); border-radius: var(--radius-lg);">
+              <div style="width: 64px; height: 64px; border-radius: 50%; background: var(--color-bg-section); flex-shrink: 0; overflow: hidden; border: 2px solid var(--color-accent); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;" aria-hidden="true">
+                👨‍💼
+              </div>
+              <div>
+                <p style="font-size: var(--text-sm); font-weight: var(--fw-semibold); color: var(--color-primary); margin-bottom: 0.25rem;">[TODO: 作者姓名]</p>
+                <p style="font-size: var(--text-xs); color: var(--color-accent); margin-bottom: var(--space-2);">[TODO: 職稱]</p>
+                <p style="font-size: var(--text-sm); color: var(--color-text-secondary); line-height: var(--lh-relaxed);">
+                  [TODO: 作者簡介，40字以內，與本文相關的專業背景說明]
+                </p>
+              </div>
+            </div>
+
+            <!-- Article CTA -->
+            <div style="margin-top: var(--space-8); padding: var(--space-6); background: var(--color-primary); border-radius: var(--radius-xl); text-align: center;">
+              <h3 style="color: var(--color-accent); font-size: var(--text-xl); margin-bottom: var(--space-2);">
+                [TODO: 文章 CTA 標題 — 呼應文章主題，引導諮詢]
+              </h3>
+              <p style="color: rgba(255,255,255,0.75); font-size: var(--text-sm); margin-bottom: var(--space-4);">
+                [TODO: 文章 CTA 文案，20-30字]
+              </p>
+              <a href="../contact.html" class="btn btn--primary">立即諮詢</a>
+            </div>
+
+          </footer>
+
+        </article>
+
+
+        <!-- Sidebar -->
+        <aside class="article-sidebar" aria-label="側欄">
+
+          <!-- Quick CTA Widget -->
+          <div class="sidebar-widget" style="background: var(--color-primary); border-color: transparent;">
+            <h3 style="color: var(--color-accent); border-color: rgba(200,169,107,0.3);">免費諮詢</h3>
+            <p style="font-size: var(--text-sm); color: rgba(255,255,255,0.75); margin-bottom: var(--space-3);">
+              有相關問題？直接諮詢所長。
+            </p>
+            <a href="../contact.html" class="btn btn--primary" style="width: 100%; justify-content: center;">立即諮詢</a>
+            <p style="margin-top: var(--space-3); font-size: var(--text-xs); color: rgba(255,255,255,0.5); text-align: center;">
+              (07) 345-3388 · (02) 2579-6961
+            </p>
+          </div>
+
+          <!-- Related Articles Widget -->
+          <div class="sidebar-widget">
+            <h3>相關文章</h3>
+            <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+              <a href="article-related-1.html" style="display: flex; gap: var(--space-2); align-items: flex-start;">
+                <div style="width: 60px; height: 45px; background: var(--color-bg-section); border-radius: var(--radius-sm); flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 1.2rem;" aria-hidden="true">📋</div>
+                <p style="font-size: var(--text-sm); color: var(--color-text-secondary); line-height: var(--lh-snug);">
+                  [TODO: 相關文章 1 標題]
+                </p>
+              </a>
+              <a href="article-related-2.html" style="display: flex; gap: var(--space-2); align-items: flex-start;">
+                <div style="width: 60px; height: 45px; background: var(--color-bg-section); border-radius: var(--radius-sm); flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 1.2rem;" aria-hidden="true">™️</div>
+                <p style="font-size: var(--text-sm); color: var(--color-text-secondary); line-height: var(--lh-snug);">
+                  [TODO: 相關文章 2 標題]
+                </p>
+              </a>
+            </div>
+          </div>
+
+          <!-- Categories Widget -->
+          <div class="sidebar-widget">
+            <h3>文章分類</h3>
+            <ul class="footer-links">
+              <li><a href="../insights.html" class="footer-link" style="color: var(--color-text-secondary);">全部文章</a></li>
+              <li><a href="../insights.html?cat=patent" class="footer-link" style="color: var(--color-text-secondary);">專利</a></li>
+              <li><a href="../insights.html?cat=trademark" class="footer-link" style="color: var(--color-text-secondary);">商標</a></li>
+              <li><a href="../insights.html?cat=copyright" class="footer-link" style="color: var(--color-text-secondary);">著作權</a></li>
+              <li><a href="../insights.html?cat=international" class="footer-link" style="color: var(--color-text-secondary);">國際智財</a></li>
+            </ul>
+          </div>
+
+        </aside>
+
+      </div>
+    </div>
+
+  </main>
+
+  <div id="site-footer-placeholder"></div>
+
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="../assets/js/main.js"></script>
+
+</body>
+</html>

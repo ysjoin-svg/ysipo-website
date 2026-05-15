@@ -1,0 +1,372 @@
+- generic [active] [ref=e1]:
+  - generic:
+    - link "跳至主要內容" [ref=e2] [cursor=pointer]:
+      - /url: "#main-content"
+    - banner [ref=e3]:
+      - generic [ref=e5]:
+        - link "永旭智慧財產事務所 回首頁" [ref=e6] [cursor=pointer]:
+          - /url: index.html
+          - img "永旭智慧財產事務所" [ref=e7]
+          - generic [ref=e8]:
+            - generic [ref=e9]: 永旭智慧財產事務所
+            - generic [ref=e10]: Yong Syu Intellectual Property Office
+        - navigation "主選單" [ref=e11]:
+          - link "首頁" [ref=e12] [cursor=pointer]:
+            - /url: index.html
+          - link "關於我們" [ref=e13] [cursor=pointer]:
+            - /url: about.html
+          - link "服務項目" [ref=e14] [cursor=pointer]:
+            - /url: services.html
+          - link "智財知識" [ref=e15] [cursor=pointer]:
+            - /url: insights.html
+          - link "新聞動態" [ref=e16] [cursor=pointer]:
+            - /url: news.html
+          - link "聯絡我們" [ref=e17] [cursor=pointer]:
+            - /url: contact.html
+          - group "語系切換" [ref=e18]:
+            - button "切換為繁體中文" [ref=e19] [cursor=pointer]: 繁中
+            - generic [ref=e20]: /
+            - button "Switch to English" [ref=e21] [cursor=pointer]: EN
+  - main [ref=e22]:
+    - region "電子博士主持 ｜ 工研院專利撰稿訓練 跨領域技術深度 × 前 20 大商標實績" [ref=e23]:
+      - generic [ref=e27]:
+        - generic [ref=e28]:
+          - generic [ref=e29]: 永旭智慧財產事務所
+          - generic [ref=e30]: Yong Syu Intellectual Property Office
+        - heading "電子博士主持 ｜ 工研院專利撰稿訓練 跨領域技術深度 × 前 20 大商標實績" [level=1] [ref=e31]:
+          - text: 電子博士主持 ｜ 工研院專利撰稿訓練
+          - text: 跨領域技術深度 ×
+          - emphasis [ref=e32]: 前 20 大商標實績
+        - paragraph [ref=e33]:
+          - text: 25 年智財實務 ｜ 2010 創立精品事務所
+          - text: 從專利撰稿到商標爭議救援，負責人親自把關每一個案件
+        - generic [ref=e34]:
+          - link "立即免費諮詢" [ref=e35] [cursor=pointer]:
+            - /url: contact.html
+            - text: 立即免費諮詢
+            - img [ref=e36]
+          - link "探索我們的服務" [ref=e38] [cursor=pointer]:
+            - /url: services.html
+        - paragraph [ref=e39]: 初次諮詢完全免費 ｜ 一個工作日內回覆
+      - generic [ref=e40]:
+        - generic [ref=e41]: scroll
+        - img [ref=e42]
+    - region "事務所核心指標" [ref=e44]:
+      - generic [ref=e46]:
+        - generic [ref=e47]:
+          - generic [ref=e48]: "25"
+          - generic [ref=e49]:
+            - generic [ref=e50]: Years Experience
+            - text: 25 年智財實務（自 2001 年起）
+        - generic [ref=e51]:
+          - generic [ref=e52]: "16"
+          - generic [ref=e53]:
+            - generic [ref=e54]: Year Firm
+            - text: 永旭創立至今 16 年（自 2010 年）
+        - generic [ref=e55]:
+          - generic [ref=e56]: 20+
+          - generic [ref=e57]:
+            - generic [ref=e58]: Top Ranking
+            - text: 多次榮獲商標申請量前 20 大事務所
+        - generic [ref=e59]:
+          - generic [ref=e60]: 50+
+          - generic [ref=e61]:
+            - generic [ref=e62]: Countries
+            - text: 服務範圍涵蓋全球 50+ 國
+        - generic [ref=e63]:
+          - generic [ref=e64]: "2"
+          - generic [ref=e65]:
+            - generic [ref=e66]: Offices
+            - text: 高雄總部 ｜ 台北分所
+    - region "三大核心服務領域" [ref=e67]:
+      - generic [ref=e68]:
+        - generic [ref=e69]:
+          - generic [ref=e70]: Our Practice Areas
+          - heading "三大核心服務領域" [level=2] [ref=e71]
+          - paragraph [ref=e73]:
+            - text: 從技術創新的專利保護，到品牌經營的商標佈局，
+            - text: 再到創作成果的著作權管理，永旭以精緻的專業服務，
+            - text: 守護您每一份智慧資產。
+        - generic [ref=e74]:
+          - article [ref=e75]:
+            - generic [ref=e76]:
+              - img [ref=e77]
+              - heading "專利服務" [level=3] [ref=e80]
+              - text: Patent
+            - generic [ref=e81]:
+              - paragraph [ref=e82]:
+                - text: 電子博士主持 × 工研院專利撰稿訓練
+                - text: 跨領域技術深度，將複雜技術轉化為強保護力的專利說明書
+              - list [ref=e83]:
+                - listitem [ref=e84]: — 技術解析與專利撰稿
+                - listitem [ref=e85]: — 前案檢索與可專利性評估
+                - listitem [ref=e86]: — PCT 國際專利申請
+                - listitem [ref=e87]: — 各國專利申請程序
+                - listitem [ref=e88]: — 專利舉發、答辯協助
+                - listitem [ref=e89]: — 侵權分析與迴避設計
+                - listitem [ref=e90]: — 專利授權、移轉
+                - listitem [ref=e91]: — 年費維護管理
+              - link "瞭解專利服務" [ref=e92] [cursor=pointer]:
+                - /url: services.html#patent
+                - text: 瞭解專利服務
+                - img [ref=e93]
+          - article [ref=e95]:
+            - generic [ref=e96]:
+              - img [ref=e97]
+              - heading "商標服務" [level=3] [ref=e100]
+              - text: Trademark
+            - generic [ref=e101]:
+              - paragraph [ref=e102]:
+                - text: 逾 25 年商標實務 × 多次榮獲前 20 大申請量
+                - text: 從申請佈局到爭議救援，商標全生命週期專業守護
+              - list [ref=e103]:
+                - listitem [ref=e104]: — 商標查名與策略規劃
+                - listitem [ref=e105]: — 國內外商標申請
+                - listitem [ref=e106]: — 馬德里國際商標
+                - listitem [ref=e107]: — 核駁救援與申復策略
+                - listitem [ref=e108]: — 異議、評定、廢止
+                - listitem [ref=e109]: — 侵權處理與訴訟協助
+                - listitem [ref=e110]: — 商標授權、移轉
+                - listitem [ref=e111]: — 仿冒取締
+              - link "瞭解商標服務" [ref=e112] [cursor=pointer]:
+                - /url: services.html#trademark
+                - text: 瞭解商標服務
+                - img [ref=e113]
+          - article [ref=e115]:
+            - generic [ref=e116]:
+              - img [ref=e117]
+              - heading "著作權服務" [level=3] [ref=e120]
+              - text: Copyright
+            - generic [ref=e121]:
+              - paragraph [ref=e122]:
+                - text: 著作權代理師主持
+                - text: 從登記、合約到侵權鑑定，守護您的創作權益
+              - list [ref=e123]:
+                - listitem [ref=e124]: — 著作權登記申請
+                - listitem [ref=e125]: — 授權合約撰寫
+                - listitem [ref=e126]: — 侵權鑑定與爭議處理
+                - listitem [ref=e127]: — 數位著作保護策略
+              - link "瞭解著作權服務" [ref=e128] [cursor=pointer]:
+                - /url: services.html#copyright
+                - text: 瞭解著作權服務
+                - img [ref=e129]
+    - region "為什麼選擇永旭" [ref=e131]:
+      - generic [ref=e132]:
+        - generic [ref=e133]:
+          - generic [ref=e134]: Why Choose YSIPO
+          - heading "為什麼選擇永旭" [level=2] [ref=e135]
+          - paragraph [ref=e137]: 25 年的積累，讓我們成為您最值得信賴的智財合作夥伴
+        - generic [ref=e138]:
+          - generic [ref=e139]:
+            - img [ref=e141]
+            - generic [ref=e143]:
+              - heading "博士主持・技術深度" [level=3] [ref=e144]
+              - paragraph [ref=e145]: 李宗穎所長為國立高雄科技大學電子工程博士，並受過工業技術研究院完整的專利說明書撰稿專業訓練。橫跨電子、半導體、通訊、機械、軟體及生醫等多元技術領域的深厚背景，能精準解析複雜技術創新，撰寫具備強保護力的專利說明書。
+          - generic [ref=e146]:
+            - img [ref=e148]
+            - generic [ref=e150]:
+              - heading "商標全生命週期實戰力" [level=3] [ref=e151]
+              - paragraph [ref=e152]: 逾 25 年商標實務積累，從申請前評估、核駁救援、異議答辯、評定廢止，到侵權處理與訴訟協助，掌握商標全生命週期的實戰能力。許多被認為「不可能核准」的商標，經永旭策略性識別性論述後成功爭取核准，我們以實戰力守護您的品牌。
+          - generic [ref=e153]:
+            - img [ref=e155]
+            - generic [ref=e157]:
+              - heading "前 20 大實績・諮詢顧問級" [level=3] [ref=e158]
+              - paragraph [ref=e159]: 永旭事務所曾多次榮獲台灣商標申請量前 20 大事務所殊榮。李宗穎所長亦長期擔任業界商標爭議的諮詢顧問，並受邀至大專院校、公家機關、社會團體及企業擔任智慧財產權主題講師，以深度的專業見解服務每一位客戶。
+          - generic [ref=e160]:
+            - img [ref=e162]
+            - generic [ref=e164]:
+              - heading "全球佈局・負責人親自承辦" [level=3] [ref=e165]
+              - paragraph [ref=e166]: 透過歐盟商標、馬德里體系、PCT 國際專利等機制，服務範圍涵蓋兩岸三地、東南亞、歐美主要市場。所長與台北所負責人架構，所長與台北所負責人親自把關每一個案件，確保專業判斷不打折、客戶權益不外包。
+    - region "服務範圍涵蓋多元產業" [ref=e167]:
+      - generic [ref=e168]:
+        - generic [ref=e169]:
+          - generic [ref=e170]: Industries We Serve
+          - heading "服務範圍涵蓋多元產業" [level=2] [ref=e171]
+          - paragraph [ref=e173]:
+            - text: 從中央部會、學術機構，到跨境品牌與在地企業，
+            - text: 永旭以精緻的專業服務，為各產業提供智財保護。
+        - generic [ref=e174]:
+          - generic [ref=e175]:
+            - img [ref=e177]
+            - generic [ref=e179]: 政府與研究機構
+            - generic [ref=e180]: 中央部會、國家級法人研究中心、地方政府機關
+          - generic [ref=e181]:
+            - img [ref=e183]
+            - generic [ref=e185]: 學術與教育機構
+            - generic [ref=e186]: 服務多所國內公私立大學與技職院校
+          - generic [ref=e187]:
+            - img [ref=e189]
+            - generic [ref=e191]: 跨境與國際品牌
+            - generic [ref=e192]: 服務涵蓋美、日、德、加、西、香港、深圳、北京等地企業
+          - generic [ref=e193]:
+            - img [ref=e195]
+            - generic [ref=e197]: 生技、藥業與醫療
+            - generic [ref=e198]: 多家生技、製藥、醫療美學長期合作客戶
+          - generic [ref=e199]:
+            - img [ref=e201]
+            - generic [ref=e204]: 食品、餐飲與消費品牌
+            - generic [ref=e205]: 涵蓋多元品牌的商標佈局與餐飲連鎖客戶
+          - generic [ref=e206]:
+            - img [ref=e208]
+            - generic [ref=e210]: 科技、製造與創新
+            - generic [ref=e211]: 從電子、機械到軟體新創，為技術型企業守護創新成果
+        - paragraph [ref=e212]:
+          - text: 永旭累積服務涵蓋超過 50 家跨境企業客戶，
+          - text: 透過歐盟商標、馬德里體系、PCT 國際專利等機制，
+          - text: 為客戶在兩岸三地、東南亞、歐美主要市場建立完整智財佈局。
+    - region "智財知識專欄" [ref=e213]:
+      - generic [ref=e214]:
+        - generic [ref=e215]:
+          - generic [ref=e216]:
+            - generic [ref=e217]: IP Insights
+            - heading "智財知識專欄" [level=2] [ref=e218]
+            - paragraph [ref=e220]:
+              - text: 了解智慧財產的基本概念，
+              - text: 幫助您為創新與品牌做出最明智的保護決策
+          - link "查看所有文章 →" [ref=e221] [cursor=pointer]:
+            - /url: insights.html
+        - generic [ref=e222]:
+          - article [ref=e223]:
+            - generic [ref=e225]: 📋
+            - generic [ref=e226]:
+              - generic [ref=e227]: 專利知識
+              - heading "申請發明專利前，為什麼一定要做前案檢索？" [level=3] [ref=e228]
+              - paragraph [ref=e229]: 許多發明人急於提出申請，卻忽略了前案檢索的重要性。事先確認技術的新穎性，不僅能節省大量申請費用，更能幫助撰寫出保護範圍更完整的專利說明書。
+              - generic [ref=e230]:
+                - time [ref=e231]: 2026-05-15
+                - generic [ref=e232]: 5 分鐘閱讀
+              - link "閱讀更多" [ref=e233] [cursor=pointer]:
+                - /url: insights/article-1.html
+                - text: 閱讀更多
+                - img [ref=e234]
+          - article [ref=e236]:
+            - generic [ref=e238]: ™️
+            - generic [ref=e239]:
+              - generic [ref=e240]: 商標知識
+              - heading "商標被核駁先行通知，真的就沒救了嗎？" [level=3] [ref=e241]
+              - paragraph [ref=e242]: 商標核駁不等於終局決定。透過識別性論述、使用證據舉證、商品服務區隔等策略，許多被認為不可能核准的商標仍有機會在申復階段成功爭取。
+              - generic [ref=e243]:
+                - time [ref=e244]: 2026-05-15
+                - generic [ref=e245]: 6 分鐘閱讀
+              - link "閱讀更多" [ref=e246] [cursor=pointer]:
+                - /url: insights/article-2.html
+                - text: 閱讀更多
+                - img [ref=e247]
+          - article [ref=e249]:
+            - generic [ref=e251]: ©️
+            - generic [ref=e252]:
+              - generic [ref=e253]: 著作權知識
+              - heading "著作權自動產生，為什麼還需要辦理著作權登記？" [level=3] [ref=e254]
+              - paragraph [ref=e255]: 著作權雖然創作完成後即自動受到保護，但辦理登記可以建立創作時間的法律佐證。當發生侵權爭議時，登記文件將成為維權的重要武器。
+              - generic [ref=e256]:
+                - time [ref=e257]: 2026-05-15
+                - generic [ref=e258]: 4 分鐘閱讀
+              - link "閱讀更多" [ref=e259] [cursor=pointer]:
+                - /url: insights/article-3.html
+                - text: 閱讀更多
+                - img [ref=e260]
+    - region [ref=e262]:
+      - generic [ref=e263]:
+        - generic [ref=e264]: 開始您的智財布局
+        - heading "準備好保護您的智慧財產了嗎？" [level=2] [ref=e265]
+        - paragraph [ref=e266]:
+          - text: 無論是專利、商標或著作權，初次諮詢完全免費 ——
+          - text: 讓電子博士主持的精品事務所，為您評估最佳保護方案
+        - generic [ref=e267]:
+          - link "立即免費諮詢" [ref=e268] [cursor=pointer]:
+            - /url: contact.html
+            - text: 立即免費諮詢
+            - img [ref=e269]
+          - link "+886 7 345-3388" [ref=e271] [cursor=pointer]:
+            - /url: tel:+886733453388
+            - img [ref=e272]
+            - text: +886 7 345-3388
+        - paragraph [ref=e274]: 高雄總部 (07) 345-3388 ｜ 台北分所 (02) 2579-6961
+  - contentinfo [ref=e276]:
+    - generic [ref=e278]:
+      - generic [ref=e279]:
+        - link "永旭智慧財產事務所 回首頁" [ref=e280] [cursor=pointer]:
+          - /url: index.html
+          - img "永旭智慧財產事務所" [ref=e281]
+          - generic [ref=e282]:
+            - generic [ref=e283]: 永旭智慧財產事務所
+            - generic [ref=e284]: Yong Syu Intellectual Property Office
+        - paragraph [ref=e285]: 致力於以 25 年實務積累與電子博士的技術深度，守護客戶的創新成果與品牌資產。精品智財服務，值得您信賴的長期夥伴。
+      - generic [ref=e286]:
+        - heading "服務項目" [level=3] [ref=e287]
+        - list [ref=e288]:
+          - listitem [ref=e289]:
+            - link "專利服務" [ref=e290] [cursor=pointer]:
+              - /url: services.html#patent
+          - listitem [ref=e291]:
+            - link "商標服務" [ref=e292] [cursor=pointer]:
+              - /url: services.html#trademark
+          - listitem [ref=e293]:
+            - link "著作權服務" [ref=e294] [cursor=pointer]:
+              - /url: services.html#copyright
+          - listitem [ref=e295]:
+            - link "智財策略顧問" [ref=e296] [cursor=pointer]:
+              - /url: services.html#strategy
+          - listitem [ref=e297]:
+            - link "國際申請服務" [ref=e298] [cursor=pointer]:
+              - /url: services.html#global
+      - generic [ref=e299]:
+        - heading "快速連結" [level=3] [ref=e300]
+        - list [ref=e301]:
+          - listitem [ref=e302]:
+            - link "關於我們" [ref=e303] [cursor=pointer]:
+              - /url: about.html
+          - listitem [ref=e304]:
+            - link "智財知識" [ref=e305] [cursor=pointer]:
+              - /url: insights.html
+          - listitem [ref=e306]:
+            - link "新聞動態" [ref=e307] [cursor=pointer]:
+              - /url: news.html
+          - listitem [ref=e308]:
+            - link "聯絡我們" [ref=e309] [cursor=pointer]:
+              - /url: contact.html
+          - listitem [ref=e310]:
+            - link "English" [ref=e311] [cursor=pointer]:
+              - /url: en/index.html
+      - generic [ref=e312]:
+        - heading "聯絡資訊" [level=3] [ref=e313]
+        - generic [ref=e314]:
+          - paragraph [ref=e315]: 高雄總部
+          - generic [ref=e316]:
+            - img [ref=e317]
+            - generic [ref=e320]: 高雄市左營區子華路 116 號 2 樓之 3
+          - generic [ref=e321]:
+            - img [ref=e322]
+            - generic [ref=e324]:
+              - text: TEL：
+              - link "(07) 345-3388" [ref=e325] [cursor=pointer]:
+                - /url: tel:+88673453388
+              - text: ／ FAX：(07) 345-2122
+        - generic [ref=e326]:
+          - paragraph [ref=e327]: 台北分所
+          - generic [ref=e328]:
+            - img [ref=e329]
+            - generic [ref=e332]: 台北市中正區莒光路 47 號 1 樓
+          - generic [ref=e333]:
+            - img [ref=e334]
+            - generic [ref=e336]:
+              - text: TEL：
+              - link "(02) 2579-6961" [ref=e337] [cursor=pointer]:
+                - /url: tel:+886225796961
+              - text: ／ FAX：(02) 2579-6932
+          - generic [ref=e338]:
+            - img [ref=e339]
+            - generic [ref=e341]:
+              - text: 專線：
+              - link "0956-264-578" [ref=e342] [cursor=pointer]:
+                - /url: tel:+886956264578
+              - text: （台北所直撥）
+          - generic [ref=e343]:
+            - img [ref=e344]
+            - link "contact@ysipo.com.tw" [ref=e346] [cursor=pointer]:
+              - /url: mailto:contact@ysipo.com.tw
+    - paragraph [ref=e349]:
+      - text: ©
+      - text: 永旭智慧財產事務所 Yong Syu Intellectual Property Office. 版權所有。 |
+      - link "聯絡我們" [ref=e350] [cursor=pointer]:
+        - /url: contact.html

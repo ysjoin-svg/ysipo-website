@@ -1,0 +1,1 @@
+fix: {ROOT} token 修正 header/footer 路徑，解決子目錄 logo 破圖與名稱重複問題
