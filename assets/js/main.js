@@ -8,13 +8,17 @@
 /* ──────────────────────────────────────────────
    Partial Loader (Header / Footer)
    ────────────────────────────────────────────── */
-async function loadPartial(selector, url) {
+async function loadPartial(selector, url, rootPath) {
   const el = document.querySelector(selector);
   if (!el) return;
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`Failed to load: ${url}`);
-    el.innerHTML = await res.text();
+    let html = await res.text();
+    if (rootPath !== undefined) {
+      html = html.replace(/\{ROOT\}/g, rootPath);
+    }
+    el.innerHTML = html;
     el.dispatchEvent(new Event('partial-loaded', { bubbles: true }));
   } catch (err) {
     console.warn('[YSIPO] Partial load failed:', err.message);
@@ -327,19 +331,18 @@ function applyNavOffset() {
 async function init() {
   // Route to English partials for /en/ pages, Chinese partials for all others
   const path = window.location.pathname;
-  let headerPath, footerPath;
   if (path.includes('/en/')) {
-    headerPath = '/en/assets/partials/header.html';
-    footerPath = '/en/assets/partials/footer.html';
+    await Promise.all([
+      loadPartial('#site-header-placeholder', '/en/assets/partials/header.html'),
+      loadPartial('#site-footer-placeholder', '/en/assets/partials/footer.html'),
+    ]);
   } else {
     const root = getRootPath();
-    headerPath = `${root}assets/partials/header.html`;
-    footerPath = `${root}assets/partials/footer.html`;
+    await Promise.all([
+      loadPartial('#site-header-placeholder', `${root}assets/partials/header.html`, root),
+      loadPartial('#site-footer-placeholder', `${root}assets/partials/footer.html`, root),
+    ]);
   }
-  await Promise.all([
-    loadPartial('#site-header-placeholder', headerPath),
-    loadPartial('#site-footer-placeholder', footerPath),
-  ]);
 
   // After partials load, init navigation
   initNavigation();
