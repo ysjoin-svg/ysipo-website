@@ -166,65 +166,11 @@
                 </div>
               </article>
 
-              <!-- Article 4 — Coming Soon -->
-              <article class="article-card" data-category="trademark" data-aos="fade-up" data-aos-delay="180" style="opacity:0.7; pointer-events:none;">
-                <div class="article-card__img" style="background: var(--color-bg-cream); display:flex; align-items:center; justify-content:center; min-height:160px;">
-                  <span style="font-size:var(--text-sm);color:var(--color-text-muted);font-weight:var(--fw-semibold);letter-spacing:0.1em;">Coming Soon</span>
-                </div>
-                <div class="article-card__body">
-                  <span class="article-tag">Trademark</span>
-                  <h2 style="font-size: var(--text-lg); color: var(--color-text-muted);">
-                    What Counts as Distinctiveness? Analyzing Refusal Grounds &amp; Response Strategies
-                  </h2>
-                  <p style="font-size: var(--text-sm); color: var(--color-text-muted);">A deep dive into how TIPO evaluates trademark distinctiveness, the common "merely descriptive" refusal ground, and how to build a compelling response using secondary meaning arguments and evidence of use.</p>
-                  <div class="article-meta">
-                    <span style="color:var(--color-text-muted);">Coming Soon</span>
-                    <span>~7 min read</span>
-                  </div>
-                </div>
-              </article>
-
-              <!-- Article 5 — Coming Soon -->
-              <article class="article-card" data-category="patent" data-aos="fade-up" data-aos-delay="240" style="opacity:0.7; pointer-events:none;">
-                <div class="article-card__img" style="background: var(--color-bg-cream); display:flex; align-items:center; justify-content:center; min-height:160px;">
-                  <span style="font-size:var(--text-sm);color:var(--color-text-muted);font-weight:var(--fw-semibold);letter-spacing:0.1em;">Coming Soon</span>
-                </div>
-                <div class="article-card__body">
-                  <span class="article-tag">Patent</span>
-                  <h2 style="font-size: var(--text-lg); color: var(--color-text-muted);">
-                    Design-Around in Practice: Navigating Competitor Patent Barriers
-                  </h2>
-                  <p style="font-size: var(--text-sm); color: var(--color-text-muted);">When product development hits a competitor's patent wall, design-around is the go-to strategy. This article introduces how to analyze a competitor's patent scope — from claim interpretation to product modification — with a complete methodology.</p>
-                  <div class="article-meta">
-                    <span style="color:var(--color-text-muted);">Coming Soon</span>
-                    <span>~9 min read</span>
-                  </div>
-                </div>
-              </article>
-
-              <!-- Article 6 — Coming Soon -->
-              <article class="article-card" data-category="copyright" data-aos="fade-up" data-aos-delay="300" style="opacity:0.7; pointer-events:none;">
-                <div class="article-card__img" style="background: var(--color-bg-cream); display:flex; align-items:center; justify-content:center; min-height:160px;">
-                  <span style="font-size:var(--text-sm);color:var(--color-text-muted);font-weight:var(--fw-semibold);letter-spacing:0.1em;">Coming Soon</span>
-                </div>
-                <div class="article-card__body">
-                  <span class="article-tag">Copyright</span>
-                  <h2 style="font-size: var(--text-lg); color: var(--color-text-muted);">
-                    Code, Designs, Marketing Assets — A Complete Digital Copyright Guide
-                  </h2>
-                  <p style="font-size: var(--text-sm); color: var(--color-text-muted);">In the digital age, copyright infringement is easier than ever. This article explains the scope of protection for various types of digital works, infringement standards, and how businesses can build a copyright management framework — from registration to contracts.</p>
-                  <div class="article-meta">
-                    <span style="color:var(--color-text-muted);">Coming Soon</span>
-                    <span>~6 min read</span>
-                  </div>
-                </div>
-              </article>
-
             </div><!-- /#articles-grid -->
 
-            <!-- Load More (placeholder) -->
-            <div style="text-align: center; margin-top: var(--space-8);">
-              <button class="btn btn--outline-dark">Load More Articles</button>
+            <!-- 動態載入狀態 -->
+            <div id="auto-articles-status" style="text-align:center;margin-top:var(--space-4);display:none;">
+              <span style="font-size:var(--text-sm);color:var(--color-text-muted);">Loading more articles...</span>
             </div>
 
           </div><!-- /main article list -->
@@ -335,7 +281,7 @@
 
   <div id="site-footer-placeholder"></div>
 
-  <!-- Category Filter Script -->
+  <!-- Category Filter + Search -->
   <script>
     document.querySelectorAll('.category-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -347,6 +293,107 @@
         });
       });
     });
+
+    const searchInput = document.getElementById('article-search');
+    if (searchInput) {
+      searchInput.addEventListener('input', function () {
+        const query = this.value.trim().toLowerCase();
+        document.querySelectorAll('#articles-grid .article-card').forEach(card => {
+          const text = card.textContent.toLowerCase();
+          card.style.display = (!query || text.includes(query)) ? '' : 'none';
+        });
+      });
+    }
+  </script>
+
+  <!-- 動態載入 articles.json 自動產生文章（英文版）-->
+  <script>
+    (function () {
+      var CATEGORY_EN = {
+        '商標知識': 'Trademark',
+        '專利知識': 'Patent',
+        '著作權知識': 'Copyright',
+        '國際智財': 'International IP',
+        '智財知識': 'IP Knowledge'
+      };
+      var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+      var grid = document.getElementById('articles-grid');
+      var status = document.getElementById('auto-articles-status');
+
+      function getExistingTitles() {
+        var titles = new Set();
+        grid.querySelectorAll('h2 a').forEach(function (a) { titles.add(a.textContent.trim()); });
+        return titles;
+      }
+
+      function formatDate(dateStr) {
+        var p = dateStr.split('-');
+        return MONTHS[parseInt(p[1]) - 1] + ' ' + parseInt(p[2]) + ', ' + p[0];
+      }
+
+      function renderCard(article, delay) {
+        var catEn = CATEGORY_EN[article.category] || 'IP Knowledge';
+        var imgSrc = '../' + article.image;
+        var card = document.createElement('article');
+        card.className = 'article-card';
+        card.dataset.category = article.categorySlug || 'trademark';
+        card.setAttribute('data-aos', 'fade-up');
+        card.setAttribute('data-aos-delay', String(delay));
+        card.innerHTML =
+          '<div class="article-card__img">' +
+            '<img src="' + imgSrc + '" alt="' + article.title + '" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy">' +
+          '</div>' +
+          '<div class="article-card__body">' +
+            '<span class="article-tag">' + catEn + '</span>' +
+            '<h2 style="font-size:var(--text-lg);">' +
+              '<a href="../insights/' + article.filename + '" style="color:inherit;">' + article.title + '</a>' +
+            '</h2>' +
+            '<p style="font-size:var(--text-sm);color:var(--color-text-secondary);line-height:var(--lh-relaxed);">' + (article.summary || '') + '</p>' +
+            '<div class="article-meta">' +
+              '<time datetime="' + article.date + '">' + formatDate(article.date) + '</time>' +
+              '<span>~' + (article.readTime || '5') + ' min read</span>' +
+            '</div>' +
+          '</div>';
+        return card;
+      }
+
+      function updateCategoryCounts() {
+        var counts = {};
+        grid.querySelectorAll('.article-card').forEach(function (card) {
+          var cat = card.dataset.category;
+          counts[cat] = (counts[cat] || 0) + 1;
+        });
+        document.querySelectorAll('.sidebar-widget .category-btn[data-category]').forEach(function (btn) {
+          var cat = btn.dataset.category;
+          var span = btn.querySelector('span:last-child');
+          if (span && counts[cat] !== undefined) {
+            span.textContent = counts[cat] + (counts[cat] === 1 ? ' article' : ' articles');
+          }
+        });
+      }
+
+      fetch('../insights/articles.json')
+        .then(function (r) { return r.json(); })
+        .then(function (articles) {
+          var existing = getExistingTitles();
+          var added = 0;
+          articles.forEach(function (article) {
+            if (existing.has(article.title)) return;
+            grid.appendChild(renderCard(article, added * 60));
+            added++;
+          });
+          if (added > 0) {
+            updateCategoryCounts();
+            var activeBtn = document.querySelector('.category-btn.active');
+            if (activeBtn) activeBtn.click();
+          }
+        })
+        .catch(function () {})
+        .finally(function () {
+          if (status) status.style.display = 'none';
+        });
+    })();
   </script>
 
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
