@@ -1,0 +1,32 @@
+﻿[
+    {
+        "FullName":  "C:\\Users\\Johnny\\Desktop\\Agent\\永旭網站\\圖片\\logo.jpg"
+    },
+    {
+        "FullName":  "C:\\Users\\Johnny\\Desktop\\Agent\\永旭網站\\圖片\\logo.png"
+    },
+    {
+        "FullName":  "C:\\Users\\Johnny\\Desktop\\Agent\\永旭網站\\圖片\\logo2.png"
+    },
+    {
+        "FullName":  "C:\\Users\\Johnny\\Desktop\\Agent\\永旭網站\\圖片\\sshot-1.jpg"
+    },
+    {
+        "FullName":  "C:\\Users\\Johnny\\Desktop\\Agent\\永旭網站\\圖片\\sshot-3.jpg"
+    },
+    {
+        "FullName":  "C:\\Users\\Johnny\\Desktop\\Agent\\永旭網站\\圖片\\_list.txt"
+    },
+    {
+        "FullName":  "C:\\Users\\Johnny\\Desktop\\Agent\\永旭網站\\圖片\\_paths.txt"
+    },
+    {
+        "FullName":  "C:\\Users\\Johnny\\Desktop\\Agent\\永旭網站\\圖片\\李宗穎.jpg"
+    },
+    {
+        "FullName":  "C:\\Users\\Johnny\\Desktop\\Agent\\永旭網站\\圖片\\李宗穎名片.jpg"
+    },
+    {
+        "FullName":  "C:\\Users\\Johnny\\Desktop\\Agent\\永旭網站\\圖片\\林家均.jpg"
+    }
+]
