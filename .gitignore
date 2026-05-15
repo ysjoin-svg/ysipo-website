@@ -1,0 +1,8 @@
+# 本地密鑰設定（不上傳 GitHub）
+scripts/config.js
+
+# 執行紀錄
+scripts/generate-article.log
+
+# Node
+node_modules/

@@ -379,8 +379,17 @@
           var existing = getExistingTitles();
           var added = 0;
           articles.forEach(function (article) {
-            if (existing.has(article.title)) return;
-            grid.appendChild(renderCard(article, added * 60));
+            // 英文版優先用英文標題和英文檔名
+            var displayTitle = article.titleEn || article.title;
+            var displaySummary = article.summaryEn || article.summary || '';
+            var linkFile = article.filenameEn || article.filename;
+            if (existing.has(displayTitle)) return;
+            var cardArticle = Object.assign({}, article, {
+              title: displayTitle,
+              summary: displaySummary,
+              filename: linkFile
+            });
+            grid.appendChild(renderCard(cardArticle, added * 60));
             added++;
           });
           if (added > 0) {
