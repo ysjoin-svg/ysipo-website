@@ -312,7 +312,7 @@
             </div>
 
             <!-- Contact Form -->
-            <form class="contact-form" novalidate aria-label="線上諮詢表單">
+            <form id="contact-form" class="contact-form" novalidate aria-label="線上諮詢表單">
 
               <!-- Name + Company -->
               <div class="form-row">
@@ -384,6 +384,7 @@
                     <input type="checkbox" name="service" value="other"> 其他（請於諮詢內容說明）
                   </label>
                 </div>
+                <input type="hidden" name="service_interest" id="service_interest_hidden">
               </div>
 
               <!-- Message -->
@@ -400,15 +401,15 @@
                 <p class="form-label" style="margin-bottom: var(--space-2);">偏好洽詢據點</p>
                 <div role="radiogroup" aria-label="偏好洽詢據點" style="display: flex; flex-wrap: wrap; gap: var(--space-3);">
                   <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: var(--text-sm); color: var(--color-text-secondary);">
-                    <input type="radio" name="office" value="" checked style="accent-color: var(--color-primary);">
+                    <input type="radio" name="preferred_office" value="" checked style="accent-color: var(--color-primary);">
                     不指定，由事務所安排
                   </label>
                   <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: var(--text-sm); color: var(--color-text-secondary);">
-                    <input type="radio" name="office" value="kaohsiung" style="accent-color: var(--color-primary);">
+                    <input type="radio" name="preferred_office" value="kaohsiung" style="accent-color: var(--color-primary);">
                     高雄總部（李所長）
                   </label>
                   <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: var(--text-sm); color: var(--color-text-secondary);">
-                    <input type="radio" name="office" value="taipei" style="accent-color: var(--color-primary);">
+                    <input type="radio" name="preferred_office" value="taipei" style="accent-color: var(--color-primary);">
                     台北分所（林負責人）
                   </label>
                 </div>
@@ -419,7 +420,7 @@
                 您的個人資料將依個人資料保護法規定妥善保存，僅用於本次諮詢服務使用。
               </p>
 
-              <button type="submit" class="btn btn--primary btn--lg" style="width: 100%;">
+              <button type="submit" id="submit-btn" class="btn btn--primary btn--lg" style="width: 100%;">
                 送出諮詢
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                   <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -490,6 +491,46 @@
 
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
   <script src="assets/js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    emailjs.init({ publicKey: "a5x52UregaIksKaKC" });
+
+    document.getElementById('contact-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+
+      const checkboxes = document.querySelectorAll('#contact-form input[type="checkbox"]:checked');
+      const services = Array.from(checkboxes).map(cb => cb.value).join('、');
+      document.getElementById('service_interest_hidden').value = services || '(未勾選)';
+
+      const officeRadio = document.querySelector('#contact-form input[name="preferred_office"]:checked');
+      const office = officeRadio ? (officeRadio.value || '不指定') : '不指定';
+
+      const templateParams = {
+        name:             document.querySelector('#contact-form [name="name"]').value,
+        company:          document.querySelector('#contact-form [name="company"]').value || '(未填)',
+        email:            document.querySelector('#contact-form [name="email"]').value,
+        phone:            document.querySelector('#contact-form [name="phone"]').value || '(未填)',
+        service_interest: services || '(未勾選)',
+        preferred_office: office,
+        message:          document.querySelector('#contact-form [name="message"]').value,
+        to_email:         'contact@ysipo.com.tw'
+      };
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.textContent = '傳送中...';
+
+      emailjs.send('service_kdq5gzi', 'template_an28ahv', templateParams)
+        .then(function() {
+          window.location.href = '/thank-you.html';
+        }, function(error) {
+          btn.disabled = false;
+          btn.textContent = '送出諮詢';
+          alert('很抱歉，送出失敗，請直接來電或寄 Email 聯絡我們。\n錯誤：' + JSON.stringify(error));
+        });
+    });
+  </script>
 
 </body>
 </html>

@@ -255,7 +255,7 @@
             </div>
 
             <!-- Form -->
-            <form class="contact-form" novalidate aria-label="Contact inquiry form">
+            <form id="contact-form-en" class="contact-form" novalidate aria-label="Contact inquiry form">
 
               <div class="form-row">
                 <div class="form-group">
@@ -294,6 +294,7 @@
                   <label class="checkbox-item"><input type="checkbox" name="service" value="strategy"> IP Strategy Consulting</label>
                   <label class="checkbox-item" style="grid-column: 1 / -1;"><input type="checkbox" name="service" value="other"> Other (please describe in message)</label>
                 </div>
+                <input type="hidden" name="service_interest" id="service_interest_hidden_en">
               </div>
 
               <div class="form-group">
@@ -305,15 +306,15 @@
                 <p class="form-label" style="margin-bottom: var(--space-2);">Preferred Office</p>
                 <div role="radiogroup" aria-label="Preferred Office" style="display: flex; flex-wrap: wrap; gap: var(--space-3);">
                   <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: var(--text-sm); color: var(--color-text-secondary);">
-                    <input type="radio" name="office" value="" checked style="accent-color: var(--color-primary);">
+                    <input type="radio" name="preferred_office" value="" checked style="accent-color: var(--color-primary);">
                     No preference — YSIPO will assign
                   </label>
                   <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: var(--text-sm); color: var(--color-text-secondary);">
-                    <input type="radio" name="office" value="kaohsiung" style="accent-color: var(--color-primary);">
+                    <input type="radio" name="preferred_office" value="kaohsiung" style="accent-color: var(--color-primary);">
                     Kaohsiung HQ (Principal Li)
                   </label>
                   <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: var(--text-sm); color: var(--color-text-secondary);">
-                    <input type="radio" name="office" value="taipei" style="accent-color: var(--color-primary);">
+                    <input type="radio" name="preferred_office" value="taipei" style="accent-color: var(--color-primary);">
                     Taipei Branch (Principal Lin)
                   </label>
                 </div>
@@ -323,7 +324,7 @@
                 Your personal data will be handled in accordance with applicable privacy laws and used solely for this consultation.
               </p>
 
-              <button type="submit" class="btn btn--primary btn--lg" style="width: 100%;">
+              <button type="submit" id="submit-btn" class="btn btn--primary btn--lg" style="width: 100%;">
                 Send Inquiry
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </button>
@@ -378,6 +379,46 @@
 
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
   <script src="../assets/js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    emailjs.init({ publicKey: "a5x52UregaIksKaKC" });
+
+    document.getElementById('contact-form-en').addEventListener('submit', function(e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+
+      const checkboxes = document.querySelectorAll('#contact-form-en input[type="checkbox"]:checked');
+      const services = Array.from(checkboxes).map(cb => cb.value).join(', ');
+      document.getElementById('service_interest_hidden_en').value = services || '(none selected)';
+
+      const officeRadio = document.querySelector('#contact-form-en input[name="preferred_office"]:checked');
+      const office = officeRadio ? (officeRadio.value || 'No preference') : 'No preference';
+
+      const templateParams = {
+        name:             document.querySelector('#contact-form-en [name="name"]').value,
+        company:          document.querySelector('#contact-form-en [name="company"]').value || '(not provided)',
+        email:            document.querySelector('#contact-form-en [name="email"]').value,
+        phone:            document.querySelector('#contact-form-en [name="phone"]').value || '(not provided)',
+        service_interest: services || '(none selected)',
+        preferred_office: office,
+        message:          document.querySelector('#contact-form-en [name="message"]').value,
+        to_email:         'contact@ysipo.com.tw'
+      };
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+
+      emailjs.send('service_kdq5gzi', 'template_an28ahv', templateParams)
+        .then(function() {
+          window.location.href = '/en/thank-you.html';
+        }, function(error) {
+          btn.disabled = false;
+          btn.textContent = 'Send Inquiry';
+          alert('Sorry, submission failed. Please contact us directly by phone or email.\nError: ' + JSON.stringify(error));
+        });
+    });
+  </script>
 
 </body>
 </html>
