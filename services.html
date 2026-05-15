@@ -1,392 +1,543 @@
 <!DOCTYPE html>
-<html lang="zh-Hant-TW">
+<html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="google-site-verification" content="ziaWW5Zx50E7nMq86mzQlp2Lpfpa19Lv5H4dSrR8pkw" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="永旭智慧財產事務所服務項目 — 國內外專利申請維護、商標申請維護評定、著作權登記侵權鑑定，全方位智財服務。">
-  <title>服務項目 — 永旭智慧財產事務所</title>
-  <link rel="stylesheet" href="assets/css/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+
+  <title>服務項目 ｜ 專利・商標・著作權・智財策略顧問 — 永旭智慧財產事務所</title>
+  <meta name="description" content="永旭智慧財產事務所提供專利撰稿佈局、商標申請與爭議救援、著作權代理（著代字第100-3010號）、智財策略顧問。電子博士主持，多次榮獲台灣前20大商標申請量事務所。">
+  <meta name="keywords" content="專利申請,專利撰稿,PCT國際專利,商標申請,商標爭議,著作權代理,智財策略顧問,永旭智慧財產事務所">
+  <link rel="canonical" href="https://ysipo.com.tw/services.html">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "永旭智慧財產事務所服務項目",
+    "url": "https://ysipo.com.tw/services.html",
+    "itemListElement": [
+      {"@type": "ListItem","position": 1,"name": "專利服務","url": "https://ysipo.com.tw/services.html#patent"},
+      {"@type": "ListItem","position": 2,"name": "商標服務","url": "https://ysipo.com.tw/services.html#trademark"},
+      {"@type": "ListItem","position": 3,"name": "著作權服務","url": "https://ysipo.com.tw/services.html#copyright"},
+      {"@type": "ListItem","position": 4,"name": "智財策略顧問","url": "https://ysipo.com.tw/services.html#strategy"}
+    ]
+  }
+  </script>
+
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="https://ysipo.com.tw/services.html">
+  <meta property="og:title"       content="服務項目 | 永旭智慧財產事務所">
+  <meta property="og:description" content="專利、商標、著作權完整智財服務。電子博士主持，前20大商標申請量事務所。">
+  <meta property="og:image"       content="https://ysipo.com.tw/assets/img/og-image.jpg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;600;700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+  <link rel="stylesheet" href="assets/css/main.css">
+
+  <style>
+    /* 商標爭議強調框 */
+    .trademark-disputes-highlight {
+      background: linear-gradient(135deg, #1a2845 0%, #243456 100%);
+      color: #ffffff;
+      border: 2px solid #c8a96b;
+      border-radius: 12px;
+      padding: 32px;
+      margin: 24px 0;
+      position: relative;
+      box-shadow: 0 8px 24px rgba(26, 40, 69, 0.15);
+    }
+    .trademark-disputes-highlight::before {
+      content: "重點服務";
+      position: absolute;
+      top: -12px;
+      left: 24px;
+      background: #c8a96b;
+      color: #1a2845;
+      padding: 4px 16px;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    .trademark-disputes-highlight h3 {
+      color: #c8a96b;
+      font-size: 1.25rem;
+      margin-bottom: 16px;
+      font-family: 'Noto Serif TC', serif;
+    }
+    .trademark-disputes-highlight ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 16px 0;
+    }
+    .trademark-disputes-highlight ul li {
+      color: rgba(255,255,255,0.85);
+      font-size: 0.9rem;
+      padding: 0.35rem 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .trademark-disputes-highlight ul li::before {
+      content: "›";
+      color: #c8a96b;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .highlight-note {
+      font-size: 0.875rem;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.6;
+      margin: 0;
+      border-top: 1px solid rgba(200,169,107,0.3);
+      padding-top: 14px;
+    }
+    /* 服務頁專屬樣式 */
+    .service-section {
+      padding: var(--space-12) 0;
+      scroll-margin-top: calc(var(--nav-height-desktop) + var(--space-4));
+    }
+    .service-section:nth-child(even) {
+      background: var(--color-bg-cream);
+    }
+    .service-detail-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+      align-items: start;
+    }
+    .service-tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin: var(--space-4) 0;
+    }
+    @media (min-width: 1024px) {
+      .service-detail-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- ══════════ NAVBAR ══════════ -->
-<nav class="navbar">
-  <div class="container">
-    <a href="index.html" class="navbar-logo">
-      <img src="assets/img/logo.png" alt="永旭" style="height:40px;" onerror="this.style.display='none'">
-      <div class="logo-wordmark">
-        <div class="name">永旭智慧財產事務所</div>
-        <div class="name-en">Yong Syu Intellectual Property Office</div>
-      </div>
-    </a>
-    <button class="navbar-toggle" aria-label="選單" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
-    <ul class="navbar-nav">
-      <li><a href="index.html">首頁</a></li>
-      <li><a href="about.html">關於我們</a></li>
-      <li><a href="services.html" class="active">服務項目</a></li>
-      <li><a href="contact.html" class="nav-cta">聯絡我們</a></li>
-    </ul>
-    <div class="lang-switch">
-      <span class="lang-btn active">繁中</span>
-      <a href="en/services.html" class="lang-btn">EN</a>
-    </div>
-  </div>
-</nav>
+  <div id="site-header-placeholder"></div>
 
-<!-- ══════════ PAGE HERO ══════════ -->
-<div class="page-hero">
-  <div class="page-hero-bg" style="background-image:url('assets/img/legal-docs.jpg')"></div>
-  <div class="container">
-    <div class="breadcrumb">
-      <a href="index.html">首頁</a>
-      <i class="fa-solid fa-chevron-right"></i>
-      <span>服務項目</span>
-    </div>
-    <div class="ph-badge"><i class="fa-solid fa-layer-group"></i> Our Services</div>
-    <h1>服務項目</h1>
-    <p class="ph-sub">國內外專利 · 商標 · 著作權 — 全球 50+ 國一站式智財服務</p>
-  </div>
-</div>
+  <main id="main-content">
 
-<!-- ══════════ SERVICE OVERVIEW CARDS ══════════ -->
-<section class="section section-soft">
-  <div class="container">
-    <div class="section-header">
-      <div class="section-label">Services at a Glance</div>
-      <h2 class="section-title">三大核心服務領域</h2>
-      <div class="divider"></div>
-      <p class="section-desc">從申請、維護到侵權取締，提供橫跨全球 50+ 國的完整智財保護，是企業與個人最值得信賴的選擇。</p>
-    </div>
-    <div class="svc-overview-grid">
-      <div class="svc-ov-card fade-up">
-        <div class="sov-icon pat"><i class="fa-solid fa-gears"></i></div>
-        <h3>專利服務</h3>
-        <p>技術創新保護專家，涵蓋發明、新型、設計專利及 PCT 國際申請</p>
-        <a href="#patent" class="sov-link">查看詳情 <i class="fa-solid fa-arrow-down"></i></a>
+    <!-- PAGE HERO -->
+    <section class="page-hero" aria-labelledby="page-title">
+      <div class="container">
+        <nav class="breadcrumb" aria-label="麵包屑導覽">
+          <a href="index.html">首頁</a>
+          <span class="breadcrumb-sep" aria-hidden="true">›</span>
+          <span class="breadcrumb-current" aria-current="page">服務項目</span>
+        </nav>
+        <span class="section-label" style="position: relative; z-index: 1;">Our Services</span>
+        <h1 id="page-title">服務項目</h1>
+        <p>
+          從技術解析到全球布局，提供智慧財產全生命週期的精品服務
+        </p>
       </div>
-      <div class="svc-ov-card fade-up" style="transition-delay:.1s">
-        <div class="sov-icon tm"><i class="fa-solid fa-trademark"></i></div>
-        <h3>商標服務</h3>
-        <p>品牌資產守護者，提供全球商標申請、維護與仿冒取締</p>
-        <a href="#trademark" class="sov-link">查看詳情 <i class="fa-solid fa-arrow-down"></i></a>
-      </div>
-      <div class="svc-ov-card fade-up" style="transition-delay:.2s">
-        <div class="sov-icon cp"><i class="fa-solid fa-copyright"></i></div>
-        <h3>著作權服務</h3>
-        <p>創意作品法律保障，辦理登記、侵權鑑定及授權合約</p>
-        <a href="#copyright" class="sov-link">查看詳情 <i class="fa-solid fa-arrow-down"></i></a>
-      </div>
-    </div>
-  </div>
-</section>
+    </section>
 
-<!-- ══════════ SERVICE DETAILS ══════════ -->
-<section class="section">
-  <div class="container">
+    <!-- Services Quick Nav -->
+    <nav style="background: var(--color-primary-dark); padding: var(--space-3) 0; overflow-x: auto; white-space: nowrap;" aria-label="服務項目快速導覽">
+      <div class="container" style="display: flex; gap: var(--space-2);">
+        <a href="#patent"    style="color: rgba(255,255,255,0.75); font-size: var(--text-sm); padding: 0.4rem var(--space-3); border-radius: var(--radius-full); transition: all 0.2s; flex-shrink:0;" onmouseover="this.style.color='#c8a96b'" onmouseout="this.style.color='rgba(255,255,255,0.75)'">專利服務</a>
+        <a href="#trademark" style="color: rgba(255,255,255,0.75); font-size: var(--text-sm); padding: 0.4rem var(--space-3); border-radius: var(--radius-full); transition: all 0.2s; flex-shrink:0;" onmouseover="this.style.color='#c8a96b'" onmouseout="this.style.color='rgba(255,255,255,0.75)'">商標服務</a>
+        <a href="#copyright" style="color: rgba(255,255,255,0.75); font-size: var(--text-sm); padding: 0.4rem var(--space-3); border-radius: var(--radius-full); transition: all 0.2s; flex-shrink:0;" onmouseover="this.style.color='#c8a96b'" onmouseout="this.style.color='rgba(255,255,255,0.75)'">著作權服務</a>
+        <a href="#strategy"  style="color: rgba(255,255,255,0.75); font-size: var(--text-sm); padding: 0.4rem var(--space-3); border-radius: var(--radius-full); transition: all 0.2s; flex-shrink:0;" onmouseover="this.style.color='#c8a96b'" onmouseout="this.style.color='rgba(255,255,255,0.75)'">智財策略顧問</a>
+      </div>
+    </nav>
 
-    <!-- 專利 -->
-    <div class="service-block" id="patent">
-      <div class="sb-sidebar patent-bg">
-        <div class="sb-icon"><i class="fa-solid fa-gears"></i></div>
-        <div>
-          <div class="sb-title">專利服務</div>
-          <div class="sb-en">Patent Services</div>
+
+    <!-- ═══════════════════════════════════════
+         SERVICE 1 — PATENT (主推)
+         ═══════════════════════════════════════ -->
+    <section class="service-section" id="patent" aria-labelledby="patent-heading">
+      <div class="container">
+
+        <div class="service-detail-grid">
+
+          <!-- Left: Description -->
+          <div data-aos="fade-right">
+            <span class="section-label">Patent Services</span>
+            <h2 class="section-title" id="patent-heading">專利服務</h2>
+            <div class="divider"></div>
+
+            <p style="font-size: var(--text-md); color: var(--color-text-secondary); line-height: var(--lh-relaxed); margin-bottom: var(--space-4);">
+              永旭以電子工程博士的技術深度為核心，提供跨越半導體、通訊、機械、生醫等多元技術領域的精品專利服務。負責人李宗穎所長曾受工業技術研究院（工研院）邀請擔任專利撰稿訓練師，具備精準解析發明核心、將技術優勢轉化為有力 Claim 的專業能力。
+            </p>
+            <p style="font-size: var(--text-md); color: var(--color-text-secondary); line-height: var(--lh-relaxed); margin-bottom: var(--space-5);">
+              從前案檢索、可專利性評估、申請文件撰稿，到核駁答辯、舉發應對與年費管理，永旭提供完整的專利生命週期服務。並透過與全球各國代理人的合作網絡，協助客戶在美國、日本、中國、歐洲及東南亞完成國際佈局。
+            </p>
+
+            <div class="service-tag-list">
+              <span class="tag tag--primary">發明專利</span>
+              <span class="tag tag--primary">新型專利</span>
+              <span class="tag tag--primary">設計專利</span>
+              <span class="tag tag--primary">PCT 國際專利</span>
+              <span class="tag tag--primary">美國専利</span>
+              <span class="tag tag--primary">日本専利</span>
+              <span class="tag tag--primary">中國専利</span>
+              <span class="tag tag--primary">歐洲専利</span>
+              <span class="tag tag--outline">東南亞各國</span>
+            </div>
+
+            <a href="contact.html" class="btn btn--primary">諮詢專利服務</a>
+          </div>
+
+          <!-- Right: Service List -->
+          <div data-aos="fade-left" data-aos-delay="100">
+            <div style="background: var(--color-primary); border-radius: var(--radius-xl); padding: var(--space-6); color: white;">
+
+              <h3 style="color: var(--color-accent); font-size: var(--text-xl); margin-bottom: var(--space-4);">服務項目清單</h3>
+
+              <div style="margin-bottom: var(--space-5);">
+                <p style="font-size: var(--text-xs); color: var(--color-accent); font-weight: var(--fw-semibold); letter-spacing: 0.1em; margin-bottom: var(--space-2);">申請與撰稿</p>
+                <ul class="service-list" style="--service-list-color: rgba(255,255,255,0.8);">
+                  <li style="color: rgba(255,255,255,0.80);">專利前案檢索與可專利性評估</li>
+                  <li style="color: rgba(255,255,255,0.80);">發明、新型、設計專利說明書撰寫</li>
+                  <li style="color: rgba(255,255,255,0.80);">技術解析與 Claim 佈局策略</li>
+                  <li style="color: rgba(255,255,255,0.80);">國內外專利申請程序協助</li>
+                </ul>
+              </div>
+
+              <div style="margin-bottom: var(--space-5);">
+                <p style="font-size: var(--text-xs); color: var(--color-accent); font-weight: var(--fw-semibold); letter-spacing: 0.1em; margin-bottom: var(--space-2);">國際申請</p>
+                <ul class="service-list">
+                  <li style="color: rgba(255,255,255,0.80);">PCT 國際專利申請（156 國）</li>
+                  <li style="color: rgba(255,255,255,0.80);">EPC 歐洲專利申請（38 個成員國，含歐盟與非歐盟國家）</li>
+                  <li style="color: rgba(255,255,255,0.80);">各國個別專利申請（美、日、中、韓、東南亞等）</li>
+                  <li style="color: rgba(255,255,255,0.80);">海外合作網絡協調</li>
+                </ul>
+              </div>
+
+              <div style="margin-bottom: var(--space-5);">
+                <p style="font-size: var(--text-xs); color: var(--color-accent); font-weight: var(--fw-semibold); letter-spacing: 0.1em; margin-bottom: var(--space-2);">爭議與維護</p>
+                <ul class="service-list">
+                  <li style="color: rgba(255,255,255,0.80);">專利舉發、答辯協助</li>
+                  <li style="color: rgba(255,255,255,0.80);">專利侵權告訴處理</li>
+                  <li style="color: rgba(255,255,255,0.80);">專利侵權警告函協商</li>
+                  <li style="color: rgba(255,255,255,0.80);">專利和解協商代理</li>
+                  <li style="color: rgba(255,255,255,0.80);">專利授權合約撰寫</li>
+                  <li style="color: rgba(255,255,255,0.80);">專利移轉策略諮詢</li>
+                  <li style="color: rgba(255,255,255,0.80);">侵權分析與迴避設計建議</li>
+                  <li style="color: rgba(255,255,255,0.80);">專利年費維護管理</li>
+                </ul>
+              </div>
+
+              <div>
+                <p style="font-size: var(--text-xs); color: var(--color-accent); font-weight: var(--fw-semibold); letter-spacing: 0.1em; margin-bottom: var(--space-2);">技術專長領域</p>
+                <p style="font-size: var(--text-sm); color: rgba(255,255,255,0.70); line-height: 1.8;">
+                  電子電機 ｜ 機械工程 ｜ 通訊工程<br>
+                  電腦軟硬體 ｜ 資訊科技 ｜ 半導體製程<br>
+                  光電工程 ｜ 生醫電子 ｜ 綠能科技 ｜ 其他技術領域
+                </p>
+              </div>
+
+            </div>
+          </div>
+
         </div>
-        <div style="width:100%;border-top:1px solid rgba(255,255,255,.14);padding-top:1.1rem">
-          <p style="font-size:.78rem;color:rgba(255,255,255,.58);text-align:center;line-height:1.72">
-            保護您的技術創新<br>建立全球專利佈局
-          </p>
-        </div>
-        <a href="contact.html" class="btn sb-cta">
-          <i class="fa-regular fa-calendar-check"></i> 立即諮詢
-        </a>
-      </div>
-      <div class="sb-body">
-        <h3><i class="fa-solid fa-file-lines"></i> 國內外專利申請</h3>
-        <ul>
-          <li>發明專利、新型專利、設計專利之申請代理</li>
-          <li>PCT 國際專利申請及各國國家階段進入</li>
-          <li>美國（USPTO）、歐洲（EPO）、中國、日本、韓國等主要市場</li>
-          <li>專利說明書撰寫、修正及補正，確保最大保護範圍</li>
-        </ul>
-        <h3><i class="fa-solid fa-shield-halved"></i> 專利維護與年費管理</h3>
-        <ul>
-          <li>專利年費繳納與到期提醒管理</li>
-          <li>多國專利組合的統一維護與管理</li>
-          <li>專利存續期限評估及放棄決策建議</li>
-        </ul>
-        <h3><i class="fa-solid fa-gavel"></i> 舉發、撤銷與答辯</h3>
-        <ul>
-          <li>針對他人專利提出舉發或撤銷申請</li>
-          <li>面對他人舉發進行專業答辯與申復</li>
-          <li>異議申請及行政救濟程序</li>
-          <li>智慧財產法院訴訟協助</li>
-        </ul>
-        <h3><i class="fa-solid fa-magnifying-glass"></i> 專利檢索與分析</h3>
-        <ul>
-          <li>新穎性、進步性前案檢索</li>
-          <li>自由實施（FTO）評估分析</li>
-          <li>競爭對手專利佈局分析與策略建議</li>
-        </ul>
-        <h3><i class="fa-solid fa-handshake"></i> 專利授權與移轉</h3>
-        <ul>
-          <li>專利授權合約之協商、草擬與審閱</li>
-          <li>技術移轉與專利買賣協助</li>
-          <li>侵權仿冒取締及民刑事訴訟配合</li>
-        </ul>
-      </div>
-    </div>
 
-    <!-- 商標 -->
-    <div class="service-block" id="trademark">
-      <div class="sb-sidebar trademark-bg">
-        <div class="sb-icon"><i class="fa-solid fa-trademark"></i></div>
-        <div>
-          <div class="sb-title">商標服務</div>
-          <div class="sb-en">Trademark Services</div>
-        </div>
-        <div style="width:100%;border-top:1px solid rgba(255,255,255,.14);padding-top:1.1rem">
-          <p style="font-size:.78rem;color:rgba(255,255,255,.58);text-align:center;line-height:1.72">
-            保護您的品牌資產<br>在全球市場建立形象
-          </p>
-        </div>
-        <a href="contact.html" class="btn sb-cta">
-          <i class="fa-regular fa-calendar-check"></i> 立即諮詢
-        </a>
       </div>
-      <div class="sb-body">
-        <h3><i class="fa-solid fa-magnifying-glass"></i> 商標查名與可行性評估</h3>
-        <ul>
-          <li>申請前商標查名檢索，評估核准可能性</li>
-          <li>近似商標、著名商標衝突分析</li>
-          <li>商標識別性評估與設計建議</li>
-        </ul>
-        <h3><i class="fa-solid fa-file-signature"></i> 國內外商標申請與註冊</h3>
-        <ul>
-          <li>台灣智慧財產局商標申請代理</li>
-          <li>馬德里協定/議定書國際商標申請（100+ 締約國）</li>
-          <li>美國、歐盟（EUIPO）、中國、日本、東南亞等個別國家申請</li>
-        </ul>
-        <h3><i class="fa-solid fa-rotate"></i> 商標維護與管理</h3>
-        <ul>
-          <li>商標使用聲明申報（第一次使用/持續使用）</li>
-          <li>商標續展申請，確保權利不中斷</li>
-          <li>商標移轉登記與授權備案</li>
-          <li>多國商標組合統一管理</li>
-        </ul>
-        <h3><i class="fa-solid fa-gavel"></i> 商標異議、評定與答辯</h3>
-        <ul>
-          <li>針對他人商標提出異議申請</li>
-          <li>商標評定申請及答辯</li>
-          <li>撤銷申請及行政救濟程序</li>
-        </ul>
-        <h3><i class="fa-solid fa-shield-halved"></i> 商標維權與仿冒取締</h3>
-        <ul>
-          <li>仿冒品查緝及侵權商品下架</li>
-          <li>海關備查申請，防止仿冒品進出口</li>
-          <li>侵權警告函寄發及談判協商</li>
-        </ul>
-      </div>
-    </div>
+    </section>
 
-    <!-- 著作權 -->
-    <div class="service-block" id="copyright">
-      <div class="sb-sidebar copyright-bg">
-        <div class="sb-icon"><i class="fa-solid fa-copyright"></i></div>
-        <div>
-          <div class="sb-title">著作權服務</div>
-          <div class="sb-en">Copyright Services</div>
-        </div>
-        <div style="width:100%;border-top:1px solid rgba(255,255,255,.14);padding-top:1.1rem">
-          <p style="font-size:.78rem;color:rgba(255,255,255,.58);text-align:center;line-height:1.72">
-            保護您的創意成果<br>確保授權收益安全
-          </p>
-        </div>
-        <a href="contact.html" class="btn sb-cta">
-          <i class="fa-regular fa-calendar-check"></i> 立即諮詢
-        </a>
-      </div>
-      <div class="sb-body">
-        <h3><i class="fa-solid fa-file-certificate"></i> 著作權登記申請</h3>
-        <ul>
-          <li>著作權登記，建立創作存在時間點之法律佐證</li>
-          <li>各類著作登記：文字、音樂、美術、視聽、電腦程式著作等</li>
-          <li>著作人格權與著作財產權的保護建議</li>
-        </ul>
-        <h3><i class="fa-solid fa-microscope"></i> 侵權鑑定</h3>
-        <ul>
-          <li>著作侵權判斷分析（接觸加實質相似雙重測試）</li>
-          <li>文字、圖像、軟體程式、音樂作品侵權鑑定</li>
-          <li>網路數位內容抄襲與侵權分析</li>
-          <li>提供專業鑑定意見書，作為法律程序依據</li>
-        </ul>
-        <h3><i class="fa-solid fa-file-contract"></i> 著作授權合約</h3>
-        <ul>
-          <li>著作授權合約之撰寫、審閱與諮詢</li>
-          <li>獨家授權、非獨家授權及次授權條款規劃</li>
-          <li>數位媒體使用授權及平台合約規劃</li>
-          <li>跨境著作授權合約法律適用建議</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
 
-<!-- ══════════ FAQ ══════════ -->
-<section class="section section-soft">
-  <div class="container">
-    <div class="section-header">
-      <div class="section-label">FAQ</div>
-      <h2 class="section-title">常見問題解答</h2>
-      <div class="divider"></div>
-      <p class="section-desc">整理客戶最常詢問的智財相關問題，提供清楚的參考說明。</p>
-    </div>
-    <div class="faq-wrap">
+    <!-- ═══════════════════════════════════════
+         SERVICE 2 — TRADEMARK (主力)
+         ═══════════════════════════════════════ -->
+    <section class="service-section" id="trademark" aria-labelledby="trademark-heading">
+      <div class="container">
 
-      <div class="faq-item">
-        <div class="faq-q">
-          <span><i class="fa-solid fa-circle-question" style="color:var(--accent);margin-right:.6rem"></i>申請專利需要多長時間才能獲得核准？</span>
-          <i class="fa-solid fa-chevron-down faq-icon"></i>
+        <div class="service-detail-grid">
+
+          <!-- Left: Service List (flipped for visual variety) -->
+          <div data-aos="fade-right" style="order: 2;">
+            <div style="background: var(--color-primary); border-radius: var(--radius-xl); padding: var(--space-6);">
+
+              <h3 style="color: var(--color-accent); font-size: var(--text-xl); margin-bottom: var(--space-5);">服務項目清單</h3>
+
+              <div style="margin-bottom: var(--space-4);">
+                <p style="font-size: var(--text-xs); color: var(--color-accent); font-weight: var(--fw-semibold); letter-spacing: 0.1em; margin-bottom: var(--space-2);">商標申請與佈局</p>
+                <ul class="service-list">
+                  <li style="color: rgba(255,255,255,0.80);">國內商標申請</li>
+                  <li style="color: rgba(255,255,255,0.80);">國際商標申請（馬德里、各國個案申請）</li>
+                  <li style="color: rgba(255,255,255,0.80);">商標查名與可註冊性評估</li>
+                  <li style="color: rgba(255,255,255,0.80);">多類別佈局策略規劃</li>
+                  <li style="color: rgba(255,255,255,0.80);">商標識別性強化建議</li>
+                </ul>
+              </div>
+
+              <div style="margin-bottom: var(--space-4); border-top: 1px solid rgba(200,169,107,0.2); padding-top: var(--space-4);">
+                <div class="trademark-disputes-highlight">
+                  <h3>商標爭議與救濟</h3>
+                  <ul>
+                    <li>核駁先行通知答辯</li>
+                    <li>申復、訴願、行政訴訟</li>
+                    <li>異議、評定、廢止程序代理</li>
+                    <li>將「困難商標」成功取得核准</li>
+                    <li>識別性論述與舉證策略</li>
+                  </ul>
+                  <p class="highlight-note">
+                    李宗穎所長擅長處理「不可能核准」的困難商標，並長期擔任業界商標爭議的諮詢顧問。
+                  </p>
+                </div>
+              </div>
+
+              <div style="margin-bottom: var(--space-4);">
+                <p style="font-size: var(--text-xs); color: var(--color-accent); font-weight: var(--fw-semibold); letter-spacing: 0.1em; margin-bottom: var(--space-2);">商標權維護與運用</p>
+                <ul class="service-list">
+                  <li style="color: rgba(255,255,255,0.80);">商標延展、變更登記</li>
+                  <li style="color: rgba(255,255,255,0.80);">商標授權合約撰寫</li>
+                  <li style="color: rgba(255,255,255,0.80);">商標移轉登記</li>
+                  <li style="color: rgba(255,255,255,0.80);">商標侵權告訴處理</li>
+                  <li style="color: rgba(255,255,255,0.80);">商標侵權警告函協商</li>
+                  <li style="color: rgba(255,255,255,0.80);">商標和解協商代理</li>
+                  <li style="color: rgba(255,255,255,0.80);">仿冒取締與侵權警告</li>
+                  <li style="color: rgba(255,255,255,0.80);">商標監視服務</li>
+                </ul>
+              </div>
+
+              <div>
+                <p style="font-size: var(--text-xs); color: var(--color-accent); font-weight: var(--fw-semibold); letter-spacing: 0.1em; margin-bottom: var(--space-2);">商標訴訟與調處</p>
+                <ul class="service-list">
+                  <li style="color: rgba(255,255,255,0.80);">侵權訴訟協助</li>
+                  <li style="color: rgba(255,255,255,0.80);">智慧財產法院案件</li>
+                  <li style="color: rgba(255,255,255,0.80);">商標調處、和解協商</li>
+                </ul>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Right: Description -->
+          <div data-aos="fade-left" data-aos-delay="100" style="order: 1;">
+            <span class="section-label">Trademark Services</span>
+            <h2 class="section-title" id="trademark-heading">商標服務</h2>
+            <div class="divider"></div>
+
+            <p style="font-size: var(--text-md); color: var(--color-text-secondary); line-height: var(--lh-relaxed); margin-bottom: var(--space-4);">
+              永旭智慧財產事務所多次榮獲台灣智慧財產局統計之「商標申請量前 20 大事務所」殊榮，具備逾 25 年的商標實務積累。服務對象涵蓋本土品牌、跨國企業與新創公司，協助規劃從國內到馬德里體系的完整品牌保護佈局，迄今已在 50 多個國家和地區完成商標申請。
+            </p>
+            <p style="font-size: var(--text-md); color: var(--color-text-secondary); line-height: var(--lh-relaxed); margin-bottom: var(--space-4);">
+              商標之路並非一帆風順——永旭深知核駁通知帶給客戶的壓力。我們擅長商標爭議全程處理，從初審核駁答辯、申復、訴願，到異議與評定程序，屢屢協助客戶突破困難案件，讓原本被認為難以核准的商標成功取得保護。這正是永旭被客戶譽為「商標救援所」的核心能力。
+            </p>
+
+            <!-- 爭議救援強調框 -->
+            <div style="background: rgba(200,169,107,0.08); border: 1px solid var(--color-accent-light); border-left: 4px solid var(--color-accent); border-radius: var(--radius-md); padding: var(--space-4); margin-bottom: var(--space-5);">
+              <p style="font-size: var(--text-sm); font-weight: var(--fw-semibold); color: var(--color-accent-dark); margin-bottom: var(--space-1);">商標爭議救援</p>
+              <p style="font-size: var(--text-sm); color: var(--color-text-secondary); line-height: var(--lh-relaxed);">
+                商標遭核駁不代表放棄。永旭以豐富的爭議實務與精準的論述策略，協助客戶從核駁通知、答辯、申復、訴願，直到最終核准，全程陪伴，讓每一個有價值的品牌都能獲得應有的保護。
+              </p>
+            </div>
+
+            <div class="service-tag-list">
+              <span class="tag tag--primary">國內商標</span>
+              <span class="tag tag--primary">馬德里商標</span>
+              <span class="tag tag--primary">歐盟商標 EUTM</span>
+              <span class="tag tag--primary">美國商標 USPTO</span>
+              <span class="tag tag--primary">中國商標</span>
+              <span class="tag tag--primary">日本商標</span>
+            </div>
+
+            <a href="contact.html" class="btn btn--primary">諮詢商標服務</a>
+          </div>
+
         </div>
-        <div class="faq-a">
-          <div class="faq-a-inner">
-            台灣發明專利的審查期間一般約為 12～24 個月，實用新型（新型）約 6 個月，設計專利約 6～12 個月。美國、歐洲等主要國家的審查期間則約 2～4 年不等。申請人可申請優先審查（加速審查）以縮短等待時間，我們將根據您的業務需求評估是否適合申請。
+
+      </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════════
+         SERVICE 3 — COPYRIGHT (輔助)
+         ═══════════════════════════════════════ -->
+    <section class="service-section" id="copyright" aria-labelledby="copyright-heading">
+      <div class="container">
+
+        <div style="max-width: var(--container-lg); margin: 0 auto;">
+          <div class="section-header" data-aos="fade-up">
+            <span class="section-label">Copyright Services</span>
+            <h2 class="section-title" id="copyright-heading">著作權服務</h2>
+            <div class="divider"></div>
+          </div>
+
+          <div class="service-detail-grid">
+            <div data-aos="fade-right">
+              <p style="font-size: var(--text-md); color: var(--color-text-secondary); line-height: var(--lh-relaxed); margin-bottom: var(--space-4);">
+                永旭智慧財產事務所提供全方位的著作權服務，由負責人李宗穎親自主持。李所長持有臺灣經濟科技發展研究院登錄之著作權代理師資格（著代字第 100-3010 號），是少數同時具備著作權代理師資格與技術博士背景的專業人士。服務涵蓋著作權登記、授權合約規劃、侵權鑑定，以及數位時代的著作保護策略。無論是文字、圖像、程式碼或影音創作，永旭均能提供完善的法律保護規劃。
+              </p>
+
+              <div class="service-tag-list">
+                <span class="tag tag--primary">著作權登記</span>
+                <span class="tag tag--primary">授權合約</span>
+                <span class="tag tag--primary">侵權鑑定</span>
+                <span class="tag tag--primary">數位著作保護</span>
+                <span class="tag tag--primary">爭議處理</span>
+              </div>
+
+              <a href="contact.html" class="btn btn--outline-dark">諮詢著作權服務</a>
+            </div>
+
+            <div data-aos="fade-left" data-aos-delay="100">
+              <ul class="service-list" style="gap: var(--space-3);">
+                <li>著作權登記申請</li>
+                <li>著作權授權合約撰寫</li>
+                <li>著作權侵權鑑定</li>
+                <li>著作權侵權告訴處理</li>
+                <li>著作權和解協商代理</li>
+                <li>數位著作保護策略</li>
+                <li>著作權爭議處理</li>
+              </ul>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="faq-item">
-        <div class="faq-q">
-          <span><i class="fa-solid fa-circle-question" style="color:var(--accent);margin-right:.6rem"></i>台灣的商標保護期限是多久？可以續展嗎？</span>
-          <i class="fa-solid fa-chevron-down faq-icon"></i>
-        </div>
-        <div class="faq-a">
-          <div class="faq-a-inner">
-            台灣商標的保護期限自註冊日起算為 10 年。期滿前 6 個月內可申請續展，每次續展亦為 10 年，且可無限次續展。只要持續使用並按時繳費，您的商標權即可永久保持有效。我們提供商標到期提醒服務，確保您的商標權利不因疏忽而中斷。
+      </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════════
+         SERVICE 4 — IP STRATEGY (顧問)
+         ═══════════════════════════════════════ -->
+    <section class="service-section bg-section" id="strategy" aria-labelledby="strategy-heading">
+      <div class="container">
+
+        <div style="max-width: var(--container-lg); margin: 0 auto;">
+          <div class="section-header section-header--center" data-aos="fade-up">
+            <span class="section-label">IP Strategy</span>
+            <h2 class="section-title" id="strategy-heading">智財策略顧問</h2>
+            <div class="divider divider--center"></div>
+            <p class="section-subtitle">
+              智財策略顧問超越單件申請，協助企業建立完整的智慧財產保護體系。永旭從您的產品研發藍圖出發，提供專利佈局規劃、商標品牌矩陣設計、技術授權策略等綜合顧問服務，讓智財成為企業最具競爭力的無形資產。
+            </p>
           </div>
-        </div>
-      </div>
 
-      <div class="faq-item">
-        <div class="faq-q">
-          <span><i class="fa-solid fa-circle-question" style="color:var(--accent);margin-right:.6rem"></i>在台灣取得的專利，可以在其他國家受到保護嗎？</span>
-          <i class="fa-solid fa-chevron-down faq-icon"></i>
-        </div>
-        <div class="faq-a">
-          <div class="faq-a-inner">
-            專利保護具有地域性，台灣專利僅在台灣境內有效。若需在其他國家取得保護，必須分別向各國申請。透過 PCT（專利合作條約）申請，可以一份申請文件在 150+ 個成員國享有優先日的保護，並在 30 個月內決定要進入哪些國家。我們將協助您評估重要市場並制定最符合成本效益的海外申請策略。
+          <div class="grid grid-3" style="gap: var(--space-4);" data-aos="fade-up" data-aos-delay="100">
+
+            <div class="card" style="text-align: left;">
+              <div style="width:48px;height:48px;background:rgba(200,169,107,0.12);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:var(--space-3);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5"/></svg>
+              </div>
+              <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-2);">專利佈局規劃</h3>
+              <p style="font-size: var(--text-sm); color: var(--color-text-secondary);">
+                依據企業技術路徑圖，規劃發明、新型與設計專利的最優申請時序與保護範圍，確保核心技術形成有效保護壁壘，阻絕競爭者模仿。
+              </p>
+            </div>
+
+            <div class="card" style="text-align: left;">
+              <div style="width:48px;height:48px;background:rgba(200,169,107,0.12);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:var(--space-3);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z"/></svg>
+              </div>
+              <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-2);">商標品牌保護策略</h3>
+              <p style="font-size: var(--text-sm); color: var(--color-text-secondary);">
+                從品牌命名階段即介入可行性評估，協助規劃國內外多類別商標佈局，建立完整的品牌資產保護矩陣，降低品牌風險與潛在爭議。
+              </p>
+            </div>
+
+            <div class="card" style="text-align: left;">
+              <div style="width:48px;height:48px;background:rgba(200,169,107,0.12);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:var(--space-3);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253"/></svg>
+              </div>
+              <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-2);">國際智財申請策略</h3>
+              <p style="font-size: var(--text-sm); color: var(--color-text-secondary);">
+                依目標市場分析 PCT 與各國直接申請的成本效益，制定最適切的國際佈局時程與資源配置策略，以最小成本取得最大保護範圍。
+              </p>
+            </div>
+
           </div>
-        </div>
-      </div>
 
-      <div class="faq-item">
-        <div class="faq-q">
-          <span><i class="fa-solid fa-circle-question" style="color:var(--accent);margin-right:.6rem"></i>如果發現有人侵害我的商標，應該怎麼辦？</span>
-          <i class="fa-solid fa-chevron-down faq-icon"></i>
         </div>
-        <div class="faq-a">
-          <div class="faq-a-inner">
-            發現商標侵權後，建議先蒐集並保全侵權證據（包括侵權商品樣本、網頁截圖、銷售記錄等），再聯絡我們進行法律評估。常見的維權途徑包括：寄發警告函要求停止侵權、向智慧財產局申請行政調查、向海關申請邊境查扣，以及提起民事損害賠償訴訟或刑事告訴。我們將根據侵權情況的嚴重性，為您建議最有效的維權策略。
+
+      </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════════
+         SERVICE PROCESS — 四步驟服務流程
+         ═══════════════════════════════════════ -->
+    <section style="padding: var(--space-12) 0; background: var(--color-bg-cream);" aria-labelledby="process-heading">
+      <div class="container">
+        <div class="section-header section-header--center" data-aos="fade-up">
+          <span class="section-label">How We Work</span>
+          <h2 class="section-title" id="process-heading">服務流程</h2>
+          <div class="divider divider--center"></div>
+          <p class="section-subtitle">從初次諮詢到長期維護，永旭陪伴您走完每一個環節</p>
+        </div>
+
+        <div class="grid grid-4" style="gap: var(--space-5); margin-top: var(--space-8);" data-aos="fade-up" data-aos-delay="100">
+
+          <div style="text-align:center; padding: var(--space-5) var(--space-4);">
+            <div style="width:64px;height:64px;background:var(--color-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto var(--space-4);">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"/></svg>
+            </div>
+            <div style="font-size:var(--text-xs);color:var(--color-accent);font-weight:var(--fw-semibold);letter-spacing:0.1em;margin-bottom:var(--space-2);">STEP 1</div>
+            <h3 style="font-size:var(--text-lg);margin-bottom:var(--space-2);">免費諮詢</h3>
+            <p style="font-size:var(--text-sm);color:var(--color-text-secondary);line-height:var(--lh-relaxed);">電話、Email 或到訪均可。我們傾聽您的需求，初步評估智財保護策略，無任何費用壓力。</p>
           </div>
-        </div>
-      </div>
 
-      <div class="faq-item">
-        <div class="faq-q">
-          <span><i class="fa-solid fa-circle-question" style="color:var(--accent);margin-right:.6rem"></i>著作權自動產生，還需要另外辦理登記嗎？</span>
-          <i class="fa-solid fa-chevron-down faq-icon"></i>
-        </div>
-        <div class="faq-a">
-          <div class="faq-a-inner">
-            根據台灣著作權法，著作人一旦完成創作，著作權即自動產生，不需要登記即享有法律保護。然而，辦理著作權登記的主要好處在於建立創作時間的官方佐證文件。當發生侵權爭議或訴訟時，登記文件可以作為您擁有著作權的有力證明，大幅提升法律維權的成功率。建議重要商業作品、軟體程式、設計圖稿等都進行登記。
+          <div style="text-align:center; padding: var(--space-5) var(--space-4);">
+            <div style="width:64px;height:64px;background:var(--color-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto var(--space-4);">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
+            </div>
+            <div style="font-size:var(--text-xs);color:var(--color-accent);font-weight:var(--fw-semibold);letter-spacing:0.1em;margin-bottom:var(--space-2);">STEP 2</div>
+            <h3 style="font-size:var(--text-lg);margin-bottom:var(--space-2);">評估報告</h3>
+            <p style="font-size:var(--text-sm);color:var(--color-text-secondary);line-height:var(--lh-relaxed);">進行前案檢索、可行性分析，提供客製化的申請策略建議，包含時程與費用的透明估算。</p>
           </div>
-        </div>
-      </div>
 
-      <div class="faq-item">
-        <div class="faq-q">
-          <span><i class="fa-solid fa-circle-question" style="color:var(--accent);margin-right:.6rem"></i>委託永旭辦理智財申請，大約需要哪些費用？</span>
-          <i class="fa-solid fa-chevron-down faq-icon"></i>
-        </div>
-        <div class="faq-a">
-          <div class="faq-a-inner">
-            智財申請的費用因案件類型、複雜程度及申請國家而有所不同，包含政府規費與專業代理費用兩部分。由於每個案件的技術內容和保護需求各有不同，我們建議您直接聯絡我們進行免費初步諮詢，我們將在了解您的具體需求後，提供詳細的費用估算。初次諮詢完全免費，歡迎來電或寄信洽詢。
+          <div style="text-align:center; padding: var(--space-5) var(--space-4);">
+            <div style="width:64px;height:64px;background:var(--color-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto var(--space-4);">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z"/></svg>
+            </div>
+            <div style="font-size:var(--text-xs);color:var(--color-accent);font-weight:var(--fw-semibold);letter-spacing:0.1em;margin-bottom:var(--space-2);">STEP 3</div>
+            <h3 style="font-size:var(--text-lg);margin-bottom:var(--space-2);">執行申請</h3>
+            <p style="font-size:var(--text-sm);color:var(--color-text-secondary);line-height:var(--lh-relaxed);">所長與負責人親自把關，精準撰稿與申請，全程追蹤進度，並即時回應審查機關的答辯需求。</p>
           </div>
-        </div>
-      </div>
 
-    </div>
-  </div>
-</section>
-
-<!-- ══════════ CTA ══════════ -->
-<section class="cta-band">
-  <div class="container">
-    <h2>不確定需要哪種服務？</h2>
-    <p>我們的專業顧問將免費為您評估，提供最適合的智財保護方案</p>
-    <div class="cta-actions">
-      <a href="contact.html" class="btn btn-primary btn-lg">
-        <i class="fa-regular fa-paper-plane"></i> 免費諮詢
-      </a>
-      <a href="tel:+88673453388" class="btn btn-outline btn-lg">
-        <i class="fa-solid fa-phone"></i> +886 7 345-3388
-      </a>
-    </div>
-  </div>
-</section>
-
-<!-- ══════════ FOOTER ══════════ -->
-<footer>
-  <div class="footer-top">
-    <div class="container">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <div class="fb-logo">
-            <div class="name">永旭智慧財產事務所</div>
-            <div class="name-en">Yong Syu Intellectual Property Office</div>
+          <div style="text-align:center; padding: var(--space-5) var(--space-4);">
+            <div style="width:64px;height:64px;background:var(--color-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto var(--space-4);">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/></svg>
+            </div>
+            <div style="font-size:var(--text-xs);color:var(--color-accent);font-weight:var(--fw-semibold);letter-spacing:0.1em;margin-bottom:var(--space-2);">STEP 4</div>
+            <h3 style="font-size:var(--text-lg);margin-bottom:var(--space-2);">長期維護</h3>
+            <p style="font-size:var(--text-sm);color:var(--color-text-secondary);line-height:var(--lh-relaxed);">核准後的年費提醒、延展管理、授權規劃，以及後續爭議應對，成為您可信賴的長期智財夥伴。</p>
           </div>
-          <p>致力於為全球客戶提供頂尖的智慧財產權服務，保護您的創新與品牌資產。</p>
-        </div>
-        <div class="footer-col">
-          <h4>服務項目</h4>
-          <ul>
-            <li><a href="#patent"><i class="fa-solid fa-gears"></i> 專利服務</a></li>
-            <li><a href="#trademark"><i class="fa-solid fa-trademark"></i> 商標服務</a></li>
-            <li><a href="#copyright"><i class="fa-solid fa-copyright"></i> 著作權服務</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>快速連結</h4>
-          <ul>
-            <li><a href="index.html"><i class="fa-solid fa-house"></i> 首頁</a></li>
-            <li><a href="about.html"><i class="fa-solid fa-circle-info"></i> 關於我們</a></li>
-            <li><a href="contact.html"><i class="fa-solid fa-envelope"></i> 聯絡我們</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>聯絡資訊</h4>
-          <div class="footer-contact-item"><i class="fa-solid fa-location-dot"></i><a href="https://www.google.com/maps/search/?api=1&query=%E9%AB%98%E9%9B%84%E5%B8%82%E5%B7%A6%E7%87%9F%E5%8D%80%E5%AD%90%E8%8F%AF%E8%B7%AF116%E8%99%9F" target="_blank" rel="noopener noreferrer" style="font-weight:600;color:var(--primary);text-decoration:none">高雄市左營區子華路 116 號 2 樓之 3</a></div>
-          <div class="footer-contact-item"><i class="fa-solid fa-phone"></i><a href="tel:+88673453388">+886 7 345-3388（高雄）</a></div>
-          <div class="footer-contact-item"><i class="fa-solid fa-location-dot"></i><a href="https://www.google.com/maps/search/?api=1&query=%E5%8F%B0%E5%8C%97%E5%B8%82%E4%B8%AD%E6%AD%A3%E5%8D%80%E8%8E%92%E5%85%89%E8%B7%AF47%E8%99%9F" target="_blank" rel="noopener noreferrer" style="font-weight:600;color:var(--primary);text-decoration:none">台北市中正區莒光路 47 號 1 樓</a></div>
-          <div class="footer-contact-item"><i class="fa-solid fa-phone"></i><a href="tel:+886225796961">+886 2 2579-6961（台北）</a></div>
-          <div class="footer-contact-item"><i class="fa-solid fa-mobile-screen-button"></i><a href="tel:+886956264578">0956-264-578</a></div>
-          <div class="footer-contact-item"><i class="fa-solid fa-envelope"></i><a href="mailto:ysptoaa@gmail.com">ysptoaa@gmail.com</a></div>
+
         </div>
       </div>
-    </div>
-  </div>
-  <div class="container">
-    <div class="footer-bottom">
-      <span>© 2025 永旭智慧財產事務所｜Yong Syu Intellectual Property Office</span>
-      <span><a href="mailto:ysptoaa@gmail.com">ysptoaa@gmail.com</a> · <a href="tel:+88673453388">+886 7 345-3388</a> · <a href="tel:+886225796961">+886 2 2579-6961</a></span>
-    </div>
-  </div>
-</footer>
+    </section>
 
-<script src="assets/js/main.js"></script>
+    <!-- CTA -->
+    <section class="cta-section" aria-labelledby="services-cta-heading">
+      <div class="container" style="position: relative; z-index: 1;">
+        <span class="section-label">Start Today</span>
+        <h2 id="services-cta-heading">有任何智財需求？</h2>
+        <p>
+          無論是創業初期的品牌保護、產品研發的專利佈局，或是面對智財爭議的緊急救援，永旭都提供第一次免費諮詢服務。讓我們了解您的需求，為您量身規劃最適切的智財保護方案。
+        </p>
+        <div class="cta-buttons">
+          <a href="contact.html" class="btn btn--primary btn--lg">立即免費諮詢</a>
+          <a href="tel:+88673453388" class="btn btn--outline btn--lg">(07) 345-3388</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="site-footer-placeholder"></div>
+
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="assets/js/main.js"></script>
+
 </body>
 </html>
