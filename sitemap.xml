@@ -14,6 +14,8 @@
 
   <url>
     <loc>https://ysipo.com.tw/about.html</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ysipo.com.tw/about.html"/>
+    <xhtml:link rel="alternate" hreflang="en"    href="https://ysipo.com.tw/en/about.html"/>
     <lastmod>2026-05-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
@@ -21,6 +23,8 @@
 
   <url>
     <loc>https://ysipo.com.tw/services.html</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ysipo.com.tw/services.html"/>
+    <xhtml:link rel="alternate" hreflang="en"    href="https://ysipo.com.tw/en/services.html"/>
     <lastmod>2026-05-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
@@ -28,6 +32,8 @@
 
   <url>
     <loc>https://ysipo.com.tw/insights.html</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ysipo.com.tw/insights.html"/>
+    <xhtml:link rel="alternate" hreflang="en"    href="https://ysipo.com.tw/en/insights.html"/>
     <lastmod>2026-05-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -35,6 +41,8 @@
 
   <url>
     <loc>https://ysipo.com.tw/news.html</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ysipo.com.tw/news.html"/>
+    <xhtml:link rel="alternate" hreflang="en"    href="https://ysipo.com.tw/en/news.html"/>
     <lastmod>2026-05-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -42,6 +50,8 @@
 
   <url>
     <loc>https://ysipo.com.tw/contact.html</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ysipo.com.tw/contact.html"/>
+    <xhtml:link rel="alternate" hreflang="en"    href="https://ysipo.com.tw/en/contact.html"/>
     <lastmod>2026-05-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.8</priority>
@@ -57,13 +67,49 @@
     <priority>0.9</priority>
   </url>
 
-  <!-- TODO: 文章頁面請依照實際發布後加入
   <url>
-    <loc>https://ysipo.com.tw/insights/article-slug.html</loc>
-    <lastmod>YYYY-MM-DD</lastmod>
+    <loc>https://ysipo.com.tw/en/about.html</loc>
+    <xhtml:link rel="alternate" hreflang="en"    href="https://ysipo.com.tw/en/about.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ysipo.com.tw/about.html"/>
+    <lastmod>2026-05-15</lastmod>
     <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://ysipo.com.tw/en/services.html</loc>
+    <xhtml:link rel="alternate" hreflang="en"    href="https://ysipo.com.tw/en/services.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ysipo.com.tw/services.html"/>
+    <lastmod>2026-05-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://ysipo.com.tw/en/insights.html</loc>
+    <xhtml:link rel="alternate" hreflang="en"    href="https://ysipo.com.tw/en/insights.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ysipo.com.tw/insights.html"/>
+    <lastmod>2026-05-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://ysipo.com.tw/en/news.html</loc>
+    <xhtml:link rel="alternate" hreflang="en"    href="https://ysipo.com.tw/en/news.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ysipo.com.tw/news.html"/>
+    <lastmod>2026-05-15</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
-  -->
+
+  <url>
+    <loc>https://ysipo.com.tw/en/contact.html</loc>
+    <xhtml:link rel="alternate" hreflang="en"    href="https://ysipo.com.tw/en/contact.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://ysipo.com.tw/contact.html"/>
+    <lastmod>2026-05-15</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>
 
 </urlset>
