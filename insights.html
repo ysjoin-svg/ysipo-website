@@ -228,67 +228,11 @@
                 </div>
               </article>
 
-              <!-- Article 4 — Coming Soon -->
-              <article class="article-card" data-category="trademark" data-aos="fade-up" data-aos-delay="180" style="opacity:0.7; pointer-events:none;">
-                <div class="article-card__img" style="background: var(--color-bg-cream); display:flex; align-items:center; justify-content:center; min-height:160px;">
-                  <span style="font-size:var(--text-sm);color:var(--color-text-muted);font-weight:var(--fw-semibold);letter-spacing:0.1em;">即將推出</span>
-                </div>
-                <div class="article-card__body">
-                  <span class="article-tag">商標</span>
-                  <h2 style="font-size: var(--text-lg); color: var(--color-text-muted);">
-                    商標識別性怎麼認定？常見核駁理由與答辯策略
-                  </h2>
-                  <p style="font-size: var(--text-sm); color: var(--color-text-muted);">深入解析智財局審查商標識別性的判斷標準，常見的「僅為描述性文字」核駁原因，以及如何透過第二意義論述、使用證據提出有力答辯。</p>
-                  <div class="article-meta">
-                    <span style="color:var(--color-text-muted);">即將推出</span>
-                    <span>預計閱讀 7 分鐘</span>
-                  </div>
-                </div>
-              </article>
-
-              <!-- Article 5 — Coming Soon -->
-              <article class="article-card" data-category="patent" data-aos="fade-up" data-aos-delay="240" style="opacity:0.7; pointer-events:none;">
-                <div class="article-card__img" style="background: var(--color-bg-cream); display:flex; align-items:center; justify-content:center; min-height:160px;">
-                  <span style="font-size:var(--text-sm);color:var(--color-text-muted);font-weight:var(--fw-semibold);letter-spacing:0.1em;">即將推出</span>
-                </div>
-                <div class="article-card__body">
-                  <span class="article-tag">專利</span>
-                  <h2 style="font-size: var(--text-lg); color: var(--color-text-muted);">
-                    迴避設計實戰：從競爭對手專利壁壘中找出生路
-                  </h2>
-                  <p style="font-size: var(--text-sm); color: var(--color-text-muted);">當產品研發遭遇競爭對手專利壁壘，迴避設計是最常見的因應策略。本文介紹如何分析競爭專利的保護範圍，從 Claim 解析到產品設計修改的完整方法論。</p>
-                  <div class="article-meta">
-                    <span style="color:var(--color-text-muted);">即將推出</span>
-                    <span>預計閱讀 9 分鐘</span>
-                  </div>
-                </div>
-              </article>
-
-              <!-- Article 6 — Coming Soon -->
-              <article class="article-card" data-category="copyright" data-aos="fade-up" data-aos-delay="300" style="opacity:0.7; pointer-events:none;">
-                <div class="article-card__img" style="background: var(--color-bg-cream); display:flex; align-items:center; justify-content:center; min-height:160px;">
-                  <span style="font-size:var(--text-sm);color:var(--color-text-muted);font-weight:var(--fw-semibold);letter-spacing:0.1em;">即將推出</span>
-                </div>
-                <div class="article-card__body">
-                  <span class="article-tag">著作權</span>
-                  <h2 style="font-size: var(--text-lg); color: var(--color-text-muted);">
-                    程式碼、設計圖、行銷素材——數位著作權保護完全指南
-                  </h2>
-                  <p style="font-size: var(--text-sm); color: var(--color-text-muted);">在數位時代，著作權侵害比以往更容易發生。本文說明各類數位創作的著作權保護範圍、侵權認定標準，以及企業應如何建立著作權管理制度，從登記到合約逐步強化保護。</p>
-                  <div class="article-meta">
-                    <span style="color:var(--color-text-muted);">即將推出</span>
-                    <span>預計閱讀 6 分鐘</span>
-                  </div>
-                </div>
-              </article>
-
             </div><!-- /#articles-grid -->
 
-            <!-- Load More (placeholder) -->
-            <div style="text-align: center; margin-top: var(--space-8);">
-              <button class="btn btn--outline-dark">
-                載入更多文章
-              </button>
+            <!-- 動態載入狀態 -->
+            <div id="auto-articles-status" style="text-align:center;margin-top:var(--space-4);display:none;">
+              <span style="font-size:var(--text-sm);color:var(--color-text-muted);">載入更多文章中...</span>
             </div>
 
           </div><!-- /main article list -->
@@ -437,6 +381,93 @@
         });
       });
     }
+  </script>
+
+  <!-- 動態載入 articles.json 自動產生文章 -->
+  <script>
+    (function () {
+      var grid = document.getElementById('articles-grid');
+      var status = document.getElementById('auto-articles-status');
+
+      // 取得已有的文章標題，避免重複
+      function getExistingTitles() {
+        var titles = new Set();
+        grid.querySelectorAll('h2 a').forEach(function (a) {
+          titles.add(a.textContent.trim());
+        });
+        return titles;
+      }
+
+      // 日期格式化
+      function formatDate(dateStr) {
+        var parts = dateStr.split('-');
+        return parts[0] + ' 年 ' + parseInt(parts[1]) + ' 月 ' + parseInt(parts[2]) + ' 日';
+      }
+
+      // 渲染單張卡片
+      function renderCard(article, delay) {
+        var card = document.createElement('article');
+        card.className = 'article-card';
+        card.dataset.category = article.categorySlug || 'trademark';
+        card.setAttribute('data-aos', 'fade-up');
+        card.setAttribute('data-aos-delay', String(delay));
+        card.innerHTML =
+          '<div class="article-card__img">' +
+            '<img src="' + article.image + '" alt="' + article.title + '" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy">' +
+          '</div>' +
+          '<div class="article-card__body">' +
+            '<span class="article-tag">' + article.category + '</span>' +
+            '<h2 style="font-size:var(--text-lg);">' +
+              '<a href="insights/' + article.filename + '" style="color:inherit;">' + article.title + '</a>' +
+            '</h2>' +
+            '<p style="font-size:var(--text-sm);color:var(--color-text-secondary);line-height:var(--lh-relaxed);">' + (article.summary || '') + '</p>' +
+            '<div class="article-meta">' +
+              '<time datetime="' + article.date + '">' + formatDate(article.date) + '</time>' +
+              '<span>閱讀約 ' + (article.readTime || '5') + ' 分鐘</span>' +
+            '</div>' +
+          '</div>';
+        return card;
+      }
+
+      // 更新側欄分類計數
+      function updateCategoryCounts() {
+        var counts = {};
+        grid.querySelectorAll('.article-card').forEach(function (card) {
+          var cat = card.dataset.category;
+          counts[cat] = (counts[cat] || 0) + 1;
+        });
+        document.querySelectorAll('.sidebar-widget .category-btn[data-category]').forEach(function (btn) {
+          var cat = btn.dataset.category;
+          var span = btn.querySelector('span:last-child');
+          if (span && counts[cat] !== undefined) {
+            span.textContent = counts[cat] + ' 篇';
+          }
+        });
+      }
+
+      fetch('insights/articles.json')
+        .then(function (r) { return r.json(); })
+        .then(function (articles) {
+          var existing = getExistingTitles();
+          var added = 0;
+          articles.forEach(function (article) {
+            if (existing.has(article.title)) return;
+            var card = renderCard(article, added * 60);
+            grid.appendChild(card);
+            added++;
+          });
+          if (added > 0) {
+            updateCategoryCounts();
+            // 重新套用目前選取的分類篩選
+            var activeBtn = document.querySelector('.category-btn.active');
+            if (activeBtn) activeBtn.click();
+          }
+        })
+        .catch(function () {})
+        .finally(function () {
+          if (status) status.style.display = 'none';
+        });
+    })();
   </script>
 
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
