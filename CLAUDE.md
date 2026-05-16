@@ -57,3 +57,38 @@
 - 回覆語言：繁體中文
 - 靜態 HTML + CSS + JS，不使用框架
 - 版面參考舊網站風格，內容以 ysipo_website_archive.md 為準
+
+## Cloudflare 快取管理
+**規則：每次 `git push` 完成後，立即自動清除 Cloudflare 快取，不需另外詢問。**
+
+密鑰存放於 `scripts/config.js`（已加入 .gitignore，不上傳）：
+- `CF_ZONE_ID`：Cloudflare Zone ID
+- `CF_API_TOKEN`：Cloudflare API Token
+
+```bash
+# 讀取 config.js 並清快取
+node -e "
+const {CF_ZONE_ID, CF_API_TOKEN} = require('./scripts/config.js');
+const https = require('https');
+const data = JSON.stringify({purge_everything: true});
+const req = https.request({
+  hostname: 'api.cloudflare.com',
+  path: '/client/v4/zones/' + CF_ZONE_ID + '/purge_cache',
+  method: 'POST',
+  headers: {'Authorization':'Bearer ' + CF_API_TOKEN,'Content-Type':'application/json','Content-Length':data.length}
+}, r => { let b=''; r.on('data',d=>b+=d); r.on('end',()=>console.log(b)); });
+req.write(data); req.end();
+"
+```
+
+或直接用 curl（token 從 config.js 取得）：
+```bash
+CF_ZONE_ID=$(node -e "console.log(require('./scripts/config.js').CF_ZONE_ID)")
+CF_API_TOKEN=$(node -e "console.log(require('./scripts/config.js').CF_API_TOKEN)")
+curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/purge_cache" \
+  -H "Authorization: Bearer ${CF_API_TOKEN}" \
+  -H "Content-Type: application/json" \
+  --data '{"purge_everything":true}'
+```
+
+- 回應 `"success":true` 表示清除成功
