@@ -345,9 +345,8 @@ async function init() {
   }
 
   // After partials load, init navigation
-  initNavigation();   // gracefully no-ops when .site-header not found (v20 pages)
-  initLangSwitch();   // gracefully no-ops when .lang-btn not found (v20 pages)
-  initV20Header();    // v20 mobile menu + active nav
+  initNavigation();
+  initLangSwitch();
 
   // Page-level features
   initScrollAnimations();
@@ -363,33 +362,4 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
 } else {
   init();
-}
-
-/* ──────────────────────────────────────────────
-   v20 Header — mobile menu + active nav
-   ────────────────────────────────────────────── */
-function initV20Header() {
-  // 漢堡選單切換
-  var btn = document.getElementById('ys-menu-toggle');
-  var nav = document.getElementById('ys-nav');
-  if (btn && nav) {
-    btn.addEventListener('click', function() {
-      nav.classList.toggle('open');
-    });
-    document.addEventListener('click', function(e) {
-      if (!btn.contains(e.target) && !nav.contains(e.target)) {
-        nav.classList.remove('open');
-      }
-    });
-  }
-
-  // 依照當前 URL 標記 active 頁面
-  var pathname = window.location.pathname;
-  var page = pathname.split('/').pop().replace('.html', '');
-  if (!page || page === '') page = 'index';
-  document.querySelectorAll('.ys-nav a[data-page]').forEach(function(a) {
-    if (a.getAttribute('data-page') === page) {
-      a.classList.add('active');
-    }
-  });
 }

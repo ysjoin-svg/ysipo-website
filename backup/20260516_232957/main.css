@@ -12,13 +12,13 @@
    CSS Custom Properties (Design Tokens)
    ────────────────────────────────────────────── */
 :root {
-  /* === 色彩系統（v20 統一色系） === */
-  --color-primary:          #0A1D37;   /* 深海藍：主色（v20 navy） */
-  --color-primary-dark:     #000d22;   /* 更深藍（v20 navy-darker） */
-  --color-primary-light:    #102443;   /* 較淡藍（v20 navy-light） */
-  --color-accent:           #D4B37D;   /* 金色：精品感強調色（v20 gold） */
-  --color-accent-light:     #E6D3B3;   /* 淡金（v20 gold-light） */
-  --color-accent-dark:      #C5A265;   /* 深金（v20 gold-dark） */
+  /* === 色彩系統 === */
+  --color-primary:          #1a2845;   /* 深海藍：主色 */
+  --color-primary-dark:     #111c33;   /* 更深藍 */
+  --color-primary-light:    #243564;   /* 較淡藍 */
+  --color-accent:           #c8a96b;   /* 金色：精品感強調色 */
+  --color-accent-light:     #dfc08a;   /* 淡金 */
+  --color-accent-dark:      #a8833e;   /* 深金 */
 
   /* 背景 */
   --color-bg-white:         #ffffff;
@@ -2108,12 +2108,6 @@ header[role="banner"] {
   --gold-dark: #C5A265;
   --gold-light: #E6D3B3;
   --white-bg: #faf9f6;
-  /* 舊變數別名，確保舊 CSS 不斷裂 */
-  --primary: var(--navy-deep);
-  --primary-dark: var(--navy-darker);
-  --accent: var(--gold);
-  --accent-dark: var(--gold-dark);
-  --bg-light: var(--white-bg);
 }
 
 /* === Header === */
@@ -2516,134 +2510,4 @@ header[role="banner"] {
   .ys-service-name-en { display: none; }
   .ys-service-desc { font-size: 10.5px; margin-bottom: 0; }
   .ys-service-more { display: none; }
-}
-
-/* ============================================
-   v20 全站統一補正 — Header / Nav / Footer
-   ============================================ */
-
-/* --- Header 補正 --- */
-.ys-header { position: relative; z-index: 100; }
-.ys-logo-block { gap: 0; }
-.ys-logo-link {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  text-decoration: none;
-}
-.ys-cta-btn { transition: background 0.2s; }
-.ys-cta-btn:hover { background: var(--gold-dark); }
-.ys-lang {
-  color: rgba(255,255,255,0.7);
-  font-size: 13px;
-  text-decoration: none;
-  font-family: 'Inter', sans-serif;
-  letter-spacing: 0.05em;
-}
-.ys-lang:hover { color: var(--gold); }
-/* 桌面版隱藏漢堡按鈕 */
-.ys-menu-btn { display: none; }
-
-/* --- Footer --- */
-.ys-footer {
-  background: var(--navy);
-  color: rgba(255, 255, 255, 0.75);
-  padding: 60px 0 0;
-}
-.ys-footer-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 40px;
-}
-.ys-footer-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1.8fr;
-  gap: 40px;
-  padding-bottom: 50px;
-}
-.ys-footer-logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-.ys-footer-logo img {
-  width: 48px;
-  height: 48px;
-  object-fit: contain;
-}
-.ys-footer-logo-zh {
-  font-family: 'Noto Serif TC', serif;
-  font-size: 17px;
-  font-weight: 600;
-  color: white;
-}
-.ys-footer-logo-en {
-  font-family: 'Inter', sans-serif;
-  font-size: 9px;
-  color: var(--gold);
-  letter-spacing: 0.12em;
-  margin-top: 2px;
-}
-.ys-footer-about {
-  font-size: 13px;
-  line-height: 1.85;
-  color: rgba(255, 255, 255, 0.65);
-}
-.ys-footer-title {
-  font-family: 'Noto Serif TC', serif;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--gold);
-  margin-bottom: 20px;
-  letter-spacing: 0.08em;
-}
-.ys-footer-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.ys-footer-list li { margin-bottom: 11px; }
-.ys-footer-list a {
-  color: rgba(255, 255, 255, 0.7);
-  text-decoration: none;
-  font-size: 13px;
-  transition: color 0.2s;
-}
-.ys-footer-list a:hover { color: var(--gold); }
-.ys-footer-contact .ys-office { margin-bottom: 18px; }
-.ys-office-name {
-  font-size: 13px;
-  color: var(--gold);
-  font-weight: 600;
-  margin-bottom: 6px;
-  letter-spacing: 0.05em;
-}
-.ys-office-info {
-  font-size: 12.5px;
-  line-height: 1.85;
-  color: rgba(255, 255, 255, 0.7);
-}
-.ys-footer-bottom {
-  border-top: 1px solid rgba(212, 179, 125, 0.15);
-  padding: 24px 0;
-  text-align: center;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-/* --- 手機 RWD 補正 --- */
-@media (max-width: 768px) {
-  .ys-header-right .ys-lang { display: none; }
-  .ys-menu-btn { display: flex; }
-
-  .ys-footer { padding: 40px 0 0; }
-  .ys-footer-inner { padding: 0 20px; }
-  .ys-footer-grid {
-    grid-template-columns: 1fr;
-    gap: 32px;
-    padding-bottom: 32px;
-  }
-  .ys-footer-title { font-size: 14px; margin-bottom: 14px; }
-  .ys-footer-bottom { padding: 18px 20px; font-size: 11px; }
 }

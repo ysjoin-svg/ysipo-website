@@ -1,69 +1,38 @@
 <a href="#main-content" class="skip-to-main">跳至主要內容</a>
 
-<header class="site-header" role="banner">
-  <div class="container">
-    <div class="header-inner">
-
-      <!-- Logo -->
-      <a href="{ROOT}index.html" class="site-logo" aria-label="永旭智慧財產事務所 回首頁">
-        <img src="{ROOT}assets/img/logo.png"
-             alt="永旭智慧財產事務所"
-             class="header-logo-img"
-             style="height: 44px; width: auto; filter: brightness(0) invert(1);">
-        <div class="logo-text-group">
-          <span class="logo-text-zh">永旭智慧財產事務所</span>
-          <span class="logo-text-en">Yong Syu Intellectual Property Office</span>
-        </div>
-      </a>
-
-      <!-- Desktop Main Navigation -->
-      <nav class="main-nav" role="navigation" aria-label="主選單">
-        <a href="{ROOT}index.html"    class="nav-link">首頁</a>
-        <a href="{ROOT}about.html"    class="nav-link">關於我們</a>
-        <a href="{ROOT}services.html" class="nav-link">服務項目</a>
-        <a href="{ROOT}insights.html" class="nav-link">智財知識</a>
-        <a href="{ROOT}news.html"     class="nav-link">新聞動態</a>
-        <a href="{ROOT}contact.html"  class="nav-link">聯絡我們</a>
-
-        <!-- Language Switch -->
-        <div class="lang-switch" role="group" aria-label="語系切換">
-          <button class="lang-btn active" data-lang="zh" aria-label="切換為繁體中文">繁中</button>
-          <span class="lang-sep" aria-hidden="true">/</span>
-          <button class="lang-btn" data-lang="en" aria-label="Switch to English">EN</button>
-        </div>
-      </nav>
-
-      <!-- Mobile Menu Button -->
-      <button class="mobile-menu-btn"
-              aria-label="開啟導覽選單"
-              aria-expanded="false"
-              aria-controls="mobile-navigation">
-        <div class="hamburger" aria-hidden="true">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-      </button>
-
-    </div>
+<!-- v20 統一 Header -->
+<header class="ys-header">
+  <div class="ys-logo-block">
+    <a href="/index.html" class="ys-logo-link">
+      <div class="ys-logo-img">
+        <img src="/assets/img/logo-white.png" alt="永旭智慧財產事務所">
+      </div>
+      <div>
+        <div class="ys-logo-zh">永旭智慧財產事務所</div>
+        <div class="ys-logo-en">YONG SYU INTELLECTUAL PROPERTY OFFICE</div>
+      </div>
+    </a>
+  </div>
+  <div class="ys-header-right">
+    <a href="tel:07-345-3388" class="ys-phone">
+      <svg class="ys-phone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+      </svg>
+      07-345-3388
+    </a>
+    <a href="/contact.html" class="ys-cta-btn">立即諮詢</a>
+    <a href="/en/index.html" class="ys-lang">EN</a>
+    <button class="ys-menu-btn" id="ys-menu-toggle" aria-label="選單">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </header>
 
-<!-- Mobile Navigation Drawer -->
-<nav class="mobile-nav" id="mobile-navigation" role="navigation" aria-label="行動選單">
-  <ul class="mobile-nav-list">
-    <li><a href="{ROOT}index.html"    class="mobile-nav-link">首頁</a></li>
-    <li><a href="{ROOT}about.html"    class="mobile-nav-link">關於我們</a></li>
-    <li><a href="{ROOT}services.html" class="mobile-nav-link">服務項目</a></li>
-    <li><a href="{ROOT}insights.html" class="mobile-nav-link">智財知識</a></li>
-    <li><a href="{ROOT}news.html"     class="mobile-nav-link">新聞動態</a></li>
-    <li><a href="{ROOT}contact.html"  class="mobile-nav-link">聯絡我們</a></li>
-    <li style="padding: 0.75rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 0.5rem;">
-      <div class="lang-switch" style="border-left: none; padding-left: 0; margin-left: 0;">
-        <button class="lang-btn active" data-lang="zh">繁中</button>
-        <span class="lang-sep">/</span>
-        <button class="lang-btn" data-lang="en">EN</button>
-      </div>
-    </li>
-  </ul>
+<nav class="ys-nav" id="ys-nav">
+  <a href="/index.html" data-page="index">首頁</a>
+  <a href="/about.html" data-page="about">關於我們</a>
+  <a href="/services.html" data-page="services">服務項目</a>
+  <a href="/insights.html" data-page="insights">智財知識</a>
+  <a href="/news.html" data-page="news">新聞動態</a>
+  <a href="/contact.html" data-page="contact">聯絡我們</a>
 </nav>
