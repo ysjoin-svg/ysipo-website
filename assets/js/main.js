@@ -387,6 +387,7 @@ function initV20Header() {
   var pathname = window.location.pathname;
   var page = pathname.split('/').pop().replace('.html', '');
   if (!page || page === '') page = 'index';
+  document.body.classList.add('page-' + page);
   document.querySelectorAll('.ys-nav a[data-page]').forEach(function(a) {
     if (a.getAttribute('data-page') === page) {
       a.classList.add('active');

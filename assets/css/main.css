@@ -2717,3 +2717,59 @@ header[role="banner"] {
   margin-right: 0;
   max-width: 60ch;
 }
+
+/* ═══════════════════════════════════════════════ */
+/* v20 階段 B：內頁 Hero 對齊基準線 + 5 張圖個別定位 */
+/* ═══════════════════════════════════════════════ */
+
+/* 內頁 Hero 容器對齊首頁 40px 基準線 */
+.page-hero .container {
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+/* 5 張背景圖個別最佳定位 — 桌面 */
+body.page-about    .page-hero { background-position: right 25%; }
+body.page-services .page-hero { background-position: right 45%; }
+body.page-insights .page-hero { background-position: right 40%; }
+body.page-news     .page-hero { background-position: right 50%; }
+body.page-contact  .page-hero { background-position: right 55%; }
+
+/* 平板（≤1199px） */
+@media (max-width: 1199px) {
+  body.page-about    .page-hero { background-position: 75% 30%; }
+  body.page-services .page-hero { background-position: 75% 45%; }
+  body.page-insights .page-hero { background-position: 75% 40%; }
+  body.page-news     .page-hero { background-position: 75% 45%; }
+  body.page-contact  .page-hero { background-position: 75% 50%; }
+  .page-hero .container { padding-left: 32px; padding-right: 32px; }
+}
+
+/* 手機（≤767px） */
+@media (max-width: 767px) {
+  body.page-about    .page-hero { background-position: 70% center; }
+  body.page-services .page-hero { background-position: 65% center; }
+  body.page-insights .page-hero { background-position: 70% center; }
+  body.page-news     .page-hero { background-position: 65% center; }
+  body.page-contact  .page-hero { background-position: 70% center; }
+  .page-hero .container { padding-left: 24px; padding-right: 24px; }
+}
+
+/* about 副標兩行差異化樣式 */
+.page-hero .hero-subtitle-main {
+  font-size: 1.15rem;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 8px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.page-hero .hero-subtitle-sub {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.70);
+  margin-bottom: 0;
+  letter-spacing: 0.02em;
+}
+@media (max-width: 767px) {
+  .page-hero .hero-subtitle-main { font-size: 1rem; }
+  .page-hero .hero-subtitle-sub  { font-size: 0.88rem; }
+}
