@@ -2702,6 +2702,12 @@ header[role="banner"] {
     border-bottom-color: rgba(255, 255, 255, 0.08);
     background: rgba(212, 179, 125, 0.08);
   }
+  .ys-nav .ys-nav-lang {
+    color: var(--gold) !important;
+    border-top: 1px solid rgba(212, 179, 125, 0.3) !important;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+  }
 }
 
 /* ── 內頁 Hero 左對齊（呼應首頁風格）── */
