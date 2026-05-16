@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" stroke="#D4B37D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+<!-- 圓形主體 -->
+<circle cx="100" cy="100" r="55" stroke-width="2.5"/>
+<circle cx="100" cy="100" r="46" stroke-width="1.8" opacity="0.6"/>
+<!-- 上方星星 -->
+<path d="M100 35 L104 47 L117 47 L107 55 L111 67 L100 60 L89 67 L93 55 L83 47 L96 47 Z" fill="#D4B37D" stroke="none"/>
+<!-- 25+ 字 -->
+<text x="100" y="113" text-anchor="middle" fill="#D4B37D" stroke="none" font-family="serif" font-size="26" font-weight="700">25+</text>
+<!-- 左月桂枝 -->
+<g transform="translate(45,110)">
+<path d="M0 0 Q-5 -22 5 -42" stroke-width="2"/>
+<path d="M-2 -8 Q-10 -10 -12 -4" stroke-width="1.6"/>
+<path d="M-1 -16 Q-9 -18 -11 -12" stroke-width="1.6"/>
+<path d="M0 -24 Q-8 -26 -10 -20" stroke-width="1.6"/>
+<path d="M2 -32 Q-6 -34 -8 -28" stroke-width="1.6"/>
+</g>
+<!-- 右月桂枝 -->
+<g transform="translate(155,110)">
+<path d="M0 0 Q5 -22 -5 -42" stroke-width="2"/>
+<path d="M2 -8 Q10 -10 12 -4" stroke-width="1.6"/>
+<path d="M1 -16 Q9 -18 11 -12" stroke-width="1.6"/>
+<path d="M0 -24 Q8 -26 10 -20" stroke-width="1.6"/>
+<path d="M-2 -32 Q6 -34 8 -28" stroke-width="1.6"/>
+</g>
+</svg>
