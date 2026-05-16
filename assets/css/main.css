@@ -2684,13 +2684,8 @@ header[role="banner"] {
     background-position: right bottom !important;
   }
 
-  /* 漢堡展開的 nav 改為絕對定位下拉 */
+  /* 漢堡展開的 nav：正常文件流，顯示於 header 正下方 */
   .ys-nav {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    z-index: 999;
     flex-direction: column;
     padding: 0;
     gap: 0;
