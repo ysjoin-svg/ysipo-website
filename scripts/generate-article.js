@@ -25,45 +25,76 @@ const TOPICS = [
 
 // 分類中英文對照
 const CATEGORY_EN = {
-  '商標知識': { name: 'Trademark', tag: 'Trademark' },
-  '專利知識': { name: 'Patent',    tag: 'Patent' },
-  '著作權知識': { name: 'Copyright', tag: 'Copyright' },
-  '國際智財':  { name: 'International IP', tag: 'International IP' },
-  '智財知識':  { name: 'IP Knowledge', tag: 'IP Knowledge' },
+  '商標': 'Trademark',
+  '專利': 'Patent',
+  '著作權': 'Copyright',
+  '國際': 'International IP',
+  '智財': 'IP Knowledge',
 };
 
 const MONTHS_EN = ['January','February','March','April','May','June',
                    'July','August','September','October','November','December'];
 
-// 依週數輪替主題
+// 依週數輪替主題（可用命令列參數覆蓋：node generate-article.js "自訂主題"）
 function getCurrentTopic() {
+  if (process.argv[2]) return process.argv[2];
   const weekNumber = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
   return TOPICS[weekNumber % TOPICS.length];
 }
 
-// 根據主題自動分類
+// 根據主題自動分類（統一不加「知識」後綴）
 function categorizeArticle(topic) {
   const categories = {
-    '商標':   { name: '商標知識', slug: 'trademark',    count: 3 },
-    '專利':   { name: '專利知識', slug: 'patent',       count: 3 },
-    '著作權': { name: '著作權知識', slug: 'copyright',  count: 3 },
-    'PCT':    { name: '國際智財', slug: 'international', count: 3 },
-    '國際':   { name: '國際智財', slug: 'international', count: 3 },
-    '馬德里': { name: '國際智財', slug: 'international', count: 3 },
-    '新型':   { name: '專利知識', slug: 'patent',       count: 3 },
-    '發明':   { name: '專利知識', slug: 'patent',       count: 3 },
-    '設計專利': { name: '專利知識', slug: 'patent',     count: 3 },
+    '商標':   { name: '商標', slug: 'trademark'    },
+    '專利':   { name: '專利', slug: 'patent'       },
+    '著作權': { name: '著作權', slug: 'copyright'  },
+    'PCT':    { name: '國際', slug: 'international' },
+    '國際':   { name: '國際', slug: 'international' },
+    '馬德里': { name: '國際', slug: 'international' },
+    '新型':   { name: '專利', slug: 'patent'       },
+    '發明':   { name: '專利', slug: 'patent'       },
+    '設計專利': { name: '專利', slug: 'patent'     },
+    '迴避':   { name: '專利', slug: 'patent'       },
+    '程式碼': { name: '著作權', slug: 'copyright'  },
   };
   for (const keyword in categories) {
     if (topic.includes(keyword)) return categories[keyword];
   }
-  return { name: '智財知識', slug: 'trademark', count: 3 };
+  return { name: '智財', slug: 'trademark' };
 }
 
-// 隨機選一張該分類的配圖
-function selectImage(category) {
-  const imageNum = Math.floor(Math.random() * category.count) + 1;
-  return `../assets/img/categories/${category.slug}-${imageNum}.jpg`;
+// 根據主題關鍵字選擇最適合的配圖（固定對應，不隨機）
+function selectImage(topic, category) {
+  const rules = {
+    trademark: [
+      { keywords: ['近似','駁回','核駁','識別性','識別'], img: 2 },
+      { keywords: ['異議','撤銷','評定','爭議','侵權'],   img: 1 },
+      { keywords: ['布局','馬德里','國際','授權','移轉'], img: 3 },
+    ],
+    patent: [
+      { keywords: ['年費','維護','消滅','期限'],           img: 2 },
+      { keywords: ['迴避','壁壘','設計專利','外觀'],       img: 3 },
+      { keywords: ['說明書','申請','新型','發明','PCT'],   img: 1 },
+    ],
+    copyright: [
+      { keywords: ['侵權','盜用','取締','鑑定'],           img: 1 },
+      { keywords: ['數位','程式碼','設計圖','素材','軟體'], img: 2 },
+      { keywords: ['登記','授權','合約'],                  img: 3 },
+    ],
+    international: [
+      { keywords: ['PCT','專利'],                          img: 1 },
+      { keywords: ['馬德里','商標'],                       img: 2 },
+      { keywords: ['著作','版權'],                         img: 3 },
+    ],
+  };
+
+  const list = rules[category.slug] || [];
+  for (const rule of list) {
+    if (rule.keywords.some(k => topic.includes(k))) {
+      return `../assets/img/categories/${category.slug}-${rule.img}.jpg`;
+    }
+  }
+  return `../assets/img/categories/${category.slug}-1.jpg`; // 預設第 1 張
 }
 
 // 呼叫 Nvidia API（通用）
@@ -286,7 +317,7 @@ function textToHtml(text, title, dateStr, category, imagePath) {
 // 產生英文 HTML
 function textToHtmlEn(text, titleEn, dateStr, category, imagePath) {
   const htmlBody = parseBody(text);
-  const catEn = CATEGORY_EN[category.name] || { name: 'IP Knowledge', tag: 'IP Knowledge' };
+  const catEn = CATEGORY_EN[category.name] || 'IP Knowledge';
   const [y, m, d] = dateStr.split('-');
   const dateEnStr = `${MONTHS_EN[parseInt(m) - 1]} ${parseInt(d)}, ${y}`;
 
@@ -312,7 +343,7 @@ function textToHtmlEn(text, titleEn, dateStr, category, imagePath) {
   </div>
   <div class="container">
     <div class="article-header">
-      <span class="article-category">${catEn.tag}</span>
+      <span class="article-category">${catEn}</span>
       <h1 class="article-title">${titleEn}</h1>
       <div class="article-meta">
         <span>YSIPO Team</span>
@@ -347,7 +378,7 @@ async function main() {
     const category = categorizeArticle(topic);
     console.log(`📂 自動分類：${category.name}`);
 
-    const imagePath = selectImage(category);
+    const imagePath = selectImage(topic, category);
     console.log(`🖼️  配圖：${imagePath}`);
 
     // 中英文 API 並行呼叫
