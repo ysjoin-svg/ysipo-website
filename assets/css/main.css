@@ -2707,3 +2707,13 @@ header[role="banner"] {
     background: rgba(212, 179, 125, 0.08);
   }
 }
+
+/* ── 內頁 Hero 左對齊（呼應首頁風格）── */
+.page-hero {
+  text-align: left;
+}
+.page-hero p {
+  margin-left: 0;
+  margin-right: 0;
+  max-width: 60ch;
+}
