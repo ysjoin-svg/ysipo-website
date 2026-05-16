@@ -2435,6 +2435,7 @@ header[role="banner"] {
   }
 
   .ys-nav { display: none; }
+  .ys-nav.open { display: flex !important; }
 
   .ys-hero {
     padding: 18px 18px 24px;
