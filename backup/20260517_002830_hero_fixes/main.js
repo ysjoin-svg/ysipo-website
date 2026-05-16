@@ -392,13 +392,4 @@ function initV20Header() {
       a.classList.add('active');
     }
   });
-
-  // 內頁 Hero 綁定對應背景圖（about/services/insights/news/contact）
-  var heroPages = ['about', 'services', 'insights', 'news', 'contact'];
-  if (heroPages.indexOf(page) !== -1) {
-    var pageHero = document.querySelector('.page-hero');
-    if (pageHero) {
-      pageHero.style.backgroundImage = "url('/assets/img/hero-" + page + ".jpg')";
-    }
-  }
 }
