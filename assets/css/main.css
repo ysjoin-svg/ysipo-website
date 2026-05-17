@@ -2206,7 +2206,7 @@ header[role="banner"] {
   padding: 50px 40px 40px;
   overflow: hidden;
   background: var(--navy-deep);
-  border-bottom: 1px solid #D4B37D;
+  border-bottom: 1px solid rgba(212, 179, 125, 0.3);
 }
 .ys-hero-bg {
   position: absolute;
@@ -2442,8 +2442,8 @@ header[role="banner"] {
   .ys-hero {
     padding: 18px 18px 24px;
     min-height: auto;
-    border-top: 1px solid var(--gold, #D4B37D);
-    border-bottom: 1px solid var(--gold, #D4B37D);
+    border-top: 1px solid rgba(212, 179, 125, 0.3);
+    border-bottom: 1px solid rgba(212, 179, 125, 0.3);
     overflow: hidden;
     background-image:
       linear-gradient(to right, rgba(0,13,34,0.93) 0%, rgba(0,13,34,0.65) 55%, rgba(0,13,34,0.2) 100%),
@@ -2658,7 +2658,7 @@ header[role="banner"] {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  border-bottom: 1px solid #D4B37D;
+  border-bottom: 1px solid rgba(212, 179, 125, 0.3);
 }
 /* 覆蓋舊的放射漸層遮罩 → 改為由深到淺的半透明暗色遮罩 */
 .page-hero::before {
@@ -2778,7 +2778,7 @@ body.page-contact  .page-hero { background-position: right 55%; }
   section.ys-hero,
   .ys-hero {
     border-top: none !important;
-    border-bottom: 1px solid #D4B37D !important;
+    border-bottom: 1px solid rgba(212, 179, 125, 0.3) !important;
     background-image:
       linear-gradient(to right, rgba(0,13,34,0.92) 0%, rgba(0,13,34,0.6) 50%, rgba(0,13,34,0.1) 100%),
       url('../img/hero-bg.jpg') !important;
@@ -2794,6 +2794,6 @@ body.page-contact  .page-hero { background-position: right 55%; }
   /* 3. 內頁 Hero 也補金線 */
   section.page-hero,
   .page-hero {
-    border-bottom: 1px solid #D4B37D !important;
+    border-bottom: 1px solid rgba(212, 179, 125, 0.3) !important;
   }
 }
