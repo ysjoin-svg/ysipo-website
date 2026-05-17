@@ -92,3 +92,18 @@ curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/purge_
 ```
 
 - 回應 `"success":true` 表示清除成功
+
+## Skill 知識包
+
+本專案備有完整工作脈絡知識包，位於 `.skill/` 資料夾。
+
+**每次收到任何網站修改、CSS 調整、部署、新增區塊、除錯等任務時，必須先讀取 `.skill/SKILL.md`，再依任務類型選讀對應的 reference 檔案。**
+
+| 任務類型 | 必讀 reference |
+|---------|--------------|
+| 任何修改前 | `.skill/references/project-context.md` |
+| 改 CSS / 樣式 | `.skill/references/css-naming.md` |
+| 改 Header / Nav | `.skill/references/communication-dict.md` |
+| 部署 / 推送 | `.skill/references/deployment.md` |
+| 遇到 bug | `.skill/references/known-issues.md` |
+| 新增文章 | `.skill/references/auto-publish.md` |
