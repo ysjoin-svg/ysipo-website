@@ -1,0 +1,42 @@
+<!--
+  Service 卡片範本（首頁 .ys-service-grid 內單一張卡）
+
+  目前首頁有 4 張卡（專利 / 商標 / 著作權 / 國際），增加第 5 張時用此範本。
+
+  注意：4 張時用 grid-template-columns: repeat(4, 1fr)
+       5 張時要在 CSS 改成 repeat(5, 1fr) 或維持 4 欄讓最後一張換行
+-->
+
+<div class="ys-service-card">
+  <div class="ys-service-icon-wrap">
+    <!-- 從 assets/img/icons/ 選一個對應 SVG，或新增一個 -->
+    <img src="assets/img/icon-XXX.svg" alt="服務名稱" class="ys-service-icon">
+  </div>
+  <h3 class="ys-service-name">服務中文名</h3>
+  <p class="ys-service-name-en">SERVICE NAME IN ENGLISH</p>
+  <p class="ys-service-desc">
+    一段簡短描述，2~3 行。介紹這個服務涵蓋什麼、為誰服務。
+  </p>
+  <a href="services.html#service-id" class="ys-service-more">
+    了解更多 →
+  </a>
+</div>
+
+<!--
+  英文版改動：
+  - <h3>: 直接用英文（例如 "Patent Application"）
+  - .ys-service-name-en: 可以省略（因為主標已是英文）
+                         或改成中文「專利申請」做對照
+  - .ys-service-desc: 翻成英文
+  - .ys-service-more: "Learn More →"
+-->
+
+<!--
+  ⚠️ 已有的 4 個 icon
+
+  - icon-patent.svg / icon-international.svg / icon-trademark.svg / icon-copyright.svg
+  - 都是金色 (#D4B37D) 線框風格，stroke-width 1.8
+  - SVG viewBox 24×24
+
+  新 icon 要保持相同視覺風格（金色、線框、相同 stroke-width）。
+-->

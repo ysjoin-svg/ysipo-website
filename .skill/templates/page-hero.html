@@ -1,0 +1,67 @@
+<!--
+  內頁 Hero 區範本（about/services/insights/news/contact 都用這個結構）
+
+  使用方式：
+  1. 複製到內頁 <main id="main-content"> 內第一個區塊
+  2. 改：section-label 內文字（英文小金字）
+  3. 改：h1 大標
+  4. 改：subtitle-main 主副標（短）
+  5. 改：subtitle-sub 副副標（補充說明）
+
+  背景圖：由 main.js initV20Header() 自動依 body class 綁定
+         確保 main.js 第 ~402 行支援該頁名
+-->
+
+<section class="page-hero" aria-labelledby="page-title">
+  <div class="container">
+    <!-- 麵包屑（已在 CSS display: none 隱藏，但 HTML 還是保留以利 SEO） -->
+    <nav class="breadcrumb" aria-label="麵包屑導覽">
+      <a href="index.html">首頁</a>
+      <span class="breadcrumb-sep" aria-hidden="true">›</span>
+      <span class="breadcrumb-current" aria-current="page">頁面名稱</span>
+    </nav>
+
+    <!-- 上方小金字 -->
+    <span class="section-label" style="position: relative; z-index: 1;">
+      ENGLISH SMALL TEXT
+    </span>
+
+    <!-- 大標 -->
+    <h1 id="page-title">中文大標</h1>
+
+    <!-- 副標主（較亮、較大）-->
+    <p class="hero-subtitle-main">主訊息一行</p>
+
+    <!-- 副標副（較淡、較小，可省略）-->
+    <p class="hero-subtitle-sub">補充說明一行 ｜ 用直線分段</p>
+  </div>
+</section>
+
+<!--
+  英文版同樣結構，只是文字翻成英文：
+
+  <section class="page-hero">
+    <div class="container">
+      <nav class="breadcrumb">...</nav>
+      <span class="section-label">ENGLISH SECTION LABEL</span>
+      <h1>English Title</h1>
+      <p class="hero-subtitle-main">Main message</p>
+      <p class="hero-subtitle-sub">Supplementary text</p>
+    </div>
+  </section>
+
+  英文版的 section-label 不一定要全大寫（雖然 CSS 會自動轉），但建議保持
+  跟中文版視覺一致。
+-->
+
+<!--
+  ⚠️ 注意事項
+
+  1. 千萬不要加 background-image 在這個 section 上（會蓋掉 main.js 動態綁定）
+  2. 千萬不要省略 <div class="container">（影響左右 padding 對齊首頁）
+  3. section-label 內 inline style 是必要的（為了 z-index 蓋過漸層遮罩）
+  4. 若是新增頁面（不在 about/services/insights/news/contact 5 個內）：
+     - 要在 assets/img/ 加對應 hero-{name}.jpg
+     - 要在 main.css 加 body.page-{name} .page-hero { background-position: ...; }
+     - main.js initV20Header() 自動會處理 body class
+-->
