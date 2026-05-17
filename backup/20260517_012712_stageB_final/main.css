@@ -2206,7 +2206,6 @@ header[role="banner"] {
   padding: 50px 40px 40px;
   overflow: hidden;
   background: var(--navy-deep);
-  border-bottom: 1px solid rgba(212, 179, 125, 0.3);
 }
 .ys-hero-bg {
   position: absolute;
@@ -2426,7 +2425,6 @@ header[role="banner"] {
 @media (max-width: 768px) {
   .ys-header {
     padding: 14px 16px;
-    border-bottom: 1px solid var(--gold, #D4B37D);
   }
   .ys-logo-img { width: 40px; height: 40px; }
   .ys-logo-zh { font-size: 14px; }
@@ -2437,23 +2435,29 @@ header[role="banner"] {
   }
 
   .ys-nav { display: none; }
-  .ys-nav.open { display: flex !important; }
 
   .ys-hero {
     padding: 18px 18px 24px;
     min-height: auto;
-    border-top: 1px solid rgba(212, 179, 125, 0.3);
-    border-bottom: 1px solid rgba(212, 179, 125, 0.3);
+    border-top: 1px solid rgba(212,179,125,0.3);
     overflow: hidden;
-    background-image:
-      linear-gradient(to right, rgba(0,13,34,0.93) 0%, rgba(0,13,34,0.65) 55%, rgba(0,13,34,0.2) 100%),
-      url('../img/hero-bg.jpg');
-    background-size: cover;
-    background-position: 65% center;
   }
   .ys-hero-bg { display: none; }
   .ys-hero-overlay { display: none; }
-  .ys-hero::after { content: none; }
+  .ys-hero::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 75%;
+    height: 250px;
+    background-image: url('../img/pen-mobile.png');
+    background-size: contain;
+    background-position: right bottom;
+    background-repeat: no-repeat;
+    z-index: 1;
+    pointer-events: none;
+  }
   .ys-hero-content { max-width: 100%; }
   .ys-hero-title { font-size: 24px; margin-bottom: 14px; }
   .ys-hero-points { gap: 6px; margin-bottom: 16px; }
@@ -2658,7 +2662,6 @@ header[role="banner"] {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  border-bottom: 1px solid rgba(212, 179, 125, 0.3);
 }
 /* 覆蓋舊的放射漸層遮罩 → 改為由深到淺的半透明暗色遮罩 */
 .page-hero::before {
@@ -2672,8 +2675,21 @@ header[role="banner"] {
     background-position: 60% center;
   }
 
-  /* 漢堡展開的 nav：正常文件流，顯示於 header 正下方 */
+  /* 首頁手機版筆圖：縮小 + 淡化，避免遮住文字 */
+  .ys-hero::after {
+    width: 60% !important;
+    height: 200px !important;
+    opacity: 0.35 !important;
+    background-position: right bottom !important;
+  }
+
+  /* 漢堡展開的 nav 改為絕對定位下拉 */
   .ys-nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 999;
     flex-direction: column;
     padding: 0;
     gap: 0;
@@ -2690,12 +2706,6 @@ header[role="banner"] {
     border-bottom-color: rgba(255, 255, 255, 0.08);
     background: rgba(212, 179, 125, 0.08);
   }
-  .ys-nav .ys-nav-lang {
-    color: var(--gold) !important;
-    border-top: 1px solid rgba(212, 179, 125, 0.3) !important;
-    font-size: 13px;
-    letter-spacing: 0.08em;
-  }
 }
 
 /* ── 內頁 Hero 左對齊（呼應首頁風格）── */
@@ -2706,104 +2716,4 @@ header[role="banner"] {
   margin-left: 0;
   margin-right: 0;
   max-width: 60ch;
-}
-
-/* ═══════════════════════════════════════════════ */
-/* v20 階段 B：內頁 Hero 對齊基準線 + 5 張圖個別定位 */
-/* ═══════════════════════════════════════════════ */
-
-/* 內頁 Hero 容器對齊首頁 40px 基準線 */
-.page-hero .container {
-  padding-left: 40px;
-  padding-right: 40px;
-}
-
-/* 5 張背景圖個別最佳定位 — 桌面 */
-body.page-about    .page-hero { background-position: right 25%; }
-body.page-services .page-hero { background-position: right 45%; }
-body.page-insights .page-hero { background-position: right 40%; }
-body.page-news     .page-hero { background-position: right 50%; }
-body.page-contact  .page-hero { background-position: right 55%; }
-
-/* 平板（≤1199px） */
-@media (max-width: 1199px) {
-  body.page-about    .page-hero { background-position: 75% 30%; }
-  body.page-services .page-hero { background-position: 75% 45%; }
-  body.page-insights .page-hero { background-position: 75% 40%; }
-  body.page-news     .page-hero { background-position: 75% 45%; }
-  body.page-contact  .page-hero { background-position: 75% 50%; }
-  .page-hero .container { padding-left: 32px; padding-right: 32px; }
-}
-
-/* 手機（≤767px） */
-@media (max-width: 767px) {
-  body.page-about    .page-hero { background-position: 70% center; }
-  body.page-services .page-hero { background-position: 65% center; }
-  body.page-insights .page-hero { background-position: 70% center; }
-  body.page-news     .page-hero { background-position: 65% center; }
-  body.page-contact  .page-hero { background-position: 70% center; }
-  .page-hero .container { padding-left: 24px; padding-right: 24px; }
-}
-
-/* about 副標兩行差異化樣式 */
-.page-hero .hero-subtitle-main {
-  font-size: 1.15rem;
-  color: rgba(255, 255, 255, 0.95);
-  margin-bottom: 8px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-}
-.page-hero .hero-subtitle-sub {
-  font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.70);
-  margin-bottom: 0;
-  letter-spacing: 0.02em;
-}
-@media (max-width: 767px) {
-  .page-hero .hero-subtitle-main { font-size: 1rem; }
-  .page-hero .hero-subtitle-sub  { font-size: 0.88rem; }
-}
-
-/* ═══════════════════════════════════════════════ */
-/* 強制修補 v3：手機 Hero 鋼筆對位 + 金線        */
-/* ═══════════════════════════════════════════════ */
-@media (max-width: 768px) {
-  /* 1. Header 底金線（全色）*/
-  header.ys-header,
-  .ys-header {
-    border-bottom: 1px solid #D4B37D !important;
-  }
-
-  /* 2. 首頁 Hero 重做：用 hero-bg.jpg + 鋼筆對齊按鈕下方 */
-  section.ys-hero,
-  .ys-hero {
-    border-top: none !important;
-    border-bottom: 1px solid rgba(212, 179, 125, 0.3) !important;
-    background-image:
-      linear-gradient(to right, rgba(0,13,34,0.92) 0%, rgba(0,13,34,0.6) 50%, rgba(0,13,34,0.1) 100%),
-      url('../img/hero-bg.jpg') !important;
-    background-size: cover, 200% auto !important;
-    background-position: center, 78% 38% !important;
-    background-repeat: no-repeat, no-repeat !important;
-    background-color: #000d22 !important;
-  }
-  .ys-hero::after { content: none !important; display: none !important; }
-  .ys-hero-bg { display: none !important; }
-  .ys-hero-overlay { display: none !important; }
-
-  /* 3. 內頁 Hero 也補金線 */
-  section.page-hero,
-  .page-hero {
-    border-bottom: 1px solid rgba(212, 179, 125, 0.3) !important;
-  }
-}
-
-/* ═══════════════════════════════════════════════ */
-/* 修補：桌面 Nav 內語系切換連結隱藏              */
-/* （桌面 Header 右上已有 .ys-lang，避免重複）   */
-/* ═══════════════════════════════════════════════ */
-@media (min-width: 769px) {
-  .ys-nav .ys-nav-lang {
-    display: none !important;
-  }
 }

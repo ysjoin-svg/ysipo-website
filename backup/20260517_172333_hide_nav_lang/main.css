@@ -2797,13 +2797,3 @@ body.page-contact  .page-hero { background-position: right 55%; }
     border-bottom: 1px solid rgba(212, 179, 125, 0.3) !important;
   }
 }
-
-/* ═══════════════════════════════════════════════ */
-/* 修補：桌面 Nav 內語系切換連結隱藏              */
-/* （桌面 Header 右上已有 .ys-lang，避免重複）   */
-/* ═══════════════════════════════════════════════ */
-@media (min-width: 769px) {
-  .ys-nav .ys-nav-lang {
-    display: none !important;
-  }
-}
