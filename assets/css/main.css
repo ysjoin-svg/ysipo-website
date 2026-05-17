@@ -2313,7 +2313,7 @@ header[role="banner"] {
 .ys-stat {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 8px;
 }
 .ys-stat-img {
   width: 64px;
@@ -2482,7 +2482,7 @@ header[role="banner"] {
     grid-template-columns: 1fr 1fr;
     gap: 18px 12px;
   }
-  .ys-stat { gap: 10px; }
+  .ys-stat { gap: 5px; }
   .ys-stat-img { width: 48px; height: 48px; }
   .ys-stat-num { font-size: 20px; }
   .ys-stat-num.small { font-size: 16px; }
