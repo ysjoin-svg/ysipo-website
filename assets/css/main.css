@@ -2658,6 +2658,7 @@ header[role="banner"] {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  border-bottom: 1px solid #D4B37D;
 }
 /* 覆蓋舊的放射漸層遮罩 → 改為由深到淺的半透明暗色遮罩 */
 .page-hero::before {
