@@ -2761,3 +2761,37 @@ body.page-contact  .page-hero { background-position: right 55%; }
   .page-hero .hero-subtitle-main { font-size: 1rem; }
   .page-hero .hero-subtitle-sub  { font-size: 0.88rem; }
 }
+
+/* ═══════════════════════════════════════════════ */
+/* 強制修補 v3：手機 Hero 鋼筆對位 + 金線        */
+/* ═══════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* 1. Header 底金線（全色）*/
+  header.ys-header,
+  .ys-header {
+    border-bottom: 1px solid #D4B37D !important;
+  }
+
+  /* 2. 首頁 Hero 重做：用 hero-bg.jpg + 鋼筆對齊按鈕下方 */
+  section.ys-hero,
+  .ys-hero {
+    border-top: none !important;
+    border-bottom: 1px solid #D4B37D !important;
+    background-image:
+      linear-gradient(to right, rgba(0,13,34,0.92) 0%, rgba(0,13,34,0.6) 50%, rgba(0,13,34,0.1) 100%),
+      url('../img/hero-bg.jpg') !important;
+    background-size: cover, 200% auto !important;
+    background-position: center, 78% 38% !important;
+    background-repeat: no-repeat, no-repeat !important;
+    background-color: #000d22 !important;
+  }
+  .ys-hero::after { content: none !important; display: none !important; }
+  .ys-hero-bg { display: none !important; }
+  .ys-hero-overlay { display: none !important; }
+
+  /* 3. 內頁 Hero 也補金線 */
+  section.page-hero,
+  .page-hero {
+    border-bottom: 1px solid #D4B37D !important;
+  }
+}
