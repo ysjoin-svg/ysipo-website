@@ -6,3 +6,6 @@ scripts/generate-article.log
 
 # Node
 node_modules/
+
+# 本地備份
+backup/

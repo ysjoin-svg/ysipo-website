@@ -1,5 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /assets/partials/
-
-Sitemap: https://ysipo.com.tw/sitemap.xml
