@@ -260,6 +260,38 @@ node generate-article.js >> "...log" 2>&1
 
 ---
 
+### 坑 18：修好重定向後圖片仍破圖（瀏覽器快取殘留）
+
+**症狀**：SSL 模式改回「完整」後，網頁可開，但 Hero 背景圖、部分 stats 圖示、service 圖示顯示破圖，Insights 文章不見，內頁 Header 消失。
+
+**原因**：瀏覽器在無限重定向期間，對某些資源 URL（圖片、JSON、JS）快取了「失敗」的重定向回應。修好 SSL 後頁面 HTML 重新載入，但這些資源 URL 仍從快取讀到舊的錯誤回應，導致破圖。
+
+**伺服器端處置**：
+1. 清除 Cloudflare 快取（`purge_everything: true`）
+2. 加入 `.nojekyll`（根目錄空白檔案，停用 Jekyll 處理，GitHub Pages 最佳實踐）
+3. 再次 git push + purge
+
+**使用者端處置（必做）**：
+- **最快**：按 `Ctrl + Shift + N` 開無痕視窗，再開網站
+- **徹底**：按 `Ctrl + Shift + Delete` → 時間選「不限時間」→ 勾「快取的圖片和檔案」→ 清除資料 → 重新整理
+
+**特別注意**：
+- `ipos.ysipo.com.tw`（承辦人系統）是同一 Cloudflare Zone，SSL 模式是 Zone 級設定，會影響所有子網域
+- 解法：Zone 設「完整」，同時建立「頁面規則」讓 `ipos.ysipo.com.tw/*` 單獨套用「彈性」模式（因為 Windows Server origin 沒有 SSL）
+- **順序**：先建頁面規則，再改 Zone SSL 模式，避免 ipos 短暫中斷
+
+---
+
+### 坑 19：Cloudflare API Token 只能清快取，無法查閱或修改安全設定
+
+**症狀**：用 API Token 查詢 `security_level`、`ssl` 等設定時回傳 `"Unauthorized to access requested resource"`。
+
+**原因**：目前的 API Token（存於 `scripts/config.js`，已 gitignore）只有 `Cache Purge` 權限，沒有 Zone Settings 讀寫權限。
+
+**解法**：需要在 Cloudflare 儀表板手動操作。如果日後想要 API 控制安全設定，需另建一組具備 `Zone:Read + Zone Settings:Edit` 權限的 Token。
+
+---
+
 ## 一般原則
 
 | 原則 | 為什麼 |
@@ -271,3 +303,5 @@ node generate-article.js >> "...log" 2>&1
 | 中英文版要對稱改動 | 不對稱會被使用者抓出來 |
 | 部署後必清 Cloudflare 快取 | 沒清就是「程式碼上線了但使用者看不到」 |
 | 實機驗證用無痕視窗 | 排除瀏覽器本機快取 |
+| Cloudflare SSL 改模式後必清 CF 快取 + 用無痕測試 | 避免 CF 快取舊錯誤回應、避免瀏覽器快取殘留 |
+| 多子網域同 Zone → 改 SSL 前先建頁面規則 | 不同 origin（GitHub Pages vs 內部 HTTP Server）需要不同 SSL 模式 |
