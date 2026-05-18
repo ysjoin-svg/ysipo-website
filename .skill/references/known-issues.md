@@ -221,6 +221,45 @@ API Error: 500 Internal server error.
 
 ---
 
+### 坑 16：Windows 工作排程器找不到 node
+
+**症狀**：排程執行結果代碼為 1，且沒有產生 log 檔。
+
+**原因**：工作排程器使用的 PATH 不含使用者自訂路徑（node 裝在 `AppData\Local\...`），導致 `node` 指令找不到。
+
+**解法**：在 `.bat` 檔內手動設 PATH：
+```bat
+set PATH=C:\Users\Johnny\AppData\Local\node-v22.15.0-win-x64;C:\Program Files\Git\cmd;%PATH%
+node generate-article.js >> "...log" 2>&1
+```
+
+---
+
+## Cloudflare 相關
+
+### 坑 17：ERR_TOO_MANY_REDIRECTS（無限重定向）
+
+**症狀**：瀏覽器顯示「將您重新導向的次數過多」，ERR_TOO_MANY_REDIRECTS。
+
+**原因**：
+- Cloudflare SSL 模式設為「**彈性**（Flexible）」→ Cloudflare 用 HTTP 連 GitHub Pages
+- GitHub Pages 有強制 HTTPS（`https_enforced: true`）→ 收到 HTTP 就 301 跳 HTTPS
+- 結果：Cloudflare → HTTP → GitHub Pages → 301 跳 HTTPS → Cloudflare 又改 HTTP → 無限循環
+
+**解法（Cloudflare 中文介面）**：
+
+1. 登入 [dash.cloudflare.com](https://dash.cloudflare.com)，選擇 `ysipo.com.tw`
+2. 左側選單 → **SSL/TLS** → **概述**
+3. 在「您的 SSL/TLS 加密模式」找到目前選項（**彈性**）
+4. 改選為 **完整**
+5. 自動儲存，立即生效
+
+> **注意**：選「完整」不要選「完整（嚴格）」——GitHub Pages 的憑證是 Let's Encrypt，嚴格模式要求 EV 憑證才不會報錯。
+
+**驗證**：改完後直接在瀏覽器開 https://ysipo.com.tw，應立即正常，不需要清快取。
+
+---
+
 ## 一般原則
 
 | 原則 | 為什麼 |
