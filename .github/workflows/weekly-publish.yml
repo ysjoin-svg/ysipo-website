@@ -33,3 +33,24 @@ jobs:
           CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
         run: node generate-article.js
+
+      - name: 寄送執行結果通知（成功 / 失敗都寄）
+        if: always()
+        uses: dawidd6/action-send-mail@v4
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          from: 永旭自動發文 <${{ secrets.MAIL_USERNAME }}>
+          to: taiejoin@hotmail.com
+          subject: ${{ job.status == 'success' && '[永旭] 自動發文成功' || '[永旭] 自動發文失敗，請檢查' }}
+          body: |
+            永旭網站每週自動發文 workflow 執行完成。
+
+            結果：${{ job.status }}
+            詳細紀錄：${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            若結果為 success，新文章已發佈：https://ysipo.com.tw/insights.html
+            若結果為 failure，請點上方連結查看錯誤原因。
