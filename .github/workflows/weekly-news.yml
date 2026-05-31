@@ -37,7 +37,7 @@ jobs:
 
       - name: 寄送結果通知（成功 / 失敗都寄）
         if: always()
-        uses: dawidd6/action-send-mail@v4
+        uses: dawidd6/action-send-mail@v17
         with:
           server_address: smtp.gmail.com
           server_port: 465
