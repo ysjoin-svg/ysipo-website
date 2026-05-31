@@ -83,13 +83,17 @@ async function fetchRSS(query) {
 function summarize(title, source) {
   return new Promise((resolve) => {
     const sys =
-      '你是台灣智慧財產權事務所的新聞編輯。請用繁體中文、台灣慣用語，' +
-      '把提供的新聞標題改寫成一則中立、專業的智財新聞摘要。要求：' +
+      '你是台灣智慧財產權事務所的新聞編輯。' +
+      '【第一步｜過濾】若這則新聞是針對「特定公司或個人」的訴訟、侵權糾紛、判賠、上訴、求償等個案事件' +
+      '（而非通用的法規修正、官方公告、制度介紹、研討會、考試報名、統計數據等），' +
+      '請只回覆 {"skip":true}，不要改寫。' +
+      '【第二步｜改寫】否則請用繁體中文、台灣慣用語把標題改寫成中立、專業的智財新聞摘要：' +
       '1) 一個精簡標題（不超過 30 字，不照抄原標題，不聳動）；' +
       '2) 2-3 句客觀摘要（不超過 120 字）：具體交代「是誰、做了什麼事、對權利人或申請人有何意義或提醒」，' +
       '避免「旨在」「促進發展」「展現成果」這類空泛套話；不杜撰原標題未提及的細節；' +
       '不用「軟件/網絡/信息/質量」等中國用語；' +
-      '3) 嚴格只以 JSON 回覆 {"title":"...","summary":"..."}，不要任何其他文字。';
+      '只以 JSON 回覆 {"title":"...","summary":"..."}。' +
+      '注意：第一步與第二步只能擇一回覆，且只輸出 JSON，不要任何其他文字。';
     const user = `新聞標題：「${title}」\n來源：${source}`;
     const payload = JSON.stringify({
       model: 'meta/llama-3.3-70b-instruct',
@@ -111,6 +115,7 @@ function summarize(title, source) {
         try {
           const txt = JSON.parse(b).choices[0].message.content;
           const obj = JSON.parse(txt.match(/\{[\s\S]*\}/)[0]);
+          if (obj.skip) { resolve({ skip: true }); return; }
           resolve({ title: obj.title, summary: obj.summary });
         } catch (e) { resolve(null); }
       });
@@ -210,6 +215,8 @@ function writeOutput(count, titles) {
   for (const n of picked) {
     const s = await summarize(n.title, n.source);
     if (!s) { console.log('  ⚠️ 摘要失敗，略過：' + n.title); continue; }
+    if (s.skip) { console.log('  ⏭️  AI 判定個案訴訟，跳過：' + n.title); continue; }
+    if (EXCLUDE_KEYWORDS.some((k) => s.title.includes(k))) { console.log('  ⏭️  改寫後判定個案，跳過：' + s.title); continue; }
     newItems.push({ ...n, displayTitle: s.title, summary: s.summary, origTitle: n.title });
   }
 
