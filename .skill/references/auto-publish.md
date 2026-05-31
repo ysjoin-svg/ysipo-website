@@ -1,31 +1,35 @@
-# Phase 3 自動發文系統
+# 自動發文系統（GitHub Actions 版）
 
-> 永旭網站每週一自動產生一篇智財文章發到 insights。
+> 永旭網站每週一自動產生一篇智財文章（含 AI 即時生成的專屬配圖）發到 insights。
+> 2026-05-31 起已從 Windows 工作排程器**遷移到 GitHub Actions**，不再依賴本機開機。
 
 ---
 
 ## 系統架構
 
 ```
-每週一早上 09:00
+每週一 台北時間 09:00（cron: UTC 01:00 週一）
    ↓
-Windows 工作排程器（在 Johnny 的電腦上）觸發
+GitHub Actions 雲端觸發（.github/workflows/weekly-publish.yml）
+   ↓
+checkout → setup-node → 設定 git identity
    ↓
 執行 node scripts/generate-article.js
    ↓
-呼叫 Nvidia API（Llama 3.3-70B）產出繁體中文文章
+呼叫 Nvidia API（Llama 3.3-70B）產出繁中 + 英文文章
    ↓
 自動分類（商標 / 專利 / 著作權 / 國際智財）
    ↓
-從 assets/img/categories/ 隨機選配圖
+★ 用 FLUX.1-schnell 依分類即時生成專屬配圖（存 insights/img/）
+   生圖失敗則回退 assets/img/categories/ 圖庫
    ↓
-產出 HTML 檔到 insights/article-yyyymmdd-時戳.html
+產出中英文 HTML 到 insights/article-yyyymmdd-時戳(.｜-en).html
    ↓
-更新 insights/articles.json 索引
+更新 insights/articles.json 索引（image 指向生成圖）
    ↓
-git add → commit → push
+git add → commit → push（用內建 GITHUB_TOKEN，免認證設定）
    ↓
-等 60 秒後自動 curl Cloudflare API 清快取
+等 60 秒後 curl Cloudflare API 清快取
 ```
 
 ---
@@ -34,138 +38,111 @@ git add → commit → push
 
 | 檔案 | 用途 |
 |------|------|
-| `scripts/generate-article.js` | 主程式（產文 + 寫檔 + 提交 + 清快取） |
-| `scripts/manage-articles.js` | 互動式管理工具（列出 / 編輯 / 刪除既有文章）|
-| `insights/articles.json` | 文章索引（標題、分類、圖、發佈日期、檔名） |
+| `.github/workflows/weekly-publish.yml` | **排程定義**（cron + workflow_dispatch 手動觸發）|
+| `scripts/generate-article.js` | 主程式（產文 + 生圖 + 寫檔 + 提交 + 清快取）|
+| `scripts/generate-article.js` 內 `generateArticleImage()` | FLUX.1 生圖函式（依分類，刻意不傳文章標題避免亂碼字）|
+| `scripts/manage-articles.js` | 互動式管理工具（列出 / 編輯標題 / 刪除）|
+| `scripts/config.js` | **本機**密鑰（已 gitignore）；CI 上改用 GitHub Secrets |
+| `insights/articles.json` | 文章索引（標題、分類、圖、發佈日期、檔名）|
 | `insights/article-*.html` | 個別文章頁 |
-| `assets/img/categories/` | 12 張分類配圖 |
+| `insights/img/article-*.jpg` | 各篇 AI 生成的專屬配圖 |
+| `assets/img/categories/` | 12 張分類配圖（生圖失敗時的 fallback）|
+
+---
+
+## 密鑰管理（兩套來源）
+
+腳本密鑰載入順序：**先讀環境變數，沒有才回退 `config.js`**。
+
+| 環境 | 來源 |
+|------|------|
+| GitHub Actions（雲端） | GitHub Secrets：`NVIDIA_API_KEY`、`CF_ZONE_ID`、`CF_API_TOKEN` |
+| 本機手動跑 | `scripts/config.js`（已 gitignore，不上傳）|
+
+設定 / 更新 Secrets（需 gh CLI 已登入、token 有 repo scope）：
+```bash
+cd C:\Users\Johnny\Desktop\Agent\永旭網站
+node -e "process.stdout.write(require('./scripts/config.js').NVIDIA_API_KEY)" | gh secret set NVIDIA_API_KEY
+node -e "process.stdout.write(require('./scripts/config.js').CF_ZONE_ID)"    | gh secret set CF_ZONE_ID
+node -e "process.stdout.write(require('./scripts/config.js').CF_API_TOKEN)"  | gh secret set CF_API_TOKEN
+gh secret list   # 確認
+```
+
+---
+
+## AI 生圖重點（FLUX.1-schnell）
+
+- endpoint：`POST https://ai.api.nvidia.com/v1/genai/black-forest-labs/flux.1-schnell`
+- 用**現有的 `NVIDIA_API_KEY`**（同一把 key，免額外申請、免額外付費）
+- 回傳 `artifacts[0].base64`，解碼存成 jpg（約 25~45 KB，1024×768）
+- prompt = 固定風格（navy + gold 扁平商務插畫、強制 no text）+ 分類物件描述
+- ⚠️ **絕對不要把文章標題（英文句子）塞進 prompt** —— FLUX 會把它「寫」進圖裡變成亂碼英文字。只用分類的具象物件詞。
+- 分類物件對照：
+  - trademark → 盾牌、放大鏡、勾選、星章
+  - patent → 燈泡、齒輪、藍圖捲軸、圓規
+  - copyright → 文件、鋼筆、調色盤、底片/音符
+  - international → 地球、世界地圖、連線、紙飛機
 
 ---
 
 ## 手動操作
 
-### 立刻產一篇文章（測試 / 補發）
+### 立刻產一篇（測試 / 補發）— 雲端（推薦）
 
+GitHub → Actions → 「Weekly Article Publish」→ Run workflow，或：
+```bash
+cd C:\Users\Johnny\Desktop\Agent\永旭網站
+gh workflow run weekly-publish.yml --ref master
+gh run watch $(gh run list --workflow=weekly-publish.yml --limit 1 --json databaseId --jq '.[0].databaseId') --exit-status
+```
+
+### 立刻產一篇 — 本機（需 config.js）
 ```bash
 cd C:\Users\Johnny\Desktop\Agent\永旭網站\scripts
 node generate-article.js
 ```
 
-預期輸出：
-```
-✅ 文章已生成：insights/article-yyyymmdd-時戳.html
-✅ articles.json 已更新
-✅ Git push 完成
-✅ Cloudflare 快取已清除
-```
-
-### 管理現有文章
-
+### 管理現有文章（列出 / 改標題 / 刪除）
 ```bash
 cd C:\Users\Johnny\Desktop\Agent\永旭網站\scripts
 node manage-articles.js
 ```
-
-互動式選單：
-- 列出所有文章
-- 編輯某篇
-- 刪除某篇
-- 重新發佈
-
----
-
-## Windows 工作排程器設定
-
-### 查看現有排程
-
-```powershell
-# PowerShell
-Get-ScheduledTask | Where-Object {$_.TaskName -like "*永旭*"}
-```
-
-或開圖形介面：「控制台 → 系統管理工具 → 工作排程器」
-
-### 排程設定要點
-
-- **觸發頻率**：每週一
-- **觸發時間**：早上 09:00
-- **動作**：`node generate-article.js`
-- **工作目錄**：`C:\Users\Johnny\Desktop\Agent\永旭網站\scripts`
-
-### 重要設定
-
-| 設定 | 建議值 |
-|------|-------|
-| 如果電腦睡眠是否喚醒 | ☑ 喚醒電腦以執行此工作 |
-| 如果錯過排程 | ☑ 啟動後盡快執行錯過的工作 |
-| AC 電源限制 | ☐ 不要勾「僅在 AC 電源時執行」（除非桌機）|
-| 失敗時重試 | ☑ 1 次，間隔 15 分鐘 |
-
----
-
-## 已知風險
-
-### ⚠️ 風險 1：電腦關機就跳過
-
-最大問題：Johnny 的電腦不是 24 小時開機，星期一 9 點若沒開機 → **該週跳過**。
-
-**狀態**：手動測試發文成功過，但實際排程**從未自動成功觸發**。
-
-### ⚠️ 風險 2：API key 過期 / 額度用完
-
-- Nvidia API 有月額度限制
-- Cloudflare token 不會主動過期但可能被重設
-
-排程失敗時不會主動通知（沒設 email alert），需要主動檢查 `insights/articles.json` 看有沒有新文章。
-
-### ⚠️ 風險 3：產文品質浮動
-
-LLM 偶爾會產出：
-- 不符合台灣用語（用了「軟件」「網絡」等中國用詞）
-- 引用法條版本過時
-- 重複過往主題
-
-**建議**：每隔 1-2 個月用 `manage-articles.js` 抽查、必要時修改或刪除。
-
----
-
-## 長期改進建議
-
-**遷移到 GitHub Actions**（強烈推薦）：
-
-優點：
-- ✅ 7×24 雲端跑，不受電腦狀態影響
-- ✅ 失敗會 email 通知
-- ✅ 執行紀錄保留在 GitHub
-- ✅ 可手動觸發測試（workflow_dispatch）
-
-步驟：
-1. 寫 `.github/workflows/weekly-publish.yml`
-2. 把 Nvidia / Cloudflare token 放進 GitHub Secrets
-3. cron: `0 1 * * 1`（UTC 01:00 = 台北 09:00 星期一）
-4. 加 `workflow_dispatch:` 讓手動觸發可行
-5. 確認後刪掉 Windows 工作排程器內的同名工作
-
-⚠️ 遷移過程中要小心**雙跑**問題（雲端跑了一篇、本機又跑一篇）。
 
 ---
 
 ## 偵察指令
 
 ```bash
-# 1. 看排程是否還在
-Get-ScheduledTask | Where-Object {$_.TaskName -like "*永旭*"}
+# 看 workflow 最近執行紀錄
+gh run list --workflow=weekly-publish.yml --limit 5
 
-# 2. 看最近一次執行紀錄
-Get-WinEvent -LogName "Microsoft-Windows-TaskScheduler/Operational" -MaxEvents 50 |
-  Where-Object {$_.Message -like "*永旭*"} |
-  Select-Object TimeCreated, Id, Message |
-  Format-Table -Wrap
+# 看某次 run 的 log
+gh run view <run-id> --log
 
-# 3. 看本機產文 log（如果有）
-cd C:\Users\Johnny\Desktop\Agent\永旭網站\scripts
-type generate-article.log 2>nul
-
-# 4. 看 articles.json 最新一篇日期
-node -e "const a = require('./insights/articles.json'); console.log(a.slice(-3));"
+# 看 articles.json 最新幾篇
+node -e "const a=require('./insights/articles.json'); console.log(a.slice(0,3).map(x=>x.date+' '+x.title));"
 ```
+
+---
+
+## 已知風險
+
+### ⚠️ Nvidia API 額度 / key 失效
+- Nvidia API 有月額度；Llama 產文與 FLUX 生圖共用同一把 key，額度雙重消耗。
+- 額度用完或 key 失效 → workflow 會失敗，**GitHub 會自動 email 通知 repo owner（ysjoin@gmail.com）**。
+
+### ⚠️ 產文品質浮動
+LLM 偶爾產出非台灣用語（「軟件」「網絡」）、過時法條或重複主題。
+**建議**：每隔 1-2 個月用 `manage-articles.js` 抽查、必要時修改或刪除。
+
+### ⚠️ 生圖品質浮動
+FLUX 偶爾構圖偏空或物件怪異。不影響發文（有 fallback），但可人工抽換 `insights/img/` 下的圖。
+
+---
+
+## 歷史備註（Windows 工作排程器，已停用）
+
+- 舊機制：Windows 工作排程器「永旭網站_自動發文」每週一 09:00 跑 `run-generate-article.bat`。
+- 問題：背景非互動環境下 node PATH / git push 認證易失敗，**實際從未自動成功觸發過**。
+- 2026-05-31 已用 `scripts/disable-schedule.ps1` 停用（disable 非 delete，設定仍保留）。
+- ⚠️ 若哪天重啟 Windows 排程，務必先確認 GitHub Actions 已停用，避免**雙跑重複發文**。
