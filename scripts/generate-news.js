@@ -23,11 +23,14 @@ const DRY = process.argv.includes('--dry');
 const NO_PUSH = process.argv.includes('--no-push');
 
 // 多組查詢，涵蓋商標 / 專利 / 著作權 / 官方公告
+// 查詢以各國官方智財消息為主，也涵蓋一般新聞媒體（避免同業事務所來源見 SOURCE_BLOCKLIST）
 const QUERIES = [
-  '智慧財產局 商標 公告',
-  '專利 法規 台灣 智慧財產',
-  '著作權 修法 台灣',
-  '智慧財產權 侵權 判決 台灣',
+  '智慧財產局 商標 專利 公告',         // 台灣官方
+  '台灣 著作權 專利 商標 法規 修法',   // 台灣法規
+  '美國 USPTO 專利 商標 智財',         // 美國
+  '日本 韓國 專利 商標 智慧財產',      // 日韓
+  '歐盟 EUIPO EPO 商標 專利',          // 歐洲
+  '中國 大陸 知識產權 專利 商標',      // 中國
 ];
 const MAX_NEWS = 2;        // 每次最多上架幾則
 const RECENT_DAYS = 150;   // 只取近 N 天的新聞
@@ -36,6 +39,13 @@ const RECENT_DAYS = 150;   // 只取近 N 天的新聞
 const EXCLUDE_KEYWORDS = [
   '判賠', '起訴', '求償', '提告', '興訟', '纏訟', '敗訴', '勝訴',
   '和解金', '被訴', '涉侵權', '侵權案', '遭訴', '判決', '官司', '訴請', '訴訟',
+];
+
+// 同業/競業來源黑名單 —— 避免引用其他事務所或智財服務業者的新聞，把客戶導去競爭對手
+const SOURCE_BLOCKLIST = [
+  '北美智權', '智權報', 'naipo', 'naipnews',
+  '事務所', '法律事務所', '律師事務所', '專利商標事務所', '智權事務所', '專利師事務所',
+  '理律', '聖島', '台一國際', '聯合專利', '群帆', '冠群',
 ];
 
 // 來源美化：RSS 給的網域 → 正式名稱
@@ -205,6 +215,8 @@ function writeOutput(count, titles) {
     if (!n.title || seen.has(n.title)) return false;
     seen.add(n.title);
     if (EXCLUDE_KEYWORDS.some((k) => n.title.includes(k))) return false; // 濾掉個案訴訟類
+    const st = (n.source || '') + ' ' + (n.title || '');
+    if (SOURCE_BLOCKLIST.some((k) => st.includes(k))) return false;      // 濾掉同業事務所來源
     return withinRecent(n.pubDate) && !publishedKeys.has(n.title);
   }).sort((a, b) => Date.parse(b.pubDate) - Date.parse(a.pubDate));
 
