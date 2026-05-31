@@ -1,19 +1,26 @@
-// 智財新聞半自動更新 —— 爬 Google News RSS + Nvidia LLM 改寫中立摘要
+// 智財新聞半自動更新 —— 爬 Google News RSS + Nvidia LLM 改寫中立摘要 + 自動上架
 // 用法：
-//   node generate-news.js --dry   只爬取+改寫並印出，不上架/不推送/不寄信（測試用）
-//   node generate-news.js         正式：上架到 news.html + email 通知 + push（之後接）
+//   node generate-news.js --dry       只爬取+改寫並印出，不寫檔/不推送（測試用）
+//   node generate-news.js --no-push    寫入 news.html + published-news.json，但不 git push（本地預覽）
+//   node generate-news.js              正式：寫入 + git push + 清 Cloudflare 快取
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 // ===== 密鑰：env 優先，本機回退 config.js =====
 let config = {};
 try { config = require('./config'); } catch (e) {}
 const NVIDIA_API_KEY = process.env.NVIDIA_API_KEY || config.NVIDIA_API_KEY;
+const CF_ZONE_ID     = process.env.CF_ZONE_ID     || config.CF_ZONE_ID;
+const CF_API_TOKEN   = process.env.CF_API_TOKEN   || config.CF_API_TOKEN;
 if (!NVIDIA_API_KEY) { console.error('❌ 缺少 NVIDIA_API_KEY'); process.exit(1); }
 
 const WEBSITE_DIR = path.resolve(__dirname, '..');
+const NEWS_HTML = path.join(WEBSITE_DIR, 'news.html');
+const PUBLISHED_JSON = path.join(__dirname, 'published-news.json');
 const DRY = process.argv.includes('--dry');
+const NO_PUSH = process.argv.includes('--no-push');
 
 // 多組查詢，涵蓋商標 / 專利 / 著作權 / 官方公告
 const QUERIES = [
@@ -24,6 +31,13 @@ const QUERIES = [
 ];
 const MAX_NEWS = 2;        // 每次最多上架幾則
 const RECENT_DAYS = 150;   // 只取近 N 天的新聞
+
+// 來源美化：RSS 給的網域 → 正式名稱
+const SOURCE_MAP = {
+  'moea.gov.tw': '經濟部智慧財產局',
+  'tipo.gov.tw': '經濟部智慧財產局',
+};
+const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 
 function httpsGet(url) {
   return new Promise((resolve, reject) => {
@@ -37,6 +51,10 @@ function decodeEntities(s) {
   return s.replace(/<!\[CDATA\[|\]\]>/g, '')
     .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&apos;/g, "'");
+}
+// 進 HTML 屬性/內文前再跳脫一次，避免破版
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 async function fetchRSS(query) {
@@ -101,6 +119,58 @@ function withinRecent(pubDate) {
   return !isNaN(t) && (Date.now() - t) <= RECENT_DAYS * 86400 * 1000;
 }
 
+function loadPublished() {
+  try { return JSON.parse(fs.readFileSync(PUBLISHED_JSON, 'utf8')); } catch (e) { return []; }
+}
+function prettySource(src) { return SOURCE_MAP[src] || src || '網路新聞'; }
+function fmtDate(pubDate) {
+  const d = new Date(pubDate);
+  return { day: String(d.getDate()).padStart(2, '0'), my: MONTHS[d.getMonth()] + ' ' + d.getFullYear() };
+}
+
+// 產生一張智財新聞卡片（含原文連結 + 資料來源）
+function buildCard(item) {
+  const f = fmtDate(item.pubDate);
+  const src = esc(prettySource(item.source));
+  return (
+'\n            <article class="news-item">' +
+'\n              <div class="news-date">' +
+'\n                <div class="day">' + f.day + '</div>' +
+'\n                <div class="month-year">' + f.my + '</div>' +
+'\n              </div>' +
+'\n              <div class="news-content">' +
+'\n                <h3><a href="' + esc(item.link) + '" target="_blank" rel="noopener" style="color:inherit;">' + esc(item.displayTitle) + '</a></h3>' +
+'\n                <p>' + esc(item.summary) + '</p>' +
+'\n                <div style="margin-top: var(--space-2);">' +
+'\n                  <span class="tag tag--outline">智財新聞</span>' +
+'\n                  <span style="font-size:var(--text-xs);color:var(--color-text-muted);margin-left:var(--space-2);">資料來源：' + src + '</span>' +
+'\n                </div>' +
+'\n              </div>' +
+'\n            </article>\n'
+  );
+}
+
+// 把卡片 prepend 到 news.html 的智財新聞插入點（最新在前，保留既有）
+function upsertNews(cardsHtml) {
+  let html = fs.readFileSync(NEWS_HTML, 'utf8');
+  const marker = '<div class="news-list" data-source="ai-agent">';
+  const idx = html.indexOf(marker);
+  if (idx < 0) throw new Error('找不到智財新聞插入點 marker');
+  const pos = idx + marker.length;
+  html = html.slice(0, pos) + cardsHtml + html.slice(pos);
+  fs.writeFileSync(NEWS_HTML, html, 'utf8');
+}
+
+function purgeCloudflare() {
+  if (!CF_ZONE_ID || !CF_API_TOKEN) return;
+  const data = JSON.stringify({ purge_everything: true });
+  const req = https.request({
+    hostname: 'api.cloudflare.com', path: '/client/v4/zones/' + CF_ZONE_ID + '/purge_cache', method: 'POST',
+    headers: { Authorization: 'Bearer ' + CF_API_TOKEN, 'Content-Type': 'application/json', 'Content-Length': data.length },
+  }, (r) => { let b = ''; r.on('data', d => b += d); r.on('end', () => console.log('🌐 Cloudflare:', b)); });
+  req.write(data); req.end();
+}
+
 (async () => {
   console.log('📡 抓取智財新聞（Google News RSS）...');
   let all = [];
@@ -108,31 +178,61 @@ function withinRecent(pubDate) {
     try { all = all.concat(await fetchRSS(q)); }
     catch (e) { console.log('  查詢失敗：' + q); }
   }
-  // 去重（標題）→ 篩近期 → 新到舊排序
+  const published = loadPublished();
+  const publishedKeys = new Set(published.map(p => p.origTitle));
+
+  // 去重(標題) → 篩近期 → 排除已上架過 → 新到舊
   const seen = new Set();
   const candidates = all.filter((n) => {
     if (!n.title || seen.has(n.title)) return false;
     seen.add(n.title);
-    return withinRecent(n.pubDate);
+    return withinRecent(n.pubDate) && !publishedKeys.has(n.title);
   }).sort((a, b) => Date.parse(b.pubDate) - Date.parse(a.pubDate));
 
-  console.log(`🔎 近 ${RECENT_DAYS} 天候選 ${candidates.length} 則，取前 ${MAX_NEWS} 則改寫：\n`);
+  console.log(`🔎 近 ${RECENT_DAYS} 天、未上架過的候選 ${candidates.length} 則，取前 ${MAX_NEWS} 則改寫`);
   const picked = candidates.slice(0, MAX_NEWS);
 
+  const newItems = [];
   for (const n of picked) {
     const s = await summarize(n.title, n.source);
-    console.log('════════════════════════════════════════');
-    console.log('【原始新聞】' + n.title + '  (' + n.source + ', ' + n.pubDate + ')');
-    console.log('────────── 上網站後的呈現 ──────────');
-    if (s) {
-      console.log('標題：' + s.title);
-      console.log('摘要：' + s.summary);
-      console.log('資料來源：' + (n.source || '網路新聞') + '（點標題可前往原文）');
-    } else {
-      console.log('⚠️ 摘要失敗，此則會略過');
-    }
-    console.log('原文連結：' + n.link);
-    console.log('');
+    if (!s) { console.log('  ⚠️ 摘要失敗，略過：' + n.title); continue; }
+    newItems.push({ ...n, displayTitle: s.title, summary: s.summary, origTitle: n.title });
   }
-  if (DRY) console.log('[dry-run] 未寫入網站、未推送、未寄信。');
+
+  if (DRY) {
+    newItems.forEach((n) => {
+      console.log('\n──────────────────────');
+      console.log('標題：' + n.displayTitle);
+      console.log('摘要：' + n.summary);
+      console.log('資料來源：' + prettySource(n.source) + '（' + n.pubDate + '）');
+      console.log('原文：' + n.link);
+    });
+    console.log('\n[dry-run] 未寫入網站、未推送。');
+    return;
+  }
+
+  if (newItems.length === 0) { console.log('✅ 本次沒有新的新聞可上架（可能都已上架過）。'); return; }
+
+  // 上架（newItems 已是新到舊，整批 prepend，最新在最前）
+  const cardsHtml = newItems.map(buildCard).join('');
+  upsertNews(cardsHtml);
+  console.log(`📰 已上架 ${newItems.length} 則到 news.html`);
+
+  // 記錄已上架，供下次去重 / 移除工具使用
+  const updated = newItems.map((n) => ({
+    origTitle: n.origTitle, displayTitle: n.displayTitle, source: n.source,
+    date: n.pubDate, link: n.link, addedAt: new Date().toISOString(),
+  })).concat(published);
+  fs.writeFileSync(PUBLISHED_JSON, JSON.stringify(updated, null, 2), 'utf8');
+
+  if (NO_PUSH) { console.log('[--no-push] 已寫檔，未推送。請自行檢查 news.html。'); return; }
+
+  // 推送 + 清快取
+  try {
+    execSync(`git -C "${WEBSITE_DIR}" add news.html scripts/published-news.json`, { stdio: 'inherit' });
+    execSync(`git -C "${WEBSITE_DIR}" commit -m "auto: 智財新聞更新 (${newItems.length} 則)"`, { stdio: 'inherit' });
+    execSync(`git -C "${WEBSITE_DIR}" push origin master`, { stdio: 'inherit' });
+    console.log('📤 已推送到 GitHub');
+    setTimeout(purgeCloudflare, 3000);
+  } catch (e) { console.log('⚠️ Git 推送失敗：' + e.message); }
 })();
