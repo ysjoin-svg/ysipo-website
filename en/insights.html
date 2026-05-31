@@ -397,6 +397,15 @@
             grid.appendChild(renderCard(cardArticle, added * 60));
             added++;
           });
+          // 依日期重新排序所有卡片（靜態 + 動態），最新在前
+          var allCards = Array.prototype.slice.call(grid.querySelectorAll('.article-card'));
+          allCards.sort(function (a, b) {
+            var ta = a.querySelector('time'), tb = b.querySelector('time');
+            var da = ta ? ta.getAttribute('datetime') : '';
+            var db = tb ? tb.getAttribute('datetime') : '';
+            return da < db ? 1 : (da > db ? -1 : 0);
+          });
+          allCards.forEach(function (c) { grid.appendChild(c); });
           if (added > 0) {
             updateCategoryCounts();
             var activeBtn = document.querySelector('.category-btn.active');
