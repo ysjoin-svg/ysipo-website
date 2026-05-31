@@ -3,11 +3,20 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-// ===== 密鑰從 config.js 載入（config.js 已加入 .gitignore）=====
-const config = require('./config');
-const NVIDIA_API_KEY = config.NVIDIA_API_KEY;
-const CF_ZONE_ID    = config.CF_ZONE_ID;
-const CF_API_TOKEN  = config.CF_API_TOKEN;
+// ===== 密鑰載入：優先讀環境變數（GitHub Actions），本機則回退 config.js =====
+let config = {};
+try {
+  config = require('./config'); // 本機有此檔；CI 環境沒有（已 gitignore），用 env
+} catch (e) {
+  // CI 環境無 config.js，改用環境變數
+}
+const NVIDIA_API_KEY = process.env.NVIDIA_API_KEY || config.NVIDIA_API_KEY;
+const CF_ZONE_ID     = process.env.CF_ZONE_ID     || config.CF_ZONE_ID;
+const CF_API_TOKEN   = process.env.CF_API_TOKEN   || config.CF_API_TOKEN;
+if (!NVIDIA_API_KEY || !CF_ZONE_ID || !CF_API_TOKEN) {
+  console.error('❌ 缺少密鑰：請設定環境變數或 scripts/config.js');
+  process.exit(1);
+}
 const WEBSITE_DIR = path.resolve(__dirname, '..');
 const INSIGHTS_DIR = path.join(WEBSITE_DIR, 'insights');
 
@@ -95,6 +104,84 @@ function selectImage(topic, category) {
     }
   }
   return `../assets/img/categories/${category.slug}-1.jpg`; // 預設第 1 張
+}
+
+// 用 FLUX.1 即時生成文章專屬配圖（失敗回傳 null，由呼叫端回退分類圖庫）
+// 注意：刻意不把文章標題塞進 prompt，否則 FLUX 會在圖上「寫」出亂碼英文字
+function generateArticleImage(category, dateStr, timestamp) {
+  return new Promise((resolve) => {
+    const styleBase =
+      'Flat modern vector business illustration, professional corporate style, ' +
+      'deep navy blue background, gold and white accents, minimalist, clean lines, ' +
+      'balanced composition with a few related icons, soft shadow, ' +
+      'absolutely NO text, no letters, no alphabet, no words, no numbers, ' +
+      'no typography, no watermark, no signature, no logos containing letters';
+    const subjectByCat = {
+      trademark:     'brand protection shield, magnifying glass, checkmark, star badge',
+      patent:        'lightbulb, mechanical gears, blueprint scroll, drafting compass',
+      copyright:     'document pages, fountain pen, artist palette, film and music icons',
+      international: 'globe, world map, connection lines, paper airplane',
+    };
+    const subject = subjectByCat[category.slug] || 'intellectual property law symbols';
+    const prompt = `${styleBase}. Theme: ${subject}.`;
+
+    const body = JSON.stringify({
+      prompt,
+      mode: 'base',
+      width: 1024,
+      height: 768,
+      steps: 4,
+      seed: Math.floor(Math.random() * 1000000),
+    });
+
+    const req = https.request(
+      {
+        hostname: 'ai.api.nvidia.com',
+        path: '/v1/genai/black-forest-labs/flux.1-schnell',
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer ' + NVIDIA_API_KEY,
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(body),
+        },
+      },
+      (r) => {
+        let b = '';
+        r.on('data', (d) => (b += d));
+        r.on('end', () => {
+          try {
+            if (r.statusCode !== 200) {
+              console.log(`  ⚠️ 生圖 HTTP ${r.statusCode}：${b.slice(0, 200)}`);
+              return resolve(null);
+            }
+            const json = JSON.parse(b);
+            const b64 = json.artifacts && json.artifacts[0] && json.artifacts[0].base64;
+            if (!b64) return resolve(null);
+            const imgDir = path.join(INSIGHTS_DIR, 'img');
+            if (!fs.existsSync(imgDir)) fs.mkdirSync(imgDir, { recursive: true });
+            const imgFilename = `article-${dateStr}-${timestamp}.jpg`;
+            const absFile = path.join(imgDir, imgFilename);
+            fs.writeFileSync(absFile, Buffer.from(b64, 'base64'));
+            resolve({
+              htmlPath: `img/${imgFilename}`,            // 給文章頁（在 insights/ 內）
+              jsonPath: `insights/img/${imgFilename}`,   // 給 insights.html（在網站根）
+              absFile,
+            });
+          } catch (e) {
+            console.log('  ⚠️ 生圖解析失敗：' + e.message);
+            resolve(null);
+          }
+        });
+      }
+    );
+    req.on('error', (e) => {
+      console.log('  ⚠️ 生圖連線失敗：' + e.message);
+      resolve(null);
+    });
+    req.write(body);
+    req.end();
+  });
 }
 
 // 呼叫 Nvidia API（通用）
@@ -378,8 +465,8 @@ async function main() {
     const category = categorizeArticle(topic);
     console.log(`📂 自動分類：${category.name}`);
 
-    const imagePath = selectImage(topic, category);
-    console.log(`🖼️  配圖：${imagePath}`);
+    // 預備配圖（AI 生圖失敗時的 fallback）
+    const fallbackImagePath = selectImage(topic, category);
 
     // 中英文 API 並行呼叫
     console.log('🤖 呼叫 Nvidia API（中文 + 英文並行）...');
@@ -402,6 +489,25 @@ async function main() {
     // 檔名
     const filenameZh = `article-${dateStr}-${timestamp}.html`;
     const filenameEn = `article-${dateStr}-${timestamp}-en.html`;
+
+    // 用 FLUX.1 即時生成專屬配圖，失敗則回退分類圖庫
+    console.log('🎨 生成專屬配圖（FLUX.1）...');
+    let imagePath = fallbackImagePath;
+    let imageField;
+    let generatedImageFile = null;
+    const imgResult = await generateArticleImage(category, dateStr, timestamp);
+    if (imgResult) {
+      imagePath = imgResult.htmlPath;
+      imageField = imgResult.jsonPath;
+      generatedImageFile = imgResult.absFile;
+      console.log(`🖼️  AI 生圖成功：${imgResult.jsonPath}`);
+    } else {
+      const m = fallbackImagePath.match(/(\w+)-(\d+)\.jpg$/);
+      imageField = m
+        ? `assets/img/categories/${m[1]}-${m[2]}.jpg`
+        : `assets/img/categories/${category.slug}-1.jpg`;
+      console.log(`🖼️  AI 生圖失敗，改用分類圖庫：${imageField}`);
+    }
 
     // 產生 HTML
     const htmlZh = textToHtml(articleZh, titleZh, dateStr, category, imagePath);
@@ -426,11 +532,6 @@ async function main() {
       articles = JSON.parse(fs.readFileSync(articlesJsonPath, 'utf8'));
     }
 
-    const imageSlug = imagePath.match(/(\w+)-(\d+)\.jpg$/);
-    const imageField = imageSlug
-      ? `assets/img/categories/${imageSlug[1]}-${imageSlug[2]}.jpg`
-      : `assets/img/categories/${category.slug}-1.jpg`;
-
     articles.unshift({
       filename:    filenameZh,
       filenameEn:  filenameEn,
@@ -452,8 +553,16 @@ async function main() {
 
     // Git commit + push
     console.log('📤 推送到 GitHub...');
+    const addPaths = [
+      `"insights/${filenameZh}"`,
+      `"insights/${filenameEn}"`,
+      `"insights/articles.json"`,
+    ];
+    if (generatedImageFile) {
+      addPaths.push(`"insights/img/article-${dateStr}-${timestamp}.jpg"`);
+    }
     execSync(
-      `git -C "${WEBSITE_DIR}" add "insights/${filenameZh}" "insights/${filenameEn}" "insights/articles.json"`,
+      `git -C "${WEBSITE_DIR}" add ${addPaths.join(' ')}`,
       { stdio: 'inherit' }
     );
     execSync(

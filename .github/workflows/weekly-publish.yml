@@ -1,0 +1,35 @@
+name: Weekly Article Publish
+
+# 每週一台北時間 09:00 自動產生一篇智財文章（含 AI 配圖）並發佈
+on:
+  schedule:
+    - cron: '0 1 * * 1'   # UTC 週一 01:00 = 台北 週一 09:00
+  workflow_dispatch: {}    # 允許在 Actions 頁面手動觸發測試
+
+permissions:
+  contents: write          # 讓內建 GITHUB_TOKEN 能 push 回 repo
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Generate and publish article
+        working-directory: scripts
+        env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: node generate-article.js

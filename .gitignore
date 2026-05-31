@@ -9,3 +9,7 @@ node_modules/
 
 # 本地備份
 backup/
+
+# 生圖功能的測試產物（不上傳）
+scripts/flux-*.jpg
+scripts/test-flux.js
