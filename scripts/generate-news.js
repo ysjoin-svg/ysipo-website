@@ -27,25 +27,25 @@ const NO_PUSH = process.argv.includes('--no-push');
 const QUERIES = [
   '智慧財產局 商標 專利 公告',         // 台灣官方
   '台灣 著作權 專利 商標 法規 修法',   // 台灣法規
+  '專利 商標 侵權 案例 企業 台灣',     // 案例（主流媒體）
+  '商標 搶註 爭議 品牌 仿冒',          // 商標案例
   '美國 USPTO 專利 商標 智財',         // 美國
   '日本 韓國 專利 商標 智慧財產',      // 日韓
   '歐盟 EUIPO EPO 商標 專利',          // 歐洲
   '中國 大陸 知識產權 專利 商標',      // 中國
 ];
-const MAX_NEWS = 2;        // 每次最多上架幾則
+const maxArg = process.argv.find((a) => a.startsWith('--max='));
+const MAX_NEWS = maxArg ? parseInt(maxArg.split('=')[1], 10) : 2;  // 每次最多上架幾則（--max=N 覆蓋，用於一次填充資料庫）
 const RECENT_DAYS = 150;   // 只取近 N 天的新聞
 
 // 排除「個案訴訟 / 點名公司」類新聞 —— 事務所網站只留法規/公告/制度類，避免影射特定企業與版權疑慮
-const EXCLUDE_KEYWORDS = [
-  '判賠', '起訴', '求償', '提告', '興訟', '纏訟', '敗訴', '勝訴',
-  '和解金', '被訴', '涉侵權', '侵權案', '遭訴', '判決', '官司', '訴請', '訴訟',
-];
+// 個案訴訟/醜聞的把關改由 LLM 語意判斷（中間尺度：保留有教育意義的案例、擋掉純賠償金額的醜聞式報導），見 summarize()
 
 // 同業/競業來源黑名單 —— 避免引用其他事務所或智財服務業者的新聞，把客戶導去競爭對手
 const SOURCE_BLOCKLIST = [
   '北美智權', '智權報', 'naipo', 'naipnews',
   '事務所', '法律事務所', '律師事務所', '專利商標事務所', '智權事務所', '專利師事務所',
-  '理律', '聖島', '台一國際', '聯合專利', '群帆', '冠群',
+  '理律', '聖島', '台一國際', '聯合專利', '群帆', '冠群', '卓遠', 'Accolade',
 ];
 
 // 來源美化：RSS 給的網域 → 正式名稱
@@ -94,16 +94,18 @@ function summarize(title, source) {
   return new Promise((resolve) => {
     const sys =
       '你是台灣智慧財產權事務所的新聞編輯。' +
-      '【第一步｜過濾】若這則新聞是針對「特定公司或個人」的訴訟、侵權糾紛、判賠、上訴、求償等個案事件' +
-      '（而非通用的法規修正、官方公告、制度介紹、研討會、考試報名、統計數據等），' +
-      '請只回覆 {"skip":true}，不要改寫。' +
-      '【第二步｜改寫】否則請用繁體中文、台灣慣用語把標題改寫成中立、專業的智財新聞摘要：' +
+      '【第一步｜過濾】若這則新聞符合以下任一，請只回覆 {"skip":true}，不要改寫：' +
+      '(a) 與專利、商標、著作權、智慧財產權無關；' +
+      '(b) 只是報導特定公司的訴訟賠償金額、勝敗或上訴等個案結果，不具通用的警示或教育意義（例如僅講「某公司被判賠X萬、上訴到底」）；' +
+      '(c) 屬八卦、醜聞或與智財專業無關的爭執。' +
+      '【第二步｜改寫】否則（包括官方公告、法規修正、制度介紹，以及「具教育或警示意義的專利／商標案例」），' +
+      '請用繁體中文、台灣慣用語改寫成中立、專業的智財新聞摘要：' +
       '1) 一個精簡標題（不超過 30 字，不照抄原標題，不聳動）；' +
-      '2) 2-3 句客觀摘要（不超過 120 字）：具體交代「是誰、做了什麼事、對權利人或申請人有何意義或提醒」，' +
-      '避免「旨在」「促進發展」「展現成果」這類空泛套話；不杜撰原標題未提及的細節；' +
-      '不用「軟件/網絡/信息/質量」等中國用語；' +
+      '2) 2-3 句客觀摘要（不超過 120 字）：交代「是誰、發生什麼、對權利人或申請人有何意義或提醒」；' +
+      '若屬案例類，聚焦「對企業或權利人的啟示、提醒」，不要聚焦賠償金額或聳動情節；' +
+      '避免「旨在／促進發展／展現成果」這類空泛套話；不杜撰未提及的細節；不用「軟件/網絡/信息/質量」等中國用語；' +
       '只以 JSON 回覆 {"title":"...","summary":"..."}。' +
-      '注意：第一步與第二步只能擇一回覆，且只輸出 JSON，不要任何其他文字。';
+      '注意：兩步驟只能擇一回覆，且只輸出 JSON。';
     const user = `新聞標題：「${title}」\n來源：${source}`;
     const payload = JSON.stringify({
       model: 'meta/llama-3.3-70b-instruct',
@@ -214,7 +216,6 @@ function writeOutput(count, titles) {
   const candidates = all.filter((n) => {
     if (!n.title || seen.has(n.title)) return false;
     seen.add(n.title);
-    if (EXCLUDE_KEYWORDS.some((k) => n.title.includes(k))) return false; // 濾掉個案訴訟類
     const st = (n.source || '') + ' ' + (n.title || '');
     if (SOURCE_BLOCKLIST.some((k) => st.includes(k))) return false;      // 濾掉同業事務所來源
     return withinRecent(n.pubDate) && !publishedKeys.has(n.title);
@@ -227,8 +228,7 @@ function writeOutput(count, titles) {
   for (const n of picked) {
     const s = await summarize(n.title, n.source);
     if (!s) { console.log('  ⚠️ 摘要失敗，略過：' + n.title); continue; }
-    if (s.skip) { console.log('  ⏭️  AI 判定個案訴訟，跳過：' + n.title); continue; }
-    if (EXCLUDE_KEYWORDS.some((k) => s.title.includes(k))) { console.log('  ⏭️  改寫後判定個案，跳過：' + s.title); continue; }
+    if (s.skip) { console.log('  ⏭️  AI 判定為醜聞式個案/無關，跳過：' + n.title); continue; }
     newItems.push({ ...n, displayTitle: s.title, summary: s.summary, origTitle: n.title });
   }
 
