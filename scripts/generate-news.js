@@ -32,6 +32,12 @@ const QUERIES = [
 const MAX_NEWS = 2;        // 每次最多上架幾則
 const RECENT_DAYS = 150;   // 只取近 N 天的新聞
 
+// 排除「個案訴訟 / 點名公司」類新聞 —— 事務所網站只留法規/公告/制度類，避免影射特定企業與版權疑慮
+const EXCLUDE_KEYWORDS = [
+  '判賠', '起訴', '求償', '提告', '興訟', '纏訟', '敗訴', '勝訴',
+  '和解金', '被訴', '涉侵權', '侵權案', '遭訴', '判決', '官司', '訴請', '訴訟',
+];
+
 // 來源美化：RSS 給的網域 → 正式名稱
 const SOURCE_MAP = {
   'moea.gov.tw': '經濟部智慧財產局',
@@ -193,6 +199,7 @@ function writeOutput(count, titles) {
   const candidates = all.filter((n) => {
     if (!n.title || seen.has(n.title)) return false;
     seen.add(n.title);
+    if (EXCLUDE_KEYWORDS.some((k) => n.title.includes(k))) return false; // 濾掉個案訴訟類
     return withinRecent(n.pubDate) && !publishedKeys.has(n.title);
   }).sort((a, b) => Date.parse(b.pubDate) - Date.parse(a.pubDate));
 

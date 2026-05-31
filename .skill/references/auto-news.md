@@ -1,4 +1,4 @@
-# 智財新聞半自動更新系統（建置中）
+# 智財新聞半自動更新系統（已上線 2026-06-01）
 
 > 每週自動爬台灣智財新聞 → AI 改寫中立摘要 → **自動上架** news.html 並 email 通知，
 > 覺得不妥可事後移除（opt-out 模式，非事前審核）。
@@ -6,18 +6,27 @@
 
 ---
 
-## 目前進度（2026-06-01）
+## 進度：全部完成並雲端驗證 ✅
 
 | 部分 | 狀態 |
 |------|------|
-| 內容生產：爬取 + 篩選 + 去重(標題) + LLM 改寫 + 來源標注 | ✅ 已完成並 dry-run 驗證（`scripts/generate-news.js`） |
-| ① 上架：寫入 news.html 的 AI_AGENT_INSERT_POINT | ⬜ 待建 |
-| ② 去重持久化：`published-news.json` 避免重複上架 | ⬜ 待建 |
-| ③ email 通知本週新增 | ⬜ 待建（複用 dawidd6 寄信） |
-| ④ 移除工具 `manage-news.js` | ⬜ 待建 |
-| ⑤ 併入每週 GitHub Actions | ⬜ 待建 |
+| 內容生產：爬取 + 篩選 + 去重 + LLM 改寫 + 來源標注 | ✅ `scripts/generate-news.js` |
+| ① 上架：寫入 news.html 的 AI_AGENT_INSERT_POINT（prepend，最新在前） | ✅ |
+| ② 去重持久化：`scripts/published-news.json`（記錄 origTitle/link） | ✅ 實測第二次跑自動抓不同的新聞 |
+| ③ email 通知本週新增 | ✅ `weekly-news.yml` 用 dawidd6 寄 taiejoin@hotmail.com |
+| ④ 移除工具 `scripts/manage-news.js` | ✅ `node manage-news.js` / `remove <N>` |
+| ⑤ 排程 | ✅ `.github/workflows/weekly-news.yml`，每週四 09:00（台北）|
+| 個案訴訟過濾 | ✅ EXCLUDE_KEYWORDS 擋掉侵權/訴訟/判賠/點名公司類 |
 
-`generate-news.js --dry` 可隨時測試爬取＋摘要品質（不寫檔/不推送/不寄信）。
+**排程時間**：發文（知識專欄）週一 09:00、新聞週四 09:00，錯開避免同時 push。
+
+**常用指令**：
+```
+node generate-news.js --dry       # 預覽當週會抓到什麼、摘要長怎樣（不上架）
+node generate-news.js --no-push   # 本地上架寫檔但不推送（檢查 news.html）
+node manage-news.js               # 列出自動上架的新聞 + 編號
+node manage-news.js remove <N>    # 移除第 N 則（刪卡片+記錄+push+清快取）
+```
 
 ---
 
@@ -35,15 +44,15 @@
 ## 架構流程
 
 ```
-每週 GitHub Actions
+每週四 09:00（台北）GitHub Actions：weekly-news.yml
   → Google News RSS 搜尋（多組關鍵字，QUERIES）
   → 解析 item（title/link/pubDate/source）
-  → 去重(標題) + 篩近 RECENT_DAYS 天 + 新到舊排序
-  → 排除 published-news.json 已上架過的            ← ②待建
+  → 去重(標題) + 排除個案訴訟類(EXCLUDE_KEYWORDS) + 篩近 RECENT_DAYS 天
+  → 排除 published-news.json 已上架過的 + 新到舊排序
   → 取前 MAX_NEWS 則，Nvidia LLM 改寫成中立摘要
-  → 寫入 news.html 的 AI_AGENT_INSERT_POINT 區塊    ← ①待建
-  → 更新 published-news.json                       ← ②待建
-  → email 本週新增清單到 taiejoin@hotmail.com       ← ③待建
+  → 寫入 news.html 的 AI_AGENT_INSERT_POINT 區塊（prepend，最新在前）
+  → 更新 published-news.json
+  → email 本週新增清單到 taiejoin@hotmail.com（成功/失敗都寄）
   → git push + 清 Cloudflare 快取
 ```
 
