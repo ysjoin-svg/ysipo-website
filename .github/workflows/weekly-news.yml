@@ -1,0 +1,59 @@
+name: Weekly IP News Update
+
+# 每週四台北時間 09:00 自動抓智財新聞、改寫摘要、上架 news.html
+on:
+  schedule:
+    - cron: '0 1 * * 4'   # UTC 週四 01:00 = 台北 週四 09:00
+  workflow_dispatch: {}    # 允許手動觸發
+
+permissions:
+  contents: write
+
+jobs:
+  news:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch & publish IP news
+        id: gen
+        working-directory: scripts
+        env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: node generate-news.js
+
+      - name: 寄送結果通知（成功 / 失敗都寄）
+        if: always()
+        uses: dawidd6/action-send-mail@v4
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          from: 永旭智財新聞 <${{ secrets.MAIL_USERNAME }}>
+          to: taiejoin@hotmail.com
+          subject: ${{ job.status == 'success' && '[永旭] 智財新聞已更新' || '[永旭] 智財新聞更新失敗，請檢查' }}
+          body: |
+            永旭網站每週智財新聞自動更新完成。
+
+            結果：${{ job.status }}
+            本週新增 ${{ steps.gen.outputs.count }} 則：
+            ${{ steps.gen.outputs.added }}
+
+            查看：https://ysipo.com.tw/news.html
+            若有不妥的新聞，可用 manage-news.js 一鍵移除（node manage-news.js / remove 編號）。
+            詳細紀錄：${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

@@ -171,6 +171,13 @@ function purgeCloudflare() {
   req.write(data); req.end();
 }
 
+// 寫 GitHub Actions step output，供 email 通知列出本週新增
+function writeOutput(count, titles) {
+  if (!process.env.GITHUB_OUTPUT) return;
+  fs.appendFileSync(process.env.GITHUB_OUTPUT, `count=${count}\n`);
+  fs.appendFileSync(process.env.GITHUB_OUTPUT, `added<<NEWS_EOF\n${titles || '(本週無新增)'}\nNEWS_EOF\n`);
+}
+
 (async () => {
   console.log('📡 抓取智財新聞（Google News RSS）...');
   let all = [];
@@ -211,7 +218,11 @@ function purgeCloudflare() {
     return;
   }
 
-  if (newItems.length === 0) { console.log('✅ 本次沒有新的新聞可上架（可能都已上架過）。'); return; }
+  if (newItems.length === 0) {
+    console.log('✅ 本次沒有新的新聞可上架（可能都已上架過）。');
+    writeOutput(0, '');
+    return;
+  }
 
   // 上架（newItems 已是新到舊，整批 prepend，最新在最前）
   const cardsHtml = newItems.map(buildCard).join('');
@@ -224,6 +235,8 @@ function purgeCloudflare() {
     date: n.pubDate, link: n.link, addedAt: new Date().toISOString(),
   })).concat(published);
   fs.writeFileSync(PUBLISHED_JSON, JSON.stringify(updated, null, 2), 'utf8');
+
+  writeOutput(newItems.length, newItems.map((n) => '・' + n.displayTitle + '（資料來源：' + prettySource(n.source) + '）').join('\n'));
 
   if (NO_PUSH) { console.log('[--no-push] 已寫檔，未推送。請自行檢查 news.html。'); return; }
 
