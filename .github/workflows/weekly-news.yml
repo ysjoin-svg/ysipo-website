@@ -3,7 +3,7 @@ name: Weekly IP News Update
 # 每週四台北時間 09:00 自動抓智財新聞、改寫摘要、上架 news.html
 on:
   schedule:
-    - cron: '0 1 * * 4'   # UTC 週四 01:00 = 台北 週四 09:00
+    - cron: '37 1 * * 4'   # UTC 週四 01:37 = 台北 週四 09:37（避開整點高峰，降低被 GitHub 丟棄的機率）
   workflow_dispatch: {}    # 允許手動觸發
 
 permissions:

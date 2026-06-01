@@ -3,7 +3,7 @@ name: Weekly Article Publish
 # 每週一台北時間 09:00 自動產生一篇智財文章（含 AI 配圖）並發佈
 on:
   schedule:
-    - cron: '0 1 * * 1'   # UTC 週一 01:00 = 台北 週一 09:00
+    - cron: '37 1 * * 1'   # UTC 週一 01:37 = 台北 週一 09:37（避開整點高峰，降低被 GitHub 丟棄的機率）
   workflow_dispatch: {}    # 允許在 Actions 頁面手動觸發測試
 
 permissions:
