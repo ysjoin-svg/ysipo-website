@@ -1,10 +1,8 @@
 name: Weekly Article Publish
 
-# 每週一台北時間 09:00 自動產生一篇智財文章（含 AI 配圖）並發佈
+# 每週一台北 09:00 發文，由 Ubuntu Server cron 觸發（GitHub 自身排程不可靠，已停用 schedule 避免雙跑）
 on:
-  schedule:
-    - cron: '37 1 * * 1'   # UTC 週一 01:37 = 台北 週一 09:37（避開整點高峰，降低被 GitHub 丟棄的機率）
-  workflow_dispatch: {}    # 允許在 Actions 頁面手動觸發測試
+  workflow_dispatch: {}    # 由 Ubuntu cron 觸發，也可在 Actions 頁面手動 Run
 
 permissions:
   contents: write          # 讓內建 GITHUB_TOKEN 能 push 回 repo

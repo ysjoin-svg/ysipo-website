@@ -1,10 +1,8 @@
 name: Weekly IP News Update
 
-# 每週四台北時間 09:00 自動抓智財新聞、改寫摘要、上架 news.html
+# 每週四台北 09:00 發新聞，由 Ubuntu Server cron 觸發（GitHub 自身排程不可靠，已停用 schedule 避免雙跑）
 on:
-  schedule:
-    - cron: '37 1 * * 4'   # UTC 週四 01:37 = 台北 週四 09:37（避開整點高峰，降低被 GitHub 丟棄的機率）
-  workflow_dispatch: {}    # 允許手動觸發
+  workflow_dispatch: {}    # 由 Ubuntu cron 觸發，也可在 Actions 頁面手動 Run
 
 permissions:
   contents: write
