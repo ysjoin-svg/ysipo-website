@@ -54,56 +54,87 @@
 
   <!-- JSON-LD Structured Data -->
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "LegalService",
-    "name": "永旭智慧財產事務所",
-    "alternateName": "Yong Syu Intellectual Property Office",
-    "description": "電子博士主持，工研院專利撰稿訓練，前 20 大商標申請量精品智財事務所。",
-    "url": "https://ysipo.com.tw",
-    "logo": "https://ysipo.com.tw/assets/img/logo.svg",
-    "foundingDate": "2010",
-    "telephone": "+886-7-345-3388",
-    "email": "contact@ysipo.com.tw",
-    "address": [
-      {
-        "@type": "PostalAddress",
-        "addressLocality": "高雄市左營區",
-        "streetAddress": "子華路 116 號 2 樓之 3",
-        "addressCountry": "TW"
-      },
-      {
-        "@type": "PostalAddress",
-        "addressLocality": "台北市中正區",
-        "streetAddress": "莒光路 47 號 1 樓",
-        "addressCountry": "TW"
-      }
-    ],
-    "serviceArea": {
-      "@type": "Place",
-      "name": "Global"
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://ysipo.com.tw/#website",
+      "url": "https://ysipo.com.tw/",
+      "name": "永旭智慧財產事務所",
+      "inLanguage": "zh-TW",
+      "publisher": { "@id": "https://ysipo.com.tw/#organization" }
     },
-    "sameAs": [
-      "https://www.linkedin.com/in/%E5%AE%97%E7%A9%8E-%E6%9D%8E-411b4077/",
-      "https://line.me/R/ti/p/@640yotwe"
-    ],
-    "contactPoint": [
-      {
-        "@type": "ContactPoint",
-        "telephone": "+886-7-345-3388",
-        "contactType": "customer service",
-        "areaServed": "TW",
-        "availableLanguage": ["zh-TW", "en"]
+    {
+      "@type": "Organization",
+      "@id": "https://ysipo.com.tw/#organization",
+      "name": "永旭智慧財產事務所",
+      "alternateName": "YONG SYU INTELLECTUAL PROPERTY OFFICE",
+      "url": "https://ysipo.com.tw/",
+      "logo": "https://ysipo.com.tw/assets/img/logo.png",
+      "image": "https://ysipo.com.tw/assets/img/og-image.jpg",
+      "description": "永旭智慧財產事務所，電子博士主持，工研院專利撰稿訓練，多次榮獲台灣商標申請量前 20 大事務所。提供專利撰稿、商標申請與爭議救援、著作權登記等精品智財服務。",
+      "foundingDate": "2010",
+      "slogan": "保護您的品牌、創意與發明",
+      "knowsAbout": ["專利申請", "商標申請", "著作權", "PCT 國際專利", "馬德里商標", "智慧財產權策略"],
+      "founder": [
+        { "@type": "Person", "name": "李宗穎", "jobTitle": "所長", "description": "國立高雄科技大學電子工程博士，工研院專利撰稿訓練出身" },
+        { "@type": "Person", "name": "林家均", "jobTitle": "台北所負責人", "description": "國立臺灣科技大學專利研究所碩士" }
+      ],
+      "sameAs": [
+        "https://www.facebook.com/ysipo/",
+        "https://www.instagram.com/yongsyuipo",
+        "https://line.me/R/ti/p/@640yotwe"
+      ],
+      "areaServed": ["TW", "CN", "HK", "US", "JP", "DE"]
+    },
+    {
+      "@type": "LegalService",
+      "@id": "https://ysipo.com.tw/#kaohsiung",
+      "name": "永旭智慧財產事務所 — 高雄總部",
+      "url": "https://ysipo.com.tw/",
+      "image": "https://ysipo.com.tw/assets/img/og-image.jpg",
+      "telephone": "+886-7-345-3388",
+      "faxNumber": "+886-7-345-2122",
+      "parentOrganization": { "@id": "https://ysipo.com.tw/#organization" },
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "左營區子華路116號2樓之3",
+        "addressLocality": "高雄市",
+        "postalCode": "813",
+        "addressCountry": "TW"
       },
-      {
-        "@type": "ContactPoint",
-        "contactType": "messaging",
-        "url": "https://line.me/R/ti/p/@640yotwe",
-        "name": "LINE Official Account @640yotwe",
-        "availableLanguage": ["zh-TW", "en"]
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "opens": "08:30",
+        "closes": "17:30"
       }
-    ]
-  }
+    },
+    {
+      "@type": "LegalService",
+      "@id": "https://ysipo.com.tw/#taipei",
+      "name": "永旭智慧財產事務所 — 台北分所",
+      "url": "https://ysipo.com.tw/",
+      "image": "https://ysipo.com.tw/assets/img/og-image.jpg",
+      "telephone": "+886-2-2302-1082",
+      "parentOrganization": { "@id": "https://ysipo.com.tw/#organization" },
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "中正區莒光路47號1樓",
+        "addressLocality": "台北市",
+        "postalCode": "108",
+        "addressCountry": "TW"
+      },
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "opens": "08:30",
+        "closes": "17:30"
+      }
+    }
+  ]
+}
   </script>
 </head>
 
