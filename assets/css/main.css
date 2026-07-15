@@ -2291,6 +2291,22 @@ header[role="banner"] {
   display: inline-block;
   background: transparent;
 }
+.ys-btn-line {
+  background: #06C755;
+  color: white;
+  padding: 15px 26px;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 2px;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  display: inline-block;
+  box-shadow: 0 8px 18px rgba(6, 199, 85, 0.22);
+}
+.ys-btn-line:hover {
+  background: #05A847;
+  color: white;
+}
 .ys-hero-note {
   color: rgba(255,255,255,.65);
   font-size: 12.5px;
@@ -2466,6 +2482,7 @@ header[role="banner"] {
     margin-bottom: 10px;
   }
   .ys-btn-primary,
+  .ys-btn-line,
   .ys-btn-outline {
     width: 150px;
     padding: 9px 0;
