@@ -2586,6 +2586,31 @@ header[role="banner"] {
   line-height: 1.85;
   color: rgba(255, 255, 255, 0.65);
 }
+.ys-social-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+.ys-social-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 7px 12px;
+  border: 1px solid rgba(212, 179, 125, 0.35);
+  border-radius: var(--radius-sm);
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.ys-social-links a:hover {
+  background: rgba(212, 179, 125, 0.12);
+  border-color: var(--gold);
+  color: var(--gold-light);
+}
 .ys-footer-title {
   font-family: 'Noto Serif TC', serif;
   font-size: 15px;
