@@ -2294,7 +2294,7 @@ header[role="banner"] {
 .ys-hero-bg {
   position: absolute;
   inset: 0;
-  background-image: url('../img/hero-bg-clean.jpg');
+  background-image: url('../img/hero-bg.jpg');
   background-size: cover;
   background-position: center right;
 }
@@ -2546,7 +2546,7 @@ header[role="banner"] {
     overflow: hidden;
     background-image:
       linear-gradient(to right, rgba(0,13,34,0.93) 0%, rgba(0,13,34,0.65) 55%, rgba(0,13,34,0.2) 100%),
-      url('../img/hero-bg-clean.jpg');
+      url('../img/hero-bg.jpg');
     background-size: cover;
     background-position: 65% center;
   }
@@ -2899,14 +2899,14 @@ body.page-contact  .page-hero { background-position: right 55%; }
     border-bottom: 1px solid #D4B37D !important;
   }
 
-  /* 2. 首頁 Hero 重做：用 hero-bg-clean.jpg + 鋼筆對齊按鈕下方 */
+  /* 2. 首頁 Hero 重做：用 hero-bg.jpg + 鋼筆對齊按鈕下方 */
   section.ys-hero,
   .ys-hero {
     border-top: none !important;
     border-bottom: 1px solid rgba(212, 179, 125, 0.3) !important;
     background-image:
       linear-gradient(to right, rgba(0,13,34,0.92) 0%, rgba(0,13,34,0.6) 50%, rgba(0,13,34,0.1) 100%),
-      url('../img/hero-bg-clean.jpg') !important;
+      url('../img/hero-bg.jpg') !important;
     background-size: cover, 200% auto !important;
     background-position: center, 78% 38% !important;
     background-repeat: no-repeat, no-repeat !important;
