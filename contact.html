@@ -19,6 +19,9 @@
   <title>聯絡我們 | 永旭智慧財產事務所</title>
   <meta name="description" content="聯絡永旭智慧財產事務所：高雄總部 (07) 345-3388、台北分所 (02) 2302-1082。歡迎諮詢專利、商標、著作權相關業務。">
   <link rel="canonical" href="https://ysipo.com.tw/contact.html">
+  <link rel="alternate" hreflang="zh-TW" href="https://ysipo.com.tw/contact.html">
+  <link rel="alternate" hreflang="en" href="https://ysipo.com.tw/en/contact.html">
+  <link rel="alternate" hreflang="x-default" href="https://ysipo.com.tw/contact.html">
 
   <meta property="og:type"        content="website">
   <meta property="og:url"         content="https://ysipo.com.tw/contact.html">
@@ -324,7 +327,7 @@
             </div>
 
             <!-- Contact Form -->
-            <form id="contact-form" class="contact-form" novalidate aria-label="線上諮詢表單">
+            <form id="contact-form" class="contact-form" data-emailjs="true" aria-label="線上諮詢表單">
 
               <!-- Name + Company -->
               <div class="form-row">
@@ -505,11 +508,20 @@
   <script src="assets/js/main.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
-    emailjs.init({ publicKey: "a5x52UregaIksKaKC" });
+    if (window.emailjs) {
+      emailjs.init({ publicKey: "a5x52UregaIksKaKC" });
+    }
 
     document.getElementById('contact-form').addEventListener('submit', function(e) {
       e.preventDefault();
       e.stopImmediatePropagation();
+
+      if (!this.reportValidity()) return;
+
+      if (!window.emailjs) {
+        alert('表單服務暫時無法載入，請直接來電或寄 Email 至 contact@ysipo.com.tw。');
+        return;
+      }
 
       const checkboxes = document.querySelectorAll('#contact-form input[type="checkbox"]:checked');
       const services = Array.from(checkboxes).map(cb => cb.value).join('、');

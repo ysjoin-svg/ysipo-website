@@ -18,6 +18,7 @@
   <link rel="canonical" href="https://ysipo.com.tw/en/news.html">
   <link rel="alternate" hreflang="zh-TW" href="https://ysipo.com.tw/news.html">
   <link rel="alternate" hreflang="en"    href="https://ysipo.com.tw/en/news.html">
+  <link rel="alternate" hreflang="x-default" href="https://ysipo.com.tw/news.html">
 
   <meta property="og:type"        content="website">
   <meta property="og:url"         content="https://ysipo.com.tw/en/news.html">
@@ -65,20 +66,20 @@
       <div class="container">
 
         <!-- Category Tabs -->
-        <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-6); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-3);" role="tablist" aria-label="News categories">
-          <button role="tab" aria-selected="true"
+        <div class="news-filter-tabs" style="display: flex; gap: var(--space-2); margin-bottom: var(--space-6); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-3);" role="tablist" aria-label="News categories">
+          <button role="tab" aria-selected="true" data-news-filter="all" aria-controls="firm-news ip-news"
             style="font-size: var(--text-sm); font-weight: var(--fw-medium); padding: 0.5rem var(--space-3); color: var(--color-accent); border-bottom: 2px solid var(--color-accent); margin-bottom: -1px; cursor: pointer; background: none; border-top: none; border-left: none; border-right: none;">
             All
           </button>
-          <button role="tab" aria-selected="false"
+          <button role="tab" aria-selected="false" data-news-filter="firm" aria-controls="firm-news"
             style="font-size: var(--text-sm); padding: 0.5rem var(--space-3); color: var(--color-text-muted); cursor: pointer; background: none; border: none;">
             Firm News
           </button>
-          <button role="tab" aria-selected="false"
+          <button role="tab" aria-selected="false" data-news-filter="speaking" aria-controls="speaking-news"
             style="font-size: var(--text-sm); padding: 0.5rem var(--space-3); color: var(--color-text-muted); cursor: pointer; background: none; border: none;">
             Speaking Events
           </button>
-          <button role="tab" aria-selected="false"
+          <button role="tab" aria-selected="false" data-news-filter="ip" aria-controls="ip-news"
             style="font-size: var(--text-sm); padding: 0.5rem var(--space-3); color: var(--color-text-muted); cursor: pointer; background: none; border: none;">
             IP News
           </button>
@@ -86,7 +87,7 @@
 
 
         <!-- ═══ Firm News ═══ -->
-        <div style="margin-bottom: var(--space-10);" data-aos="fade-up">
+        <div id="firm-news" data-news-section="firm" style="margin-bottom: var(--space-10);" data-aos="fade-up">
           <h2 style="font-size: var(--text-xl); color: var(--color-primary); margin-bottom: var(--space-4); display: flex; align-items: center; gap: var(--space-2);">
             <span style="width: 4px; height: 24px; background: var(--color-accent); border-radius: var(--radius-full); display: inline-block;" aria-hidden="true"></span>
             Firm News
@@ -127,7 +128,7 @@
 
 
         <!-- ═══ Speaking Events (temporarily hidden: no content yet; remove display:none below to restore) ═══ -->
-        <div style="margin-bottom: var(--space-10); display: none;" data-aos="fade-up" data-aos-delay="100">
+        <div id="speaking-news" data-news-section="speaking" data-default-hidden="true" style="margin-bottom: var(--space-10);" data-aos="fade-up" data-aos-delay="100" hidden>
           <h2 style="font-size: var(--text-xl); color: var(--color-primary); margin-bottom: var(--space-4); display: flex; align-items: center; gap: var(--space-2);">
             <span style="width: 4px; height: 24px; background: var(--color-accent); border-radius: var(--radius-full); display: inline-block;" aria-hidden="true"></span>
             Speaking Events
@@ -154,41 +155,103 @@
 
 
         <!-- ═══ IP News ═══ -->
-        <div data-aos="fade-up" data-aos-delay="200">
+        <div id="ip-news" data-news-section="ip" data-aos="fade-up" data-aos-delay="200">
           <h2 style="font-size: var(--text-xl); color: var(--color-primary); margin-bottom: var(--space-4); display: flex; align-items: center; gap: var(--space-2);">
             <span style="width: 4px; height: 24px; background: var(--color-accent); border-radius: var(--radius-full); display: inline-block;" aria-hidden="true"></span>
             IP News
           </h2>
 
           <div class="news-list">
-
             <article class="news-item">
               <div class="news-date">
-                <div class="day">01</div>
-                <div class="month-year">FEB 2026</div>
+                <div class="day">13</div>
+                <div class="month-year">JUL 2026</div>
               </div>
               <div class="news-content">
-                <h3>TIPO Announces Expanded Electronic Examination of Trademark Figurative Elements</h3>
-                <p>Taiwan's Intellectual Property Office (TIPO) has announced an expansion of its electronic examination procedures for trademark figurative elements, alongside an upgrade to its image-search comparison system. These measures are expected to improve examination efficiency and reduce initial review wait times. Applicants are advised to verify that their logo files meet the updated specification and resolution standards before submission to avoid processing delays.</p>
+                <h3><a href="https://www.tipo.gov.tw/tw/tipo1/891-87833.html" target="_blank" rel="noopener" style="color:inherit;">TIPO Launches Automatic Goods and Services Name Recommendations</a></h3>
+                <p>TIPO added automatic recommendations to its trademark search system to help applicants choose clearer goods and services descriptions and reduce classification-related corrections.</p>
                 <div style="margin-top: var(--space-2);">
                   <span class="tag tag--outline">IP News</span>
+                  <span style="font-size:var(--text-xs);color:var(--color-text-muted);margin-left:var(--space-2);">Source：Taiwan Intellectual Property Office</span>
                 </div>
               </div>
             </article>
 
             <article class="news-item">
               <div class="news-date">
-                <div class="day">01</div>
-                <div class="month-year">JUN 2025</div>
+                <div class="day">26</div>
+                <div class="month-year">JUN 2026</div>
               </div>
               <div class="news-content">
-                <h3>One Year of the UPC: What Taiwan Companies Should Know About European Patent Strategy</h3>
-                <p>The Unified Patent Court (UPC) and Unitary Patent system have now been operating for over one year. The system allows applicants to obtain patent protection across 17 EU member states through a single filing, significantly reducing the administrative cost of European IP portfolios. Taiwan companies with European market ambitions should reassess whether to convert existing European validated patents to Unitary Patent format, and how to structure future European filings under the UPC framework. Contact YSIPO for guidance.</p>
+                <h3><a href="https://www.tipo.gov.tw/tw/patents/515-87698.html" target="_blank" rel="noopener" style="color:inherit;">Taiwan Patent E-Filing Adds Post-Filing and Specification Editing Tools</a></h3>
+                <p>Taiwan’s patent e-filing system now supports additional invention and utility-model post-filing procedures plus online specification editing.</p>
                 <div style="margin-top: var(--space-2);">
                   <span class="tag tag--outline">IP News</span>
+                  <span style="font-size:var(--text-xs);color:var(--color-text-muted);margin-left:var(--space-2);">Source：Taiwan Intellectual Property Office</span>
                 </div>
               </div>
             </article>
+
+            <article class="news-item">
+              <div class="news-date">
+                <div class="day">26</div>
+                <div class="month-year">JUN 2026</div>
+              </div>
+              <div class="news-content">
+                <h3><a href="https://www.tipo.gov.tw/tw/patents/515-87681.html" target="_blank" rel="noopener" style="color:inherit;">Accelerated Examination Program for Women Inventors Extended</a></h3>
+                <p>TIPO extended its accelerated examination pilot for women invention-patent applicants through June 30, 2027; eligibility and application-stage requirements still apply.</p>
+                <div style="margin-top: var(--space-2);">
+                  <span class="tag tag--outline">IP News</span>
+                  <span style="font-size:var(--text-xs);color:var(--color-text-muted);margin-left:var(--space-2);">Source：Taiwan Intellectual Property Office</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="news-item">
+              <div class="news-date">
+                <div class="day">24</div>
+                <div class="month-year">JUN 2026</div>
+              </div>
+              <div class="news-content">
+                <h3><a href="https://www.tipo.gov.tw/tw/tipo1/891-87680.html" target="_blank" rel="noopener" style="color:inherit;">Taiwan Patent GO Highlights Medical Patent Commercialization</a></h3>
+                <p>TIPO’s Taiwan Patent GO pavilion presented medical and precision-care patents while connecting patent owners with industry partners and consultation resources.</p>
+                <div style="margin-top: var(--space-2);">
+                  <span class="tag tag--outline">IP News</span>
+                  <span style="font-size:var(--text-xs);color:var(--color-text-muted);margin-left:var(--space-2);">Source：Taiwan Intellectual Property Office</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="news-item">
+              <div class="news-date">
+                <div class="day">22</div>
+                <div class="month-year">JUN 2026</div>
+              </div>
+              <div class="news-content">
+                <h3><a href="https://www.tipo.gov.tw/tw/tipo1/799-87662.html" target="_blank" rel="noopener" style="color:inherit;">TIPO e-Net Dashboard Adds Case-Management Features</a></h3>
+                <p>TIPO’s e-Net dashboard now includes consolidated receipt downloads, direct patent search links, and interface customization for easier IP case management.</p>
+                <div style="margin-top: var(--space-2);">
+                  <span class="tag tag--outline">IP News</span>
+                  <span style="font-size:var(--text-xs);color:var(--color-text-muted);margin-left:var(--space-2);">Source：Taiwan Intellectual Property Office</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="news-item">
+              <div class="news-date">
+                <div class="day">25</div>
+                <div class="month-year">MAY 2026</div>
+              </div>
+              <div class="news-content">
+                <h3><a href="https://www.tipo.gov.tw/tw/tipo1/891-86794.html" target="_blank" rel="noopener" style="color:inherit;">Taiwan Patent GO Supports Designers at Young Designers’ Exhibition</a></h3>
+                <p>TIPO provided design-patent filing, examination, and search guidance to help young creators consider IP protection before public display and commercialization.</p>
+                <div style="margin-top: var(--space-2);">
+                  <span class="tag tag--outline">IP News</span>
+                  <span style="font-size:var(--text-xs);color:var(--color-text-muted);margin-left:var(--space-2);">Source：Taiwan Intellectual Property Office</span>
+                </div>
+              </div>
+            </article>
+
 
           </div>
 

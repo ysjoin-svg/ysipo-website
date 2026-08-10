@@ -72,64 +72,81 @@ function categorizeArticle(topic) {
   return { name: '智財', slug: 'trademark' };
 }
 
-// 根據主題關鍵字選擇最適合的配圖（固定對應，不隨機）
-function selectImage(topic, category) {
-  const rules = {
-    trademark: [
-      { keywords: ['近似','駁回','核駁','識別性','識別'], img: 2 },
-      { keywords: ['異議','撤銷','評定','爭議','侵權'],   img: 1 },
-      { keywords: ['布局','馬德里','國際','授權','移轉'], img: 3 },
-    ],
-    patent: [
-      { keywords: ['年費','維護','消滅','期限'],           img: 2 },
-      { keywords: ['迴避','壁壘','設計專利','外觀'],       img: 3 },
-      { keywords: ['說明書','申請','新型','發明','PCT'],   img: 1 },
-    ],
-    copyright: [
-      { keywords: ['侵權','盜用','取締','鑑定'],           img: 1 },
-      { keywords: ['數位','程式碼','設計圖','素材','軟體'], img: 2 },
-      { keywords: ['登記','授權','合約'],                  img: 3 },
-    ],
-    international: [
-      { keywords: ['PCT','專利'],                          img: 1 },
-      { keywords: ['馬德里','商標'],                       img: 2 },
-      { keywords: ['著作','版權'],                         img: 3 },
-    ],
-  };
-
-  const list = rules[category.slug] || [];
-  for (const rule of list) {
-    if (rule.keywords.some(k => topic.includes(k))) {
-      return `../assets/img/categories/${category.slug}-${rule.img}.jpg`;
-    }
+function getImageDimensions(buffer) {
+  if (buffer.length >= 24 && buffer.toString('ascii', 1, 4) === 'PNG') {
+    return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
   }
-  return `../assets/img/categories/${category.slug}-1.jpg`; // 預設第 1 張
+  if (buffer.length < 4 || buffer[0] !== 0xff || buffer[1] !== 0xd8) return null;
+  let offset = 2;
+  const sofMarkers = new Set([0xc0, 0xc1, 0xc2, 0xc3, 0xc5, 0xc6, 0xc7, 0xc9, 0xca, 0xcb, 0xcd, 0xce, 0xcf]);
+  while (offset + 8 < buffer.length) {
+    if (buffer[offset] !== 0xff) {
+      offset += 1;
+      continue;
+    }
+    const marker = buffer[offset + 1];
+    offset += 2;
+    if (marker === 0xd8 || marker === 0xd9) continue;
+    if (offset + 2 > buffer.length) break;
+    const length = buffer.readUInt16BE(offset);
+    if (sofMarkers.has(marker) && offset + 7 < buffer.length) {
+      return {
+        height: buffer.readUInt16BE(offset + 3),
+        width: buffer.readUInt16BE(offset + 5),
+      };
+    }
+    if (length < 2) break;
+    offset += length;
+  }
+  return null;
 }
 
-// 用 FLUX.1 即時生成文章專屬配圖（失敗回傳 null，由呼叫端回退分類圖庫）
+// 用 FLUX.1 即時生成文章專屬配圖（失敗回傳 null，由呼叫端重試）
 // 注意：刻意不把文章標題塞進 prompt，否則 FLUX 會在圖上「寫」出亂碼英文字
-function generateArticleImage(category, dateStr, timestamp) {
+function generateArticleImage(category, dateStr, timestamp, attempt = 0) {
   return new Promise((resolve) => {
     const styleBase =
-      'Flat modern vector business illustration, professional corporate style, ' +
-      'deep navy blue background, gold and white accents, minimalist, clean lines, ' +
-      'balanced composition with a few related icons, soft shadow, ' +
+      'Premium realistic editorial still-life photography for an intellectual property law firm, ' +
+      'deep midnight navy, warm metallic gold and ivory legal paper, cinematic credible studio lighting, ' +
+      'wide composition with a clear subject and generous crop-safe margins, refined and authoritative, ' +
+      'real physical objects, not illustration, not vector art, not iconography, ' +
       'absolutely NO text, no letters, no alphabet, no words, no numbers, ' +
-      'no typography, no watermark, no signature, no logos containing letters';
-    const subjectByCat = {
-      trademark:     'brand protection shield, magnifying glass, checkmark, star badge',
-      patent:        'lightbulb, mechanical gears, blueprint scroll, drafting compass',
-      copyright:     'document pages, fountain pen, artist palette, film and music icons',
-      international: 'globe, world map, connection lines, paper airplane',
+      'no typography, no watermark, no signature, no logos, no generic shield icon';
+    const scenesByCat = {
+      trademark: [
+        'abstract embossed brand tokens being compared under a brass magnifying glass with an ivory evidence dossier',
+        'one distinctive sculptural product seal standing apart from neutral forms on a dark presentation table',
+        'premium unbranded packaging prototypes beside a trademark examination file and precision measuring tools',
+        'abstract identity samples arranged for a careful legal comparison with a loupe and archival folders',
+      ],
+      patent: [
+        'precision mechanical prototype components on authentic engineering drawings with calipers and drafting tools',
+        'an invention development desk moving from hand sketch to technical drawing and sealed filing portfolio',
+        'a refined industrial prototype under examination beside exploded-view drawings and a brass magnifier',
+        'alternative engineered components arranged around a protected reference assembly on a blueprint worktable',
+      ],
+      copyright: [
+        'camera, original photo prints, creation records and a legal evidence folder documenting a creative work',
+        'graphic tablet, professional camera and encrypted media drives representing digital creative ownership',
+        'manuscript pages, fountain pen, audio equipment and archival storage documenting original authorship',
+        'design proofs and production materials organized beside timestamped evidence envelopes without readable text',
+      ],
+      international: [
+        'elegant brass globe, unmarked filing dossiers and connected destination markers on a navy legal worktable',
+        'international portfolio planning desk with world atlas textures, sealed folders and multiple jurisdiction tokens',
+        'global filing route represented by physical brass markers, ivory documents and a refined navigation instrument',
+        'cross-border intellectual property strategy scene with globe, passport-like blank dossiers and legal seals',
+      ],
     };
-    const subject = subjectByCat[category.slug] || 'intellectual property law symbols';
-    const prompt = `${styleBase}. Theme: ${subject}.`;
+    const scenes = scenesByCat[category.slug] || scenesByCat.trademark;
+    const subject = scenes[(Number(timestamp) + attempt) % scenes.length];
+    const prompt = `${styleBase}. Scene: ${subject}.`;
 
     const body = JSON.stringify({
       prompt,
       mode: 'base',
       width: 1024,
-      height: 768,
+      height: 576,
       steps: 4,
       seed: Math.floor(Math.random() * 1000000),
     });
@@ -158,15 +175,24 @@ function generateArticleImage(category, dateStr, timestamp) {
             const json = JSON.parse(b);
             const b64 = json.artifacts && json.artifacts[0] && json.artifacts[0].base64;
             if (!b64) return resolve(null);
+            const imageBuffer = Buffer.from(b64, 'base64');
+            const dimensions = getImageDimensions(imageBuffer);
+            if (!dimensions || Math.abs(dimensions.width / dimensions.height - 16 / 9) > 0.01) {
+              const actual = dimensions ? `${dimensions.width}x${dimensions.height}` : '無法辨識';
+              console.log(`  ⚠️ 生圖比例不是 16:9（${actual}），本次不採用`);
+              return resolve(null);
+            }
             const imgDir = path.join(INSIGHTS_DIR, 'img');
             if (!fs.existsSync(imgDir)) fs.mkdirSync(imgDir, { recursive: true });
             const imgFilename = `article-${dateStr}-${timestamp}.jpg`;
             const absFile = path.join(imgDir, imgFilename);
-            fs.writeFileSync(absFile, Buffer.from(b64, 'base64'));
+            fs.writeFileSync(absFile, imageBuffer);
             resolve({
               htmlPath: `img/${imgFilename}`,            // 給文章頁（在 insights/ 內）
               jsonPath: `insights/img/${imgFilename}`,   // 給 insights.html（在網站根）
               absFile,
+              width: dimensions.width,
+              height: dimensions.height,
             });
           } catch (e) {
             console.log('  ⚠️ 生圖解析失敗：' + e.message);
@@ -353,8 +379,13 @@ function extractSummary(text) {
 }
 
 // 產生中文 HTML
-function textToHtml(text, title, dateStr, category, imagePath) {
+function textToHtml(text, title, dateStr, category, imagePath, imageWidth, imageHeight, filenameZh, filenameEn) {
   const htmlBody = parseBody(text);
+  const canonicalUrl = `https://ysipo.com.tw/insights/${filenameZh}`;
+  const englishUrl = `https://ysipo.com.tw/insights/${filenameEn}`;
+  const absoluteImage = imagePath.startsWith('http')
+    ? imagePath
+    : `https://ysipo.com.tw/${imagePath.replace(/^\.\.\//, '')}`;
   return `<!DOCTYPE html>
 <html lang="zh-Hant-TW">
 <head>
@@ -364,18 +395,19 @@ function textToHtml(text, title, dateStr, category, imagePath) {
 <meta name="description" content="${title} - 永旭智慧財產事務所智財知識專欄">
 <meta property="og:title" content="${title} | 永旭智慧財產事務所">
 <meta property="og:description" content="${title} - 智財知識專欄">
-<meta property="og:image" content="${imagePath}">
+<meta property="og:image" content="${absoluteImage}">
 <meta property="og:type" content="article">
-<link rel="alternate" hreflang="zh-TW" href="https://ysipo.com.tw/insights/${title}">
+<meta property="og:url" content="${canonicalUrl}">
+<link rel="canonical" href="${canonicalUrl}">
+<link rel="alternate" hreflang="zh-TW" href="${canonicalUrl}">
+<link rel="alternate" hreflang="en" href="${englishUrl}">
+<link rel="alternate" hreflang="x-default" href="${canonicalUrl}">
 <link rel="stylesheet" href="../assets/css/main.css">
 </head>
 <body>
-<div id="header-placeholder"></div>
-<main class="article-main">
-  <div class="article-hero">
-    <img src="${imagePath}" alt="${title}" class="article-hero-image">
-  </div>
-  <div class="container">
+<div id="site-header-placeholder"></div>
+<main class="article-main ys-article-page">
+  <div class="container ys-article-column">
     <div class="article-header">
       <span class="article-category">${category.name}</span>
       <h1 class="article-title">${title}</h1>
@@ -385,6 +417,9 @@ function textToHtml(text, title, dateStr, category, imagePath) {
         <span>閱讀約 5 分鐘</span>
       </div>
     </div>
+    <figure class="ys-article-hero">
+      <img src="${imagePath}" alt="${title}" class="ys-article-hero-image" width="${imageWidth}" height="${imageHeight}">
+    </figure>
     <div class="article-content">
       ${htmlBody}
     </div>
@@ -395,18 +430,23 @@ function textToHtml(text, title, dateStr, category, imagePath) {
     </div>
   </div>
 </main>
-<div id="footer-placeholder"></div>
+<div id="site-footer-placeholder"></div>
 <script src="../assets/js/main.js"></script>
 </body>
 </html>`;
 }
 
 // 產生英文 HTML
-function textToHtmlEn(text, titleEn, dateStr, category, imagePath) {
+function textToHtmlEn(text, titleEn, dateStr, category, imagePath, imageWidth, imageHeight, filenameZh, filenameEn) {
   const htmlBody = parseBody(text);
   const catEn = CATEGORY_EN[category.name] || 'IP Knowledge';
   const [y, m, d] = dateStr.split('-');
   const dateEnStr = `${MONTHS_EN[parseInt(m) - 1]} ${parseInt(d)}, ${y}`;
+  const chineseUrl = `https://ysipo.com.tw/insights/${filenameZh}`;
+  const canonicalUrl = `https://ysipo.com.tw/insights/${filenameEn}`;
+  const absoluteImage = imagePath.startsWith('http')
+    ? imagePath
+    : `https://ysipo.com.tw/${imagePath.replace(/^\.\.\//, '')}`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -417,18 +457,20 @@ function textToHtmlEn(text, titleEn, dateStr, category, imagePath) {
 <meta name="description" content="${titleEn} - YSIPO IP Knowledge Column">
 <meta property="og:title" content="${titleEn} | YSIPO">
 <meta property="og:description" content="${titleEn} - IP Knowledge Column">
-<meta property="og:image" content="${imagePath}">
+<meta property="og:image" content="${absoluteImage}">
 <meta property="og:type" content="article">
 <meta property="og:locale" content="en_US">
+<meta property="og:url" content="${canonicalUrl}">
+<link rel="canonical" href="${canonicalUrl}">
+<link rel="alternate" hreflang="zh-TW" href="${chineseUrl}">
+<link rel="alternate" hreflang="en" href="${canonicalUrl}">
+<link rel="alternate" hreflang="x-default" href="${chineseUrl}">
 <link rel="stylesheet" href="../assets/css/main.css">
 </head>
 <body>
-<div id="header-placeholder"></div>
-<main class="article-main">
-  <div class="article-hero">
-    <img src="${imagePath}" alt="${titleEn}" class="article-hero-image">
-  </div>
-  <div class="container">
+<div id="site-header-placeholder"></div>
+<main class="article-main ys-article-page">
+  <div class="container ys-article-column">
     <div class="article-header">
       <span class="article-category">${catEn}</span>
       <h1 class="article-title">${titleEn}</h1>
@@ -438,6 +480,9 @@ function textToHtmlEn(text, titleEn, dateStr, category, imagePath) {
         <span>~5 min read</span>
       </div>
     </div>
+    <figure class="ys-article-hero">
+      <img src="${imagePath}" alt="${titleEn}" class="ys-article-hero-image" width="${imageWidth}" height="${imageHeight}">
+    </figure>
     <div class="article-content">
       ${htmlBody}
     </div>
@@ -448,7 +493,7 @@ function textToHtmlEn(text, titleEn, dateStr, category, imagePath) {
     </div>
   </div>
 </main>
-<div id="footer-placeholder"></div>
+<div id="site-footer-placeholder"></div>
 <script src="../assets/js/main.js"></script>
 </body>
 </html>`;
@@ -464,9 +509,6 @@ async function main() {
 
     const category = categorizeArticle(topic);
     console.log(`📂 自動分類：${category.name}`);
-
-    // 預備配圖（AI 生圖失敗時的 fallback）
-    const fallbackImagePath = selectImage(topic, category);
 
     // 中英文 API 並行呼叫
     console.log('🤖 呼叫 Nvidia API（中文 + 英文並行）...');
@@ -490,28 +532,28 @@ async function main() {
     const filenameZh = `article-${dateStr}-${timestamp}.html`;
     const filenameEn = `article-${dateStr}-${timestamp}-en.html`;
 
-    // 用 FLUX.1 即時生成專屬配圖，失敗則回退分類圖庫
+    // 用 FLUX.1 即時生成專屬配圖；失敗會重試，避免發布重複的分類共用圖
     console.log('🎨 生成專屬配圖（FLUX.1）...');
-    let imagePath = fallbackImagePath;
+    let imagePath;
     let imageField;
     let generatedImageFile = null;
-    const imgResult = await generateArticleImage(category, dateStr, timestamp);
+    let imgResult = null;
+    for (let attempt = 0; attempt < 2 && !imgResult; attempt++) {
+      imgResult = await generateArticleImage(category, dateStr, timestamp, attempt);
+      if (!imgResult && attempt === 0) console.log('  ⚠️ 首次生圖失敗，改用另一個寫實場景重試...');
+    }
     if (imgResult) {
       imagePath = imgResult.htmlPath;
       imageField = imgResult.jsonPath;
       generatedImageFile = imgResult.absFile;
       console.log(`🖼️  AI 生圖成功：${imgResult.jsonPath}`);
     } else {
-      const m = fallbackImagePath.match(/(\w+)-(\d+)\.jpg$/);
-      imageField = m
-        ? `assets/img/categories/${m[1]}-${m[2]}.jpg`
-        : `assets/img/categories/${category.slug}-1.jpg`;
-      console.log(`🖼️  AI 生圖失敗，改用分類圖庫：${imageField}`);
+      throw new Error('專屬配圖連續兩次生成失敗，已停止發布，避免使用重複的分類共用圖。');
     }
 
     // 產生 HTML
-    const htmlZh = textToHtml(articleZh, titleZh, dateStr, category, imagePath);
-    const htmlEn = textToHtmlEn(articleEn, titleEn, dateStr, category, imagePath);
+    const htmlZh = textToHtml(articleZh, titleZh, dateStr, category, imagePath, imgResult.width, imgResult.height, filenameZh, filenameEn);
+    const htmlEn = textToHtmlEn(articleEn, titleEn, dateStr, category, imagePath, imgResult.width, imgResult.height, filenameZh, filenameEn);
 
     // 確保 insights 資料夾存在
     if (!fs.existsSync(INSIGHTS_DIR)) {
@@ -524,6 +566,10 @@ async function main() {
 
     fs.writeFileSync(path.join(INSIGHTS_DIR, filenameEn), htmlEn, 'utf8');
     console.log(`💾 英文：insights/${filenameEn}`);
+
+    // 寫入後、提交前檢查全部文章格式；任何主圖位置或比例錯誤都停止發布
+    execSync(`node "${path.join(__dirname, 'check-article-layout.js')}"`, { stdio: 'inherit' });
+    console.log('✅ 文章主圖位置、比例與欄寬格式檢查通過');
 
     // 更新 articles.json
     const articlesJsonPath = path.join(INSIGHTS_DIR, 'articles.json');

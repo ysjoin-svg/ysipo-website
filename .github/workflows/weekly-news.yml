@@ -24,7 +24,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Fetch & publish IP news
+      - name: Fetch IP news drafts
         id: gen
         working-directory: scripts
         env:
@@ -44,14 +44,14 @@ jobs:
           password: ${{ secrets.MAIL_PASSWORD }}
           from: 永旭智財新聞 <${{ secrets.MAIL_USERNAME }}>
           to: taiejoin@hotmail.com
-          subject: ${{ job.status == 'success' && '[永旭] 智財新聞已更新' || '[永旭] 智財新聞更新失敗，請檢查' }}
+          subject: ${{ job.status == 'success' && '[永旭] 智財新聞草稿待審' || '[永旭] 智財新聞草稿產生失敗，請檢查' }}
           body: |
-            永旭網站每週智財新聞自動更新完成。
+            永旭網站每週智財新聞草稿已產生；尚未公開上架。
 
             結果：${{ job.status }}
-            本週新增 ${{ steps.gen.outputs.count }} 則：
+            本週新增待審草稿 ${{ steps.gen.outputs.count }} 則：
             ${{ steps.gen.outputs.added }}
 
-            查看：https://ysipo.com.tw/news.html
-            若有不妥的新聞，可用 manage-news.js 一鍵移除（node manage-news.js / remove 編號）。
+            審核：node scripts/manage-news.js pending
+            核准：node scripts/manage-news.js approve 編號
             詳細紀錄：${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

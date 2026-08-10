@@ -1,8 +1,8 @@
-// 智財新聞半自動更新 —— 爬 Google News RSS + Nvidia LLM 改寫中立摘要 + 自動上架
+// 智財新聞草稿產生器 —— 爬 Google News RSS + Nvidia LLM 改寫，人工核准後才上架
 // 用法：
 //   node generate-news.js --dry       只爬取+改寫並印出，不寫檔/不推送（測試用）
-//   node generate-news.js --no-push    寫入 news.html + published-news.json，但不 git push（本地預覽）
-//   node generate-news.js              正式：寫入 + git push + 清 Cloudflare 快取
+//   node generate-news.js --no-push    寫入 pending-news.json，但不 git push（本地預覽）
+//   node generate-news.js              正式：建立草稿並推送，網站內容不會自動變更
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
@@ -19,6 +19,7 @@ if (!NVIDIA_API_KEY) { console.error('❌ 缺少 NVIDIA_API_KEY'); process.exit(
 const WEBSITE_DIR = path.resolve(__dirname, '..');
 const NEWS_HTML = path.join(WEBSITE_DIR, 'news.html');
 const PUBLISHED_JSON = path.join(__dirname, 'published-news.json');
+const PENDING_JSON = path.join(__dirname, 'pending-news.json');
 const DRY = process.argv.includes('--dry');
 const NO_PUSH = process.argv.includes('--no-push');
 
@@ -146,6 +147,15 @@ function withinRecent(pubDate) {
 function loadPublished() {
   try { return JSON.parse(fs.readFileSync(PUBLISHED_JSON, 'utf8')); } catch (e) { return []; }
 }
+function loadPending() {
+  try { return JSON.parse(fs.readFileSync(PENDING_JSON, 'utf8')); } catch (e) { return []; }
+}
+function normalizeTitle(title) {
+  return String(title || '')
+    .replace(/\s*[-｜|]\s*[^-｜|]{2,30}$/u, '')
+    .replace(/[\s\p{P}\p{S}]+/gu, '')
+    .toLowerCase();
+}
 function prettySource(src) { return SOURCE_MAP[src] || src || '網路新聞'; }
 function fmtDate(pubDate) {
   const d = new Date(pubDate);
@@ -175,13 +185,42 @@ function buildCard(item) {
 }
 
 // 把卡片 prepend 到 news.html 的智財新聞插入點（最新在前，保留既有）
+function validateNewsHtml(html) {
+  const startMarker = '<div class="news-list" data-source="ai-agent">';
+  const endMarker = '<!-- END_AI_AGENT_INSERT_POINT -->';
+  const start = html.indexOf(startMarker);
+  const end = html.indexOf(endMarker, start + startMarker.length);
+
+  if (start < 0 || end < 0) {
+    throw new Error('智財新聞區塊標記不完整，停止寫入 news.html');
+  }
+
+  const section = html.slice(start, end);
+  if (/tokens truncated/i.test(section)) {
+    throw new Error('智財新聞區塊含有內容截斷標記，停止寫入 news.html');
+  }
+
+  const openArticles = (section.match(/<article\b/gi) || []).length;
+  const closeArticles = (section.match(/<\/article>/gi) || []).length;
+  const openDivs = (section.match(/<div\b/gi) || []).length;
+  const closeDivs = (section.match(/<\/div>/gi) || []).length;
+
+  if (openArticles !== closeArticles || openDivs !== closeDivs) {
+    throw new Error(
+      `智財新聞 HTML 結構不完整（article ${openArticles}/${closeArticles}、div ${openDivs}/${closeDivs}），停止寫入 news.html`
+    );
+  }
+}
+
 function upsertNews(cardsHtml) {
   let html = fs.readFileSync(NEWS_HTML, 'utf8');
+  validateNewsHtml(html);
   const marker = '<div class="news-list" data-source="ai-agent">';
   const idx = html.indexOf(marker);
   if (idx < 0) throw new Error('找不到智財新聞插入點 marker');
   const pos = idx + marker.length;
   html = html.slice(0, pos) + cardsHtml + html.slice(pos);
+  validateNewsHtml(html);
   fs.writeFileSync(NEWS_HTML, html, 'utf8');
 }
 
@@ -210,7 +249,9 @@ function writeOutput(count, titles) {
     catch (e) { console.log('  查詢失敗：' + q); }
   }
   const published = loadPublished();
-  const publishedKeys = new Set(published.map(p => p.origTitle));
+  const pending = loadPending();
+  const knownTitles = new Set([...published, ...pending].map(p => normalizeTitle(p.origTitle || p.displayTitle)));
+  const knownLinks = new Set([...published, ...pending].map(p => p.link).filter(Boolean));
 
   // 去重(標題) → 篩近期 → 排除已上架過 → 新到舊
   const seen = new Set();
@@ -219,7 +260,7 @@ function writeOutput(count, titles) {
     seen.add(n.title);
     const st = (n.source || '') + ' ' + (n.title || '');
     if (SOURCE_BLOCKLIST.some((k) => st.includes(k))) return false;      // 濾掉同業事務所來源
-    return withinRecent(n.pubDate) && !publishedKeys.has(n.title);
+    return withinRecent(n.pubDate) && !knownTitles.has(normalizeTitle(n.title)) && !knownLinks.has(n.link);
   }).sort((a, b) => Date.parse(b.pubDate) - Date.parse(a.pubDate));
 
   console.log(`🔎 近 ${RECENT_DAYS} 天、未上架過的候選 ${candidates.length} 則，取前 ${MAX_NEWS} 則改寫`);
@@ -251,28 +292,23 @@ function writeOutput(count, titles) {
     return;
   }
 
-  // 上架（newItems 已是新到舊，整批 prepend，最新在最前）
-  const cardsHtml = newItems.map(buildCard).join('');
-  upsertNews(cardsHtml);
-  console.log(`📰 已上架 ${newItems.length} 則到 news.html`);
-
-  // 記錄已上架，供下次去重 / 移除工具使用
-  const updated = newItems.map((n) => ({
+  // 只建立待審草稿；必須以 manage-news.js approve 核准才會出現在網站
+  const drafts = newItems.map((n) => ({
     origTitle: n.origTitle, displayTitle: n.displayTitle, source: n.source,
-    date: n.pubDate, link: n.link, addedAt: new Date().toISOString(),
-  })).concat(published);
-  fs.writeFileSync(PUBLISHED_JSON, JSON.stringify(updated, null, 2), 'utf8');
+    summary: n.summary, date: n.pubDate, link: n.link, draftedAt: new Date().toISOString(),
+  })).concat(pending).sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
+  fs.writeFileSync(PENDING_JSON, JSON.stringify(drafts, null, 2), 'utf8');
+  console.log(`📝 已建立 ${newItems.length} 則待審草稿，尚未上架`);
 
   writeOutput(newItems.length, newItems.map((n) => '・' + n.displayTitle + '（資料來源：' + prettySource(n.source) + '）').join('\n'));
 
-  if (NO_PUSH) { console.log('[--no-push] 已寫檔，未推送。請自行檢查 news.html。'); return; }
+  if (NO_PUSH) { console.log('[--no-push] 已寫入 pending-news.json，未推送。'); return; }
 
   // 推送 + 清快取
   try {
-    execSync(`git -C "${WEBSITE_DIR}" add news.html scripts/published-news.json`, { stdio: 'inherit' });
-    execSync(`git -C "${WEBSITE_DIR}" commit -m "auto: 智財新聞更新 (${newItems.length} 則)"`, { stdio: 'inherit' });
+    execSync(`git -C "${WEBSITE_DIR}" add scripts/pending-news.json`, { stdio: 'inherit' });
+    execSync(`git -C "${WEBSITE_DIR}" commit -m "draft: 智財新聞待審 (${newItems.length} 則)"`, { stdio: 'inherit' });
     execSync(`git -C "${WEBSITE_DIR}" push origin master`, { stdio: 'inherit' });
-    console.log('📤 已推送到 GitHub');
-    setTimeout(purgeCloudflare, 3000);
+    console.log('📤 待審草稿已推送到 GitHub（網站未變更）');
   } catch (e) { console.log('⚠️ Git 推送失敗：' + e.message); }
 })();

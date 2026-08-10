@@ -189,7 +189,7 @@
 
   <div id="site-header-placeholder"></div>
 
-  <main id="main-content">
+  <main id="main-content" class="ys-article-page">
 
     <!-- Minimal Hero (for articles — lighter than service pages) -->
     <div style="background: var(--color-primary); padding-top: calc(var(--nav-height-desktop) + var(--space-6)); padding-bottom: var(--space-6);">
@@ -210,7 +210,7 @@
       <div class="article-layout">
 
         <!-- Main Article Body -->
-        <article class="article-body">
+        <article class="article-body ys-article-column">
 
           <!-- Article Header -->
           <header class="article-header">
@@ -255,16 +255,15 @@
           </header>
 
 
-          <!-- Hero Image (optional) -->
-          <!-- TODO: 待文章配圖
-          <img class="article-hero-img"
-               src="../assets/img/insights/[image-filename].jpg"
-               alt="[圖片說明]"
-               loading="lazy">
-          -->
-          <div class="article-hero-img" style="display:flex;align-items:center;justify-content:center;color:var(--color-text-muted);font-size:var(--text-sm);">
-            [TODO: 文章封面圖 — 請提供 1200x675px 以上的圖片]
-          </div>
+          <!-- Article cover: fixed 16:9, directly after header and before content -->
+          <figure class="ys-article-hero">
+            <img src="../assets/img/insights/[image-filename].webp"
+                 alt="[圖片說明]"
+                 class="ys-article-hero-image"
+                 width="1200"
+                 height="675"
+                 loading="lazy">
+          </figure>
 
 
           <!-- Article Content -->

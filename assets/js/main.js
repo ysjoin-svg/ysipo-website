@@ -211,6 +211,7 @@ function initLangSwitch() {
 function initContactForm() {
   const form = document.querySelector('.contact-form');
   if (!form) return;
+  if (form.dataset.emailjs === 'true') return;
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -255,6 +256,32 @@ function initContactForm() {
         field.classList.remove('error');
       }
     });
+  });
+}
+
+/* ──────────────────────────────────────────────
+   News category filters
+   ────────────────────────────────────────────── */
+function initNewsFilters() {
+  const tabs = Array.from(document.querySelectorAll('[data-news-filter]'));
+  const sections = Array.from(document.querySelectorAll('[data-news-section]'));
+  if (!tabs.length || !sections.length) return;
+
+  function activate(filter) {
+    tabs.forEach(tab => {
+      tab.setAttribute('aria-selected', String(tab.dataset.newsFilter === filter));
+    });
+
+    sections.forEach(section => {
+      const showByDefault = section.dataset.defaultHidden !== 'true';
+      section.hidden = filter === 'all'
+        ? !showByDefault
+        : section.dataset.newsSection !== filter;
+    });
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => activate(tab.dataset.newsFilter));
   });
 }
 
@@ -331,7 +358,7 @@ function applyNavOffset() {
 async function init() {
   // Route to English partials for /en/ pages, Chinese partials for all others
   const path = window.location.pathname;
-  if (path.includes('/en/')) {
+  if (path.includes('/en/') || /-en\.html$/i.test(path)) {
     await Promise.all([
       loadPartial('#site-header-placeholder', '/en/assets/partials/header.html'),
       loadPartial('#site-footer-placeholder', '/en/assets/partials/footer.html'),
@@ -353,6 +380,7 @@ async function init() {
   initScrollAnimations();
   initAccordions();
   initContactForm();
+  initNewsFilters();
   initCounters();
   initSmoothScroll();
   initAOS();
@@ -373,12 +401,26 @@ function initV20Header() {
   var btn = document.getElementById('ys-menu-toggle');
   var nav = document.getElementById('ys-nav');
   if (btn && nav) {
+    function closeMenu() {
+      nav.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
     btn.addEventListener('click', function() {
-      nav.classList.toggle('open');
+      var isOpen = nav.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(isOpen));
+    });
+    nav.querySelectorAll('a').forEach(function(link) {
+      link.addEventListener('click', closeMenu);
     });
     document.addEventListener('click', function(e) {
       if (!btn.contains(e.target) && !nav.contains(e.target)) {
-        nav.classList.remove('open');
+        closeMenu();
+      }
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeMenu();
+        btn.focus();
       }
     });
   }

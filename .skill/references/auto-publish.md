@@ -20,10 +20,15 @@ checkout → setup-node → 設定 git identity
    ↓
 自動分類（商標 / 專利 / 著作權 / 國際智財）
    ↓
-★ 用 FLUX.1-schnell 依分類即時生成專屬配圖（存 insights/img/）
-   生圖失敗則回退 assets/img/categories/ 圖庫
+★ 用 FLUX.1-schnell 依分類即時生成寫實專屬配圖（存 insights/img/）
+   固定要求 16:9，並讀取實際圖檔尺寸驗證
+   首次失敗或比例不符會換場景重試；連續兩次失敗則停止發布
    ↓
 產出中英文 HTML 到 insights/article-yyyymmdd-時戳(.｜-en).html
+   主圖固定放在標題後、正文前，使用 ys-article-hero 標準容器
+   ↓
+執行 node scripts/check-article-layout.js 檢查全部文章格式
+   任一頁主圖位置、16:9 比例、欄寬或 placeholder 錯誤即停止發布
    ↓
 更新 insights/articles.json 索引（image 指向生成圖）
    ↓
@@ -40,13 +45,14 @@ git add → commit → push（用內建 GITHUB_TOKEN，免認證設定）
 |------|------|
 | `.github/workflows/weekly-publish.yml` | **排程定義**（cron + workflow_dispatch 手動觸發）|
 | `scripts/generate-article.js` | 主程式（產文 + 生圖 + 寫檔 + 提交 + 清快取）|
-| `scripts/generate-article.js` 內 `generateArticleImage()` | FLUX.1 生圖函式（依分類，刻意不傳文章標題避免亂碼字）|
+| `scripts/generate-article.js` 內 `generateArticleImage()` | FLUX.1 寫實生圖函式（依分類輪替場景，刻意不傳文章標題避免亂碼字）|
+| `scripts/check-article-layout.js` | 文章主圖格式檢查；加 `--fix` 可統一既有文章結構 |
 | `scripts/manage-articles.js` | 互動式管理工具（列出 / 編輯標題 / 刪除）|
 | `scripts/config.js` | **本機**密鑰（已 gitignore）；CI 上改用 GitHub Secrets |
 | `insights/articles.json` | 文章索引（標題、分類、圖、發佈日期、檔名）|
 | `insights/article-*.html` | 個別文章頁 |
 | `insights/img/article-*.jpg` | 各篇 AI 生成的專屬配圖 |
-| `assets/img/categories/` | 12 張分類配圖（生圖失敗時的 fallback）|
+| `assets/img/categories/` | 舊分類配圖圖庫（自動發文已不再使用，避免重複圖）|
 
 ---
 
@@ -74,14 +80,15 @@ gh secret list   # 確認
 
 - endpoint：`POST https://ai.api.nvidia.com/v1/genai/black-forest-labs/flux.1-schnell`
 - 用**現有的 `NVIDIA_API_KEY`**（同一把 key，免額外申請、免額外付費）
-- 回傳 `artifacts[0].base64`，解碼存成 jpg（約 25~45 KB，1024×768）
-- prompt = 固定風格（navy + gold 扁平商務插畫、強制 no text）+ 分類物件描述
+- 回傳 `artifacts[0].base64`，解碼存成 jpg，要求 1024×576（16:9）
+- 寫檔前會解析 PNG/JPEG 的實際像素；不是 16:9 就視為失敗並重試
+- prompt = 固定風格（navy + gold 寫實編輯攝影、強制 no text）+ 依分類輪替的實體場景
 - ⚠️ **絕對不要把文章標題（英文句子）塞進 prompt** —— FLUX 會把它「寫」進圖裡變成亂碼英文字。只用分類的具象物件詞。
-- 分類物件對照：
-  - trademark → 盾牌、放大鏡、勾選、星章
-  - patent → 燈泡、齒輪、藍圖捲軸、圓規
-  - copyright → 文件、鋼筆、調色盤、底片/音符
-  - international → 地球、世界地圖、連線、紙飛機
+- 分類場景對照：
+  - trademark → 抽象品牌樣本、實體包裝、放大鏡、審查資料
+  - patent → 機械原型、工程圖、量測與製圖工具
+  - copyright → 攝影、設計、影音創作工具與存證資料
+  - international → 實體地球儀、跨國申請卷宗與布局標記
 
 ---
 
@@ -107,6 +114,17 @@ node generate-article.js
 cd C:\Users\Johnny\Desktop\Agent\永旭網站\scripts
 node manage-articles.js
 ```
+
+### 檢查 / 修正文章主圖格式
+
+```bash
+cd C:\Users\Johnny\Desktop\Agent\永旭網站
+node scripts/check-article-layout.js
+node scripts/check-article-layout.js --fix
+```
+
+標準格式：主圖位於文章標題後、正文前，容器為 `.ys-article-hero`，圖片為
+`.ys-article-hero-image`，比例固定 16:9，欄寬使用 `.ys-article-column`，且不得使用 inline style。
 
 ---
 
@@ -136,7 +154,7 @@ LLM 偶爾產出非台灣用語（「軟件」「網絡」）、過時法條或�
 **建議**：每隔 1-2 個月用 `manage-articles.js` 抽查、必要時修改或刪除。
 
 ### ⚠️ 生圖品質浮動
-FLUX 偶爾構圖偏空或物件怪異。不影響發文（有 fallback），但可人工抽換 `insights/img/` 下的圖。
+FLUX 偶爾構圖偏空、物件怪異或未依指定比例輸出。系統會驗證實際尺寸並自動換場景重試一次；若仍失敗則停止發布並由 GitHub Actions 通知，避免以錯誤比例或重複圖片上線。
 
 ---
 

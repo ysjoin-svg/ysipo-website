@@ -21,6 +21,7 @@
   <link rel="canonical" href="https://ysipo.com.tw/en/contact.html">
   <link rel="alternate" hreflang="zh-TW" href="https://ysipo.com.tw/contact.html">
   <link rel="alternate" hreflang="en" href="https://ysipo.com.tw/en/contact.html">
+  <link rel="alternate" hreflang="x-default" href="https://ysipo.com.tw/contact.html">
 
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://ysipo.com.tw/en/contact.html">
@@ -267,7 +268,7 @@
             </div>
 
             <!-- Form -->
-            <form id="contact-form-en" class="contact-form" novalidate aria-label="Contact inquiry form">
+            <form id="contact-form-en" class="contact-form" data-emailjs="true" aria-label="Contact inquiry form">
 
               <div class="form-row">
                 <div class="form-group">
@@ -393,11 +394,20 @@
   <script src="../assets/js/main.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
-    emailjs.init({ publicKey: "a5x52UregaIksKaKC" });
+    if (window.emailjs) {
+      emailjs.init({ publicKey: "a5x52UregaIksKaKC" });
+    }
 
     document.getElementById('contact-form-en').addEventListener('submit', function(e) {
       e.preventDefault();
       e.stopImmediatePropagation();
+
+      if (!this.reportValidity()) return;
+
+      if (!window.emailjs) {
+        alert('The form service is temporarily unavailable. Please call us or email contact@ysipo.com.tw.');
+        return;
+      }
 
       const checkboxes = document.querySelectorAll('#contact-form-en input[type="checkbox"]:checked');
       const services = Array.from(checkboxes).map(cb => cb.value).join(', ');
