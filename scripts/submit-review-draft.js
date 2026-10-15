@@ -24,8 +24,13 @@ async function main() {
   if (!input) throw new Error('請提供草稿 JSON 檔案');
   const payload = JSON.parse(fs.readFileSync(input, 'utf8'));
   const drafts = Array.isArray(payload) ? payload : [payload];
+  const publishedTitles = new Set(JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'insights', 'articles.json'), 'utf8')).map((article) => article.title));
   const links = Object.fromEntries(RECIPIENTS.map((email) => [email, []]));
   for (const draft of drafts) {
+    if (draft.type === 'article' && publishedTitles.has(draft.content.titleZh)) {
+      console.log('略過與既有網站重複的文章標題');
+      continue;
+    }
     const response = await fetch(`${REVIEW_URL}/api/drafts`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json' },

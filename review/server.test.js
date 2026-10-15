@@ -60,4 +60,14 @@ test('review requires mailbox code, edits are saved, approval is single-use', as
   assert.equal(readDraft(id).status, 'published');
   response = await fetch(`${root}/api/drafts`, { method: 'POST', headers: { Authorization: 'Bearer test-ingest-key', 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'news', content }) });
   assert.deepEqual(await response.json(), { duplicate: true });
+
+  const article = { titleZh: '待審文章', titleEn: 'Article', bodyZh: '正文', bodyEn: 'Body', category: '商標', imageBase64: 'eA==', imageWidth: 1280, imageHeight: 720 };
+  const submit = () => fetch(`${root}/api/drafts`, { method: 'POST', headers: { Authorization: 'Bearer test-ingest-key', 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'article', content: article }) });
+  const articleResponse = await submit();
+  const articleId = (await articleResponse.json()).id;
+  assert.equal((await (await submit()).json()).duplicate, true);
+  response = await fetch(`${root}/api/drafts/${articleId}/cancel`, { method: 'POST', headers: { Authorization: 'Bearer test-ingest-key' } });
+  assert.equal(response.status, 200);
+  assert.equal(readDraft(articleId).status, 'cancelled');
+  assert.equal((await submit()).status, 201);
 });

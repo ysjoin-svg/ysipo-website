@@ -109,7 +109,7 @@ function editor(draft, session) {
     ? `<label for="title">標題</label><input id="title" name="title" maxlength="200" required value="${esc(c.title)}"><label for="summary">摘要</label><textarea id="summary" name="summary" maxlength="1500" required>${esc(c.summary)}</textarea><p class="muted">資料來源：${esc(c.source)}　<a href="${esc(c.link)}" target="_blank" rel="noopener noreferrer">查看原文</a></p>`
     : `<label for="titleZh">中文標題</label><input id="titleZh" name="titleZh" maxlength="200" required value="${esc(c.titleZh)}"><label for="bodyZh">中文正文</label><textarea id="bodyZh" name="bodyZh" class="body-editor" required>${esc(c.bodyZh)}</textarea><label for="titleEn">英文標題</label><input id="titleEn" name="titleEn" maxlength="200" required value="${esc(c.titleEn)}"><label for="bodyEn">英文正文</label><textarea id="bodyEn" name="bodyEn" class="body-editor" required>${esc(c.bodyEn)}</textarea><h2>封面圖</h2><img src="/review/${draft.id}/image" alt="文章封面">`;
   const disabled = !['pending', 'failed'].includes(draft.status);
-  return page(draft.type === 'news' ? '智財新聞草稿' : '智財知識文章草稿', `<h1>${draft.type === 'news' ? '智財新聞草稿' : '智財知識文章草稿'}</h1><p class="status">狀態：${draft.status === 'pending' ? '待審' : draft.status === 'publishing' ? '發布中' : draft.status === 'published' ? '已發布' : '發布失敗，可重新嘗試'}</p>${draft.publishedUrl ? `<p><a href="${esc(draft.publishedUrl)}">查看已發布內容</a></p>` : ''}${disabled ? '' : `<form method="post" action="/review/${draft.id}/save"><input type="hidden" name="csrf" value="${session.csrf}">${fields}<div class="row"><button type="submit" class="secondary">儲存修改</button></div></form><form method="post" action="/review/${draft.id}/publish"><input type="hidden" name="csrf" value="${session.csrf}"><div class="panel">確認內容後按「核准並發布」。系統會上架目前儲存的版本；若有修改，請先按「儲存修改」。</div><button type="submit">核准並發布</button></form>`}<p class="muted">本頁僅供兩位指定收件人審核；先完成的發布即生效。</p>`);
+  return page(draft.type === 'news' ? '智財新聞草稿' : '智財知識文章草稿', `<h1>${draft.type === 'news' ? '智財新聞草稿' : '智財知識文章草稿'}</h1><p class="status">狀態：${draft.status === 'pending' ? '待審' : draft.status === 'publishing' ? '發布中' : draft.status === 'published' ? '已發布' : draft.status === 'cancelled' ? '已取消（內容重複）' : '發布失敗，可重新嘗試'}</p>${draft.publishedUrl ? `<p><a href="${esc(draft.publishedUrl)}">查看已發布內容</a></p>` : ''}${disabled ? '' : `<form method="post" action="/review/${draft.id}/save"><input type="hidden" name="csrf" value="${session.csrf}">${fields}<div class="row"><button type="submit" class="secondary">儲存修改</button></div></form><form method="post" action="/review/${draft.id}/publish"><input type="hidden" name="csrf" value="${session.csrf}"><div class="panel">確認內容後按「核准並發布」。系統會上架目前儲存的版本；若有修改，請先按「儲存修改」。</div><button type="submit">核准並發布</button></form>`}<p class="muted">本頁僅供兩位指定收件人審核；先完成的發布即生效。</p>`);
 }
 
 async function handler(req, res) {
@@ -120,8 +120,8 @@ async function handler(req, res) {
     if (!apiAuth(req)) return send(res, 401, 'Unauthorized', 'text/plain');
     const body = JSON.parse(await readBody(req));
     if (!validateContent(body.type, body.content)) return send(res, 400, 'Invalid draft', 'text/plain');
-    if (body.type === 'news') {
-      const duplicate = fs.readdirSync(DATA_DIR).filter((name) => /^[a-f0-9]{32}\.json$/.test(name)).map((name) => readDraft(name.slice(0, 32))).find((item) => item?.type === 'news' && item.content.link === body.content.link);
+    if (body.type === 'news' || body.type === 'article') {
+      const duplicate = fs.readdirSync(DATA_DIR).filter((name) => /^[a-f0-9]{32}\.json$/.test(name)).map((name) => readDraft(name.slice(0, 32))).find((item) => item?.type === body.type && item.status !== 'cancelled' && (body.type === 'news' ? item.content.link === body.content.link : item.content.titleZh === body.content.titleZh));
       if (duplicate) return send(res, 200, JSON.stringify({ duplicate: true }), 'application/json; charset=utf-8');
     }
     const id = crypto.randomBytes(16).toString('hex');
@@ -143,7 +143,7 @@ async function handler(req, res) {
     return send(res, 200, JSON.stringify({ recipient: payload.recipient, code: payload.code }), 'application/json; charset=utf-8');
   }
 
-  const apiMatch = url.pathname.match(/^\/api\/drafts\/([a-f0-9]{32})(?:\/result)?$/);
+  const apiMatch = url.pathname.match(/^\/api\/drafts\/([a-f0-9]{32})(?:\/(result|cancel))?$/);
   if (apiMatch) {
     if (!apiAuth(req)) return send(res, 401, 'Unauthorized', 'text/plain');
     const draft = readDraft(apiMatch[1]);
@@ -157,6 +157,13 @@ async function handler(req, res) {
       if (draft.status !== 'publishing') return send(res, 409, 'Already resolved', 'text/plain');
       draft.status = result.status === 'success' ? 'published' : 'failed';
       draft.publishedUrl = result.status === 'success' && typeof result.url === 'string' ? result.url : undefined;
+      draft.resolvedAt = new Date().toISOString();
+      saveDraft(draft);
+      return send(res, 200, 'ok', 'text/plain');
+    }
+    if (req.method === 'POST' && url.pathname.endsWith('/cancel')) {
+      if (!['pending', 'failed'].includes(draft.status)) return send(res, 409, 'Cannot cancel', 'text/plain');
+      draft.status = 'cancelled';
       draft.resolvedAt = new Date().toISOString();
       saveDraft(draft);
       return send(res, 200, 'ok', 'text/plain');

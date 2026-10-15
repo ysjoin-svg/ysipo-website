@@ -30,7 +30,22 @@ const TOPICS = [
   '新型專利vs發明專利：如何選擇最適合的保護方式',
   '商標近似判斷：如何避免申請被駁回',
   'PCT國際專利申請：從台灣布局全球市場',
-  '設計專利保護：產品外觀的智財防線'
+  '設計專利保護：產品外觀的智財防線',
+  '商標延展與到期管理：企業如何維持品牌權利',
+  '技術合作前的保密協議：研發成果如何分配',
+  '專利檢索入門：投入研發前要查哪些資料',
+  '海外參展前的商標與專利檢查清單',
+  '商標授權合約：品質控管與使用範圍怎麼寫',
+  '職務發明的權利歸屬：企業與員工應注意什麼',
+  '電商賣家遇到仿冒商品：蒐證與申訴步驟',
+  '著作權授權範圍：圖片與影音素材如何合法使用',
+  '產品上市前的專利侵權風險排查',
+  '商標申請類別怎麼選：商品與服務項目規劃',
+  '企業名稱與商標不同：品牌保護常見誤區',
+  '共同研發的專利申請：合作各方如何約定權利',
+  '商標註冊後沒有使用：撤銷風險與證據保存',
+  '營業秘密與專利怎麼選：技術保護策略比較',
+  '設計專利申請前公開產品：可能面臨哪些問題'
 ];
 
 // 分類中英文對照
@@ -50,7 +65,13 @@ function getCurrentTopic() {
   const customTopic = process.argv.slice(2).find((arg) => !arg.startsWith('--'));
   if (customTopic) return customTopic;
   const weekNumber = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
-  return TOPICS[weekNumber % TOPICS.length];
+  const articles = JSON.parse(fs.readFileSync(path.join(INSIGHTS_DIR, 'articles.json'), 'utf8'));
+  const published = new Set(articles.map((article) => article.title));
+  for (let offset = 0; offset < TOPICS.length; offset++) {
+    const topic = TOPICS[(weekNumber + offset) % TOPICS.length];
+    if (!published.has(topic)) return topic;
+  }
+  throw new Error('所有預設主題都已發過，請新增題目');
 }
 
 // 根據主題自動分類（統一不加「知識」後綴）
@@ -286,6 +307,7 @@ function buildZhMessages(topic) {
 
 要求：
 - 字數：800-1200字
+- 第一行標題請原樣使用「${topic}」，不要改寫標題
 - 結構：主標題、2-3個副標題、各段落說明
 - 語氣：專業但易懂，適合企業主和發明人
 - 內容：實用的建議和注意事項
