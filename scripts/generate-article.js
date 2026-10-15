@@ -472,7 +472,7 @@ function textToHtml(text, title, dateStr, category, imagePath, imageWidth, image
   </div>
 </main>
 <div id="site-footer-placeholder"></div>
-<script src="../assets/js/main.js"></script>
+<script src="../assets/js/main.js?v=traffic-20261015"></script>
 </body>
 </html>`;
 }
@@ -535,7 +535,7 @@ function textToHtmlEn(text, titleEn, dateStr, category, imagePath, imageWidth, i
   </div>
 </main>
 <div id="site-footer-placeholder"></div>
-<script src="../assets/js/main.js"></script>
+<script src="../assets/js/main.js?v=traffic-20261015"></script>
 </body>
 </html>`;
 }
