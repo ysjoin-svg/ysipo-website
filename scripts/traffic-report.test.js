@@ -3,7 +3,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
-  articleItemId, newsItemId, parseNews, parseArticles, joinReport,
+  articleItemId, newsItemId, githubArticleFiles, parseNews, parseArticles, joinReport,
   renderHtml, toCsv, percent,
 } = require('./traffic-report-core');
 const { taipeiDay, fetchCloudflare } = require('./traffic-report');
@@ -27,6 +27,26 @@ test('article inventory normalizes English variants to one list item', () => {
   }], 'missing-directory');
   assert.equal(rows.length, 1);
   assert.equal(rows[0].id, articleItemId('article-2026-10-15-123-en.html'));
+});
+
+test('public repository tree finds unindexed articles and legacy English pages', () => {
+  const files = githubArticleFiles({ truncated: false, tree: [
+    { type: 'blob', path: 'insights/article-1.html' },
+    { type: 'blob', path: 'en/insights/article-1.html' },
+    { type: 'blob', path: 'insights/article-2026-05-15-123.html' },
+    { type: 'blob', path: 'insights/article-template.html' },
+    { type: 'blob', path: 'insights/article-2026-06-01-456-en.html' },
+  ] });
+  assert.equal(files.length, 2);
+  const legacy = files.find((item) => item.filename === 'article-1.html');
+  assert.equal(legacy.legacyEnPath, '/en/insights/article-1.html');
+  const [article] = parseArticles([{ ...legacy, title: '舊文章' }], 'missing-directory');
+  const report = joinReport({ articles: [article], news: [] }, {
+    gaPages: new Map([['/insights/article-1.html', 4], ['/en/insights/article-1.html', 3]]),
+    cfPages: new Map(), items: new Map(), search: new Map(),
+  }, { gaViews: 'ok', gaItems: 'missing', search: 'missing', cloudflare: 'missing' });
+  assert.equal(report.articles[0].gaViews, 7);
+  assert.throws(() => githubArticleFiles({ truncated: true, tree: [] }), /不完整/);
 });
 
 test('report joins distinct GA4, Cloudflare and Search Console measures', () => {

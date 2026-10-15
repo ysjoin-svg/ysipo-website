@@ -4,6 +4,8 @@
 
 雙擊根目錄的 `traffic-report.cmd`，程式會讀取官網目前已上線的文章與新聞，查詢最近 30 天資料，並開啟 `reports/traffic-report.html`。同一資料夾會產生兩份 CSV。`reports/` 和本機憑證均已加入 `.gitignore`。
 
+文章清單以官網索引為主，另從公開 GitHub 檔案清單補齊仍在線上、但未列入索引的舊文章；若該清單暫時無法取得，報表會提示可能漏列，不會將漏列文章顯示為零流量。
+
 也可在專案根目錄執行 `node scripts/traffic-report.js --days=7`；天數可設 1 至 90。
 
 ## 指標口徑

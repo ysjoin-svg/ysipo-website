@@ -28,9 +28,28 @@ function newsItemId(url, title) {
 }
 
 function articlePaths(article) {
-  return [article.filename, article.filenameEn]
+  const paths = [article.filename, article.filenameEn]
     .filter(Boolean)
     .map((filename) => `/insights/${path.basename(filename)}`);
+  if (article.legacyEnPath) paths.push(article.legacyEnPath);
+  return paths;
+}
+
+function githubArticleFiles(tree) {
+  if (!Array.isArray(tree?.tree) || tree.truncated) throw new Error('GitHub 文章檔案清單不完整');
+  const paths = new Set(tree.tree.filter((entry) => entry.type === 'blob').map((entry) => entry.path));
+  return [...paths]
+    .filter((name) => /^insights\/article-[\w-]+\.html$/.test(name) && !name.endsWith('-en.html') && name !== 'insights/article-template.html')
+    .map((name) => {
+      const filename = path.basename(name);
+      const english = name.replace(/\.html$/, '-en.html');
+      const legacyEnPath = `/en/insights/${filename}`;
+      return {
+        filename,
+        filenameEn: paths.has(english) ? path.basename(english) : '',
+        legacyEnPath: paths.has(legacyEnPath.slice(1)) ? legacyEnPath : '',
+      };
+    });
 }
 
 function parseNews(html, language, pageUrl) {
@@ -63,6 +82,7 @@ function parseArticles(index, insightsDir) {
       id: articleItemId(filename),
       filename,
       filenameEn: /^article-[\w-]+-en\.html$/.test(item.filenameEn || '') ? item.filenameEn : '',
+      legacyEnPath: /^\/en\/insights\/article-[\w-]+\.html$/.test(item.legacyEnPath || '') ? item.legacyEnPath : '',
       title: item.title || filename,
       date: item.date || '',
       category: item.category || '',
@@ -188,4 +208,4 @@ ${notices ? `<div class="notice"><strong>資料狀態</strong><ul>${notices}</ul
     .replace('<script>', options.nonce ? `<script nonce="${escapeHtml(options.nonce)}">` : '<script>');
 }
 
-module.exports = { SITE, hash, articleItemId, newsItemId, parseNews, parseArticles, pathFromUrl, joinReport, renderHtml, toCsv, percent };
+module.exports = { SITE, hash, articleItemId, newsItemId, githubArticleFiles, parseNews, parseArticles, pathFromUrl, joinReport, renderHtml, toCsv, percent };

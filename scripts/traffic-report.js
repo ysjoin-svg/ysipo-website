@@ -2,9 +2,10 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const cheerio = require('cheerio');
 const { GoogleAuth } = require('google-auth-library');
 const {
-  SITE, parseNews, parseArticles, pathFromUrl, joinReport,
+  SITE, githubArticleFiles, parseNews, parseArticles, pathFromUrl, joinReport,
   renderHtml, toCsv, percent,
 } = require('./traffic-report-core');
 
@@ -64,7 +65,28 @@ async function inventory(issues) {
   ]);
   const index = JSON.parse(indexText);
   if (!Array.isArray(index)) throw new Error('articles.json 格式不是文章清單');
-  const articles = parseArticles(index, path.join(ROOT, 'insights'));
+  const listed = new Set(index.map((item) => item.filename));
+  const extras = [];
+  try {
+    const response = await fetch('https://api.github.com/repos/ysjoin-svg/ysipo-website/git/trees/master?recursive=1', {
+      headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'ysipo-traffic-report' },
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!response.ok) throw new Error(`GitHub HTTP ${response.status}`);
+    const files = githubArticleFiles(await response.json());
+    await Promise.all(files.filter((entry) => !listed.has(entry.filename)).map(async (entry) => {
+      try {
+        const html = await liveText(`insights/${entry.filename}`);
+        const $ = cheerio.load(html);
+        extras.push({
+          ...entry,
+          title: $('h1').first().text().trim() || $('title').first().text().split('|')[0].trim() || entry.filename,
+          date: entry.filename.match(/^article-(\d{4}-\d{2}-\d{2})-/)?.[1] || '',
+        });
+      } catch (error) { issues.push(`${entry.filename} 無法從官網讀取，已略過：${error.message}`); }
+    }));
+  } catch (error) { issues.push(`文章檔案清單無法從 GitHub 讀取；未列入索引的文章可能遺漏：${error.message}`); }
+  const articles = parseArticles(index.concat(extras), path.join(ROOT, 'insights'));
   const news = [
     ...parseNews(zhNews, '繁中', `${SITE}/news.html`),
     ...parseNews(enNews, 'English', `${SITE}/en/news.html`),
