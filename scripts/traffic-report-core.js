@@ -162,7 +162,7 @@ function toCsv(headers, rows) {
   return '\uFEFF' + [headers, ...rows].map((row) => row.map(csvCell).join(',')).join('\r\n') + '\r\n';
 }
 
-function renderHtml(report, dates, status, issues) {
+function renderHtml(report, dates, status, issues, options = {}) {
   const articleRows = report.articles.map((row) => `<tr><td><a href="${escapeHtml(row.url)}" target="_blank" rel="noopener">${escapeHtml(row.title)}</a><small>${escapeHtml(row.category)}</small></td><td>${escapeHtml(row.date)}</td><td>${number(row.gaViews)}</td><td>${number(row.cfViews)}</td><td>${number(row.listViews)}</td><td>${number(row.listClicks)}</td><td>${percent(row.listClicks, row.listViews)}</td><td>${number(row.searchImpressions)}</td><td>${number(row.searchClicks)}</td><td>${percent(row.searchClicks, row.searchImpressions)}</td></tr>`).join('');
   const newsRows = report.news.map((row) => `<tr><td>${row.url ? `<a href="${escapeHtml(safeLink(row.url))}" target="_blank" rel="noopener">${escapeHtml(row.title)}</a>` : escapeHtml(row.title)}<small>${escapeHtml(row.language)}</small></td><td>${escapeHtml(row.date)}</td><td>${number(row.listViews)}</td><td>${number(row.listClicks)}</td><td>${percent(row.listClicks, row.listViews)}</td></tr>`).join('');
   const sources = [
@@ -170,7 +170,7 @@ function renderHtml(report, dates, status, issues) {
     ['Search Console', status.search], ['Cloudflare', status.cloudflare],
   ].map(([name, state]) => `<span class="source ${state === 'ok' ? 'ok' : 'muted'}">${escapeHtml(name)}：${state === 'ok' ? '已連線' : '未連線'}</span>`).join('');
   const notices = issues.map((item) => `<li>${escapeHtml(item)}</li>`).join('');
-  return `<!doctype html>
+  const html = `<!doctype html>
 <html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="data:,"><title>永旭內容成效報表</title>
 <style>
 :root{font-family:system-ui,"Microsoft JhengHei",sans-serif;color:#17272a;background:#f5f7f6}*{box-sizing:border-box}body{margin:0}header{background:#fff;border-bottom:1px solid #dce3e0;padding:22px max(20px,4vw)}h1{font-size:24px;margin:0 0 6px}header p{margin:0;color:#5f6e6b}main{padding:20px max(20px,4vw) 50px}.sources{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}.source{font-size:13px;border:1px solid #a5cbc0;color:#17624f;background:#e9f5ef;padding:5px 9px;border-radius:4px}.source.muted{border-color:#d7dedd;color:#687674;background:#fff}.summary{display:flex;gap:32px;flex-wrap:wrap;border-bottom:1px solid #dce3e0;padding-bottom:18px}.summary div{min-width:120px}.summary strong{font-size:24px;display:block}.summary span{font-size:13px;color:#63716e}.notice{background:#fff;border-left:3px solid #d1a953;padding:10px 16px;margin:20px 0}.notice ul{margin:5px 0;padding-left:22px}nav{display:flex;gap:14px;margin:24px 0 12px;border-bottom:1px solid #dce3e0}nav button{background:none;border:0;border-bottom:3px solid transparent;padding:8px 2px;font:inherit;cursor:pointer}nav button.active{border-color:#247e67;font-weight:700}.toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:0 0 10px}.toolbar input{font:inherit;padding:8px;border:1px solid #b9c8c3;border-radius:4px;max-width:300px;width:100%}.toolbar a{white-space:nowrap;color:#17624f}.table-wrap{overflow:auto;background:#fff;border:1px solid #dce3e0}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:10px 12px;border-bottom:1px solid #e8edeb;white-space:nowrap}th{background:#ecf1ee;position:sticky;top:0}td:first-child{white-space:normal;min-width:250px}td small{display:block;color:#71807c;margin-top:3px}a{color:#17624f}tbody tr:hover{background:#f5faf8}[hidden]{display:none!important}.footnote{font-size:13px;color:#5f6e6b;line-height:1.6;margin-top:16px}
@@ -182,6 +182,10 @@ ${notices ? `<div class="notice"><strong>資料狀態</strong><ul>${notices}</ul
 <section id="news" hidden><div class="toolbar"><input type="search" placeholder="搜尋新聞" aria-label="搜尋新聞"><a href="traffic-news.csv" download>下載 CSV</a></div><div class="table-wrap"><table><thead><tr><th>新聞</th><th>日期</th><th>卡片曝光</th><th>來源連結點擊</th><th>卡片 CTR</th></tr></thead><tbody>${newsRows}</tbody></table></div><p class="footnote">新聞共用 news.html，沒有逐則文章頁。上方的新聞頁瀏覽量不可分攤到每則；逐則成效以卡片曝光與來源連結點擊衡量。未設來源連結的新聞沒有可計算的點擊率。</p></section>
 <p class="footnote">列表事件及新補上的文章 GA4 瀏覽，僅自追蹤程式上線後開始累積，無法回補歷史數據。Cloudflare 與 GA4 的口徑不同。</p></main>
 <script>document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('main section').forEach(s=>s.hidden=s.id!==b.dataset.tab)}));document.querySelectorAll('.toolbar input').forEach(i=>i.addEventListener('input',()=>{i.closest('section').querySelectorAll('tbody tr').forEach(r=>r.hidden=!r.textContent.toLowerCase().includes(i.value.toLowerCase()))}));</script></body></html>`;
+  return html
+    .replace('href="traffic-articles.csv"', `href="${escapeHtml(options.articleDownload || 'traffic-articles.csv')}"`)
+    .replace('href="traffic-news.csv"', `href="${escapeHtml(options.newsDownload || 'traffic-news.csv')}"`)
+    .replace('<script>', options.nonce ? `<script nonce="${escapeHtml(options.nonce)}">` : '<script>');
 }
 
 module.exports = { SITE, hash, articleItemId, newsItemId, parseNews, parseArticles, pathFromUrl, joinReport, renderHtml, toCsv, percent };

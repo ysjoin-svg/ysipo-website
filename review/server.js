@@ -10,6 +10,10 @@ const INGEST_KEY = process.env.REVIEW_INGEST_KEY;
 const TOKEN_FILE = process.env.REVIEW_GITHUB_TOKEN_FILE;
 const REVIEWERS = ['taiejoin@hotmail.com', 'fish801113@gmail.com'];
 const sessions = new Map();
+const trafficSessions = new Map();
+const trafficCodes = new Map();
+const trafficReports = new Map();
+const trafficRequests = [];
 
 if (!INGEST_KEY || (!TOKEN_FILE && process.env.NODE_ENV !== 'test')) {
   throw new Error('REVIEW_INGEST_KEY and REVIEW_GITHUB_TOKEN_FILE are required');
@@ -49,7 +53,7 @@ function send(res, status, body, type = 'text/html; charset=utf-8', extra = {}) 
 
 function page(title, body) {
   return `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)} | 永旭審稿</title><style>
-  body{margin:0;background:#f7f8f7;color:#1b2630;font:16px/1.6 system-ui,-apple-system,sans-serif}main{max-width:760px;margin:0 auto;padding:24px 18px 64px}header{background:#0b2236;color:#fff;padding:17px 20px;font-weight:700}h1{font-size:1.5rem;line-height:1.35}h2{font-size:1.1rem;margin-top:28px}p{margin:12px 0}label{display:block;font-weight:650;margin:18px 0 7px}input,textarea{box-sizing:border-box;width:100%;border:1px solid #aab7bd;border-radius:4px;padding:12px;font:inherit;background:#fff;color:#1b2630}textarea{min-height:130px;resize:vertical}.body-editor{min-height:320px}button{border:0;border-radius:4px;padding:11px 18px;background:#0b6b60;color:#fff;font:inherit;font-weight:700;cursor:pointer}button.secondary{background:#0b2236}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:20px}.panel{border-left:4px solid #c6a45b;background:white;padding:16px;margin:20px 0}.status{font-weight:700;color:#0b6b60}.muted{color:#52616b;font-size:.9rem}img{max-width:100%;height:auto}a{color:#075e91}</style></head><body><header>永旭智慧財產事務所 · 審稿</header><main>${body}</main></body></html>`;
+  body{margin:0;background:#f7f8f7;color:#1b2630;font:16px/1.6 system-ui,-apple-system,sans-serif}main{max-width:760px;margin:0 auto;padding:24px 18px 64px}header{background:#0b2236;color:#fff;padding:17px 20px;font-weight:700;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}header a{color:#fff;font-weight:500}h1{font-size:1.5rem;line-height:1.35}h2{font-size:1.1rem;margin-top:28px}p{margin:12px 0}label{display:block;font-weight:650;margin:18px 0 7px}input,textarea{box-sizing:border-box;width:100%;border:1px solid #aab7bd;border-radius:4px;padding:12px;font:inherit;background:#fff;color:#1b2630}textarea{min-height:130px;resize:vertical}.body-editor{min-height:320px}button{border:0;border-radius:4px;padding:11px 18px;background:#0b6b60;color:#fff;font:inherit;font-weight:700;cursor:pointer}button.secondary{background:#0b2236}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:20px}.panel{border-left:4px solid #c6a45b;background:white;padding:16px;margin:20px 0}.status{font-weight:700;color:#0b6b60}.muted{color:#52616b;font-size:.9rem}img{max-width:100%;height:auto}a{color:#075e91}</style></head><body><header><span>永旭智慧財產事務所 · 審稿</span><a href="/traffic">內容成效</a></header><main>${body}</main></body></html>`;
 }
 
 async function readBody(req, limit = 8 * 1024 * 1024) {
@@ -76,6 +80,49 @@ function sessionFor(req, id) {
   const session = match && sessions.get(match[1]);
   if (!session || session.id !== id || session.expires < Date.now()) return null;
   return session;
+}
+
+function trafficSessionFor(req) {
+  const match = (req.headers.cookie || '').match(/(?:^|;\s*)ystraffic=([A-Za-z0-9_-]+)/);
+  const session = match && trafficSessions.get(match[1]);
+  if (!session || session.expires < Date.now()) return null;
+  return session;
+}
+
+function trafficPage(title, body) {
+  return page(title, body).replace('永旭智慧財產事務所 · 審稿', '永旭智慧財產事務所 · 內容成效');
+}
+
+function trafficLogin() {
+  return trafficPage('內容成效登入', `<h1>內容成效</h1><p>使用指定信箱取得一次性驗證碼。</p><form method="post" action="/traffic/code"><label for="email">信箱</label><input id="email" name="email" type="email" autocomplete="email" required><div class="row"><button type="submit">寄送驗證碼</button></div></form>`);
+}
+
+function trafficModule(name) {
+  const localDir = path.join(__dirname, 'scripts');
+  const dir = process.env.TRAFFIC_REPORT_DIR || (fs.existsSync(localDir) ? localDir : path.join(__dirname, '..', 'scripts'));
+  return require(path.join(dir, name));
+}
+
+function trafficCsv(report, kind) {
+  const { toCsv, percent } = trafficModule('traffic-report-core');
+  if (kind === 'articles') return toCsv(
+    ['文章', '日期', 'GA4瀏覽', 'Cloudflare瀏覽', '列表曝光', '列表點擊', '列表CTR', '搜尋曝光', '搜尋點擊', '搜尋CTR', '網址'],
+    report.articles.map((row) => [row.title, row.date, row.gaViews, row.cfViews, row.listViews, row.listClicks, percent(row.listClicks, row.listViews), row.searchImpressions, row.searchClicks, percent(row.searchClicks, row.searchImpressions), row.url]),
+  );
+  return toCsv(
+    ['新聞', '語言', '日期', '卡片曝光', '來源連結點擊', '卡片CTR', '來源網址'],
+    report.news.map((row) => [row.title, row.language, row.date, row.listViews, row.listClicks, percent(row.listClicks, row.listViews), row.url]),
+  );
+}
+
+async function trafficReport(days) {
+  let cached = trafficReports.get(days);
+  if (cached && cached.expires > Date.now()) return cached.promise;
+  const promise = trafficModule('traffic-report').buildReport(days);
+  cached = { expires: Date.now() + 10 * 60000, promise };
+  trafficReports.set(days, cached);
+  try { return await promise; }
+  catch (error) { if (trafficReports.get(days) === cached) trafficReports.delete(days); throw error; }
 }
 
 async function dispatchWorkflow(workflow, inputs) {
@@ -115,6 +162,61 @@ function editor(draft, session) {
 async function handler(req, res) {
   const url = new URL(req.url, BASE_URL);
   if (req.method === 'GET' && url.pathname === '/health') return send(res, 200, 'ok', 'text/plain');
+
+  if (url.pathname === '/traffic' && req.method === 'GET') {
+    if (trafficSessionFor(req)) return send(res, 303, '', 'text/plain', { Location: '/traffic/report' });
+    return send(res, 200, trafficLogin());
+  }
+  if (url.pathname === '/traffic/code' && req.method === 'POST') {
+    if (req.headers.origin && req.headers.origin !== BASE_URL) return send(res, 403, 'Forbidden', 'text/plain');
+    const form = new URLSearchParams(await readBody(req, 1024));
+    const email = (form.get('email') || '').trim().toLowerCase();
+    if (!REVIEWERS.includes(email)) return send(res, 403, trafficPage('無法登入', '<h1>此信箱未開放查詢</h1>'));
+    const now = Date.now();
+    const history = (trafficCodes.get(email)?.requests || []).filter((time) => now - time < 3600000);
+    while (trafficRequests.length && now - trafficRequests[0] > 3600000) trafficRequests.shift();
+    if (history.length >= 5 || trafficRequests.length >= 20) return send(res, 429, trafficPage('稍後再試', '<h1>驗證碼寄送次數已達上限，請一小時後再試</h1>'));
+    if (history.length && now - history[history.length - 1] < 60000) return send(res, 429, trafficPage('稍候再試', '<h1>請一分鐘後再寄送</h1>'));
+    const code = process.env.NODE_ENV === 'test' ? '12345678' : String(crypto.randomInt(10000000, 100000000));
+    const requestId = crypto.randomBytes(16).toString('hex');
+    const codeFile = path.join(DATA_DIR, `${requestId}.code`);
+    fs.writeFileSync(codeFile, JSON.stringify({ recipient: email, code, createdAt: now }), { mode: 0o600 });
+    try { await dispatchWorkflow('review-code.yml', { request_id: requestId }); }
+    catch (error) { fs.unlinkSync(codeFile); throw error; }
+    trafficCodes.set(email, { hash: digest(code), sentAt: now, attempts: 0, requests: history.concat(now) });
+    trafficRequests.push(now);
+    return send(res, 200, trafficPage('輸入驗證碼', `<h1>輸入驗證碼</h1><p>已寄送至 ${esc(email)}，10 分鐘內有效。</p><form method="post" action="/traffic/verify"><input type="hidden" name="email" value="${esc(email)}"><label for="code">8 位數驗證碼</label><input id="code" name="code" inputmode="numeric" pattern="[0-9]{8}" required><div class="row"><button type="submit">查看成效</button></div></form>`));
+  }
+  if (url.pathname === '/traffic/verify' && req.method === 'POST') {
+    if (req.headers.origin && req.headers.origin !== BASE_URL) return send(res, 403, 'Forbidden', 'text/plain');
+    const form = new URLSearchParams(await readBody(req, 1024));
+    const email = (form.get('email') || '').trim().toLowerCase();
+    const state = trafficCodes.get(email);
+    if (!state || Date.now() - state.sentAt > 600000 || state.attempts >= 5) return send(res, 403, trafficPage('驗證失敗', '<h1>驗證碼已失效，請重新寄送</h1>'));
+    state.attempts += 1;
+    if (digest(form.get('code') || '') !== state.hash) return send(res, 403, trafficPage('驗證失敗', '<h1>驗證碼錯誤，請返回上一頁重試</h1>'));
+    trafficCodes.delete(email);
+    const sid = random();
+    trafficSessions.set(sid, { email, expires: Date.now() + 12 * 3600000 });
+    return send(res, 303, '', 'text/plain', { Location: '/traffic/report', 'Set-Cookie': `ystraffic=${sid}; HttpOnly; Secure; SameSite=Strict; Path=/traffic; Max-Age=43200` });
+  }
+  if (url.pathname === '/traffic/report' && req.method === 'GET') {
+    if (!trafficSessionFor(req)) return send(res, 303, '', 'text/plain', { Location: '/traffic' });
+    const days = url.searchParams.has('days') ? Number(url.searchParams.get('days')) : 30;
+    if (![7, 30, 90].includes(days)) return send(res, 400, trafficPage('查詢範圍錯誤', '<h1>請選擇 7、30 或 90 天</h1>'));
+    const result = await trafficReport(days);
+    const kind = url.searchParams.get('download');
+    if (kind) {
+      if (!['articles', 'news'].includes(kind)) return send(res, 400, 'Invalid download', 'text/plain');
+      return send(res, 200, trafficCsv(result.report, kind), 'text/csv; charset=utf-8', { 'Content-Disposition': `attachment; filename="traffic-${kind}.csv"` });
+    }
+    const nonce = random();
+    const { renderHtml } = trafficModule('traffic-report-core');
+    const options = { nonce, articleDownload: `?days=${days}&download=articles`, newsDownload: `?days=${days}&download=news` };
+    const html = renderHtml(result.report, result.dates, result.status, result.issues, options)
+      .replace('</header><main>', `<form method="get" action="/traffic/report" style="display:flex;gap:8px;align-items:center;margin-top:14px"><label for="days">查詢期間</label><select id="days" name="days" style="font:inherit;padding:7px"><option value="7" ${days === 7 ? 'selected' : ''}>最近 7 天</option><option value="30" ${days === 30 ? 'selected' : ''}>最近 30 天</option><option value="90" ${days === 90 ? 'selected' : ''}>最近 90 天</option></select><button type="submit" style="font:inherit;padding:7px 14px">查詢</button></form></header><main>`);
+    return send(res, 200, html, 'text/html; charset=utf-8', { 'Content-Security-Policy': `default-src 'none'; style-src 'unsafe-inline'; script-src 'nonce-${nonce}'; img-src 'self' data:; form-action 'self'; base-uri 'none'` });
+  }
 
   if (url.pathname === '/api/drafts' && req.method === 'POST') {
     if (!apiAuth(req)) return send(res, 401, 'Unauthorized', 'text/plain');

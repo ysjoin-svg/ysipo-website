@@ -71,3 +71,49 @@ test('review requires mailbox code, edits are saved, approval is single-use', as
   assert.equal(readDraft(articleId).status, 'cancelled');
   assert.equal((await submit()).status, 201);
 });
+
+test('traffic report requires mailbox code and protects report downloads', async () => {
+  const root = `http://127.0.0.1:${server.address().port}`;
+  let response = await fetch(`${root}/traffic/report`, { redirect: 'manual' });
+  assert.equal(response.status, 303);
+  assert.equal(response.headers.get('location'), '/traffic');
+  response = await fetch(`${root}/traffic/report?download=articles`, { redirect: 'manual' });
+  assert.equal(response.status, 303);
+
+  response = await fetch(`${root}/traffic/code`, { method: 'POST', body: new URLSearchParams({ email: 'other@example.com' }) });
+  assert.equal(response.status, 403);
+  response = await fetch(`${root}/traffic/code`, { method: 'POST', body: new URLSearchParams({ email: 'fish801113@gmail.com' }) });
+  assert.equal(response.status, 200);
+  const codeFile = fs.readdirSync(dataDir).find((name) => name.endsWith('.code'));
+  response = await fetch(`${root}/api/codes/${codeFile.slice(0, 32)}`, { method: 'POST', headers: { Authorization: 'Bearer test-ingest-key' } });
+  assert.equal((await response.json()).code, '12345678');
+  response = await fetch(`${root}/traffic/verify`, { method: 'POST', body: new URLSearchParams({ email: 'fish801113@gmail.com', code: '00000000' }) });
+  assert.equal(response.status, 403);
+  response = await fetch(`${root}/traffic/verify`, { method: 'POST', redirect: 'manual', body: new URLSearchParams({ email: 'fish801113@gmail.com', code: '12345678' }) });
+  assert.equal(response.status, 303);
+  const cookie = response.headers.get('set-cookie').split(';')[0];
+
+  const traffic = require('../scripts/traffic-report');
+  const original = traffic.buildReport;
+  traffic.buildReport = async () => ({
+    report: { articles: [], news: [], newsGaViews: null, newsCfViews: null },
+    dates: { start: '2026-10-01', end: '2026-10-15', generatedAt: '2026-10-15 12:00' },
+    status: { gaViews: 'missing', gaItems: 'missing', search: 'missing', cloudflare: 'missing' },
+    issues: ['尚未設定唯讀憑證'],
+  });
+  try {
+    response = await fetch(`${root}/traffic/report?days=7`, { headers: { Cookie: cookie } });
+    assert.equal(response.status, 200);
+    const html = await response.text();
+    assert.match(html, /尚未設定唯讀憑證/);
+    assert.match(html, /script nonce=/);
+    assert.match(html, /download=articles/);
+    response = await fetch(`${root}/traffic/report?days=7&download=articles`, { headers: { Cookie: cookie } });
+    assert.equal(response.status, 200);
+    assert.match(response.headers.get('content-type'), /text\/csv/);
+    response = await fetch(`${root}/traffic/report?days=0`, { headers: { Cookie: cookie } });
+    assert.equal(response.status, 400);
+  } finally {
+    traffic.buildReport = original;
+  }
+});

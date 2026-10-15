@@ -34,3 +34,11 @@ gh run list --workflow=weekly-news.yml --limit 5
 gh run list --workflow=review-publish.yml --limit 5
 ssh yongsyu@192.168.0.101 'systemctl is-active ysipo-review; curl -s http://127.0.0.1:4310/health'
 ```
+
+## 私人內容成效頁
+
+`https://review.ysipo.com.tw/traffic` 可用手機或電腦開啟，僅允許上述兩個收件信箱取得一次性驗證碼。登入有效 12 小時；報表與 CSV 下載都必須登入。可查最近 7、30、90 天，結果在伺服器記憶體快取 10 分鐘，不寫入公開網站或草稿目錄。驗證碼仍由 `review-code.yml` 寄送，不需要 GitHub 帳號。
+
+部署時將 `scripts/traffic-report.js`、`scripts/traffic-report-core.js` 複製到審稿主機的 `scripts/`，在審稿主機用 `review/package-lock.json` 安裝唯讀查詢依賴。Google 服務帳戶 JSON 與 Cloudflare Analytics 唯讀 token 只能保留在主機私有檔案／環境變數；不可提交 Git 或送到瀏覽器。授權方法見 `scripts/traffic-report.md`。
+
+未設定唯讀憑證時，登入和清單仍可用，但流量欄位顯示未連線，不代表零流量。

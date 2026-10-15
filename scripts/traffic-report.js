@@ -204,10 +204,8 @@ function writeReport(report, dates, status, issues) {
   ), 'utf8');
 }
 
-async function main() {
-  const daysArg = process.argv.find((arg) => arg.startsWith('--days='));
-  const days = daysArg ? Number(daysArg.slice(7)) : 30;
-  if (!Number.isInteger(days) || days < 1 || days > 90) throw new Error('--days 須為 1 至 90 的整數');
+async function buildReport(days = 30) {
+  if (!Number.isInteger(days) || days < 1 || days > 90) throw new Error('查詢天數須為 1 至 90 的整數');
   const dates = dateRange(days);
   const settings = config();
   const issues = [];
@@ -237,6 +235,16 @@ async function main() {
   } else issues.push('未設定 Cloudflare Analytics 唯讀 token；歷史 Cloudflare 瀏覽量暫不可查。');
 
   const report = joinReport(content, data, status);
+  const generatedAt = new Intl.DateTimeFormat('sv-SE', {
+    timeZone: 'Asia/Taipei', dateStyle: 'short', timeStyle: 'medium',
+  }).format(new Date());
+  return { report, dates: { ...dates, generatedAt }, status, issues };
+}
+
+async function main() {
+  const daysArg = process.argv.find((arg) => arg.startsWith('--days='));
+  const days = daysArg ? Number(daysArg.slice(7)) : 30;
+  const { report, dates, status, issues } = await buildReport(days);
   writeReport(report, dates, status, issues);
   console.log(`報表已產生：${path.join(OUTPUT, 'traffic-report.html')}`);
   console.log(`文章 ${report.articles.length} 篇、新聞 ${report.news.length} 則；GA4 ${status.gaViews}/${status.gaItems}、搜尋 ${status.search}、Cloudflare ${status.cloudflare}`);
@@ -245,4 +253,4 @@ async function main() {
 
 if (require.main === module) main().catch((error) => { console.error(`流量報表失敗：${error.message}`); process.exitCode = 1; });
 
-module.exports = { dateRange, taipeiDay, fetchCloudflare, fetchGaViews, fetchGaItems, fetchSearch, inventory };
+module.exports = { dateRange, taipeiDay, fetchCloudflare, fetchGaViews, fetchGaItems, fetchSearch, inventory, buildReport };
