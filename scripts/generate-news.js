@@ -114,6 +114,7 @@ function summarize(title, source) {
       messages: [{ role: 'system', content: sys }, { role: 'user', content: user }],
       temperature: 0.4,
       max_tokens: 400,
+      chat_template_kwargs: { enable_thinking: false },
     });
     const req = https.request({
       hostname: 'integrate.api.nvidia.com',

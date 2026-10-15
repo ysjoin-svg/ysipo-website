@@ -235,7 +235,8 @@ function callNvidiaAPI(messages) {
       model: process.env.NVIDIA_TEXT_MODEL || 'nvidia/nemotron-3-super-120b-a12b',
       messages,
       temperature: 0.7,
-      max_tokens: 2048
+      max_tokens: 4096,
+      chat_template_kwargs: { enable_thinking: false },
     });
 
     const options = {
@@ -255,10 +256,10 @@ function callNvidiaAPI(messages) {
       res.on('end', () => {
         try {
           const parsed = JSON.parse(data);
-          if (parsed.choices && parsed.choices[0]) {
+          if (typeof parsed.choices?.[0]?.message?.content === 'string' && parsed.choices[0].message.content.trim()) {
             resolve(parsed.choices[0].message.content);
           } else {
-            reject(new Error('API 回應格式錯誤: ' + data));
+            reject(new Error('AI 未回傳文章正文：' + JSON.stringify({ status: res.statusCode, finish_reason: parsed.choices?.[0]?.finish_reason, detail: parsed.detail }).slice(0, 300)));
           }
         } catch (e) {
           reject(new Error('JSON 解析失敗: ' + data));
