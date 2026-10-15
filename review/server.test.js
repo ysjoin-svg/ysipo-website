@@ -1,0 +1,63 @@
+const { test, after } = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+
+const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ysipo-review-test-'));
+process.env.NODE_ENV = 'test';
+process.env.REVIEW_DATA_DIR = dataDir;
+process.env.REVIEW_INGEST_KEY = 'test-ingest-key';
+const { server, readDraft } = require('./server');
+
+after(() => {
+  server.close();
+  assert.equal(path.dirname(path.resolve(dataDir)), path.resolve(os.tmpdir()));
+  fs.rmSync(dataDir, { recursive: true, force: true });
+});
+
+test('review requires mailbox code, edits are saved, approval is single-use', async () => {
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  const root = `http://127.0.0.1:${server.address().port}`;
+  const content = { title: '測試新聞', summary: '原稿內容', link: 'https://example.com/news', source: 'example.com', date: new Date().toUTCString() };
+  let response = await fetch(`${root}/api/drafts`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'news', content }) });
+  assert.equal(response.status, 401);
+  response = await fetch(`${root}/api/drafts`, { method: 'POST', headers: { Authorization: 'Bearer test-ingest-key', 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'news', content }) });
+  assert.equal(response.status, 201);
+  const created = await response.json();
+  assert.notEqual(created.links['taiejoin@hotmail.com'], created.links['fish801113@gmail.com']);
+  const id = created.id;
+  response = await fetch(`${root}/review/${id}`);
+  assert.equal(response.status, 403);
+  const link = new URL(created.links['fish801113@gmail.com']);
+  const token = link.searchParams.get('token');
+  response = await fetch(`${root}/review/${id}/code`, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ token }) });
+  assert.equal(response.status, 200);
+  const codeFile = fs.readdirSync(dataDir).find((name) => name.endsWith('.code'));
+  assert.ok(codeFile);
+  response = await fetch(`${root}/api/codes/${codeFile.slice(0, 32)}`, { method: 'POST', headers: { Authorization: 'Bearer test-ingest-key' } });
+  assert.equal((await response.json()).code, '12345678');
+  response = await fetch(`${root}/api/codes/${codeFile.slice(0, 32)}`, { method: 'POST', headers: { Authorization: 'Bearer test-ingest-key' } });
+  assert.equal(response.status, 404);
+  response = await fetch(`${root}/review/${id}/verify`, { method: 'POST', redirect: 'manual', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ token, code: '12345678' }) });
+  assert.equal(response.status, 303);
+  const cookie = response.headers.get('set-cookie').split(';')[0];
+  response = await fetch(`${root}/review/${id}`, { headers: { Cookie: cookie } });
+  assert.equal(response.status, 200);
+  const csrf = (await response.text()).match(/name="csrf" value="([^"]+)"/)[1];
+  response = await fetch(`${root}/review/${id}/save`, { method: 'POST', redirect: 'manual', headers: { Cookie: cookie, 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ csrf, title: '已修改標題', summary: '已修改摘要' }) });
+  assert.equal(response.status, 303);
+  assert.equal(readDraft(id).content.title, '已修改標題');
+  response = await fetch(`${root}/review/${id}/publish`, { method: 'POST', redirect: 'manual', headers: { Cookie: cookie, 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ csrf }) });
+  assert.equal(response.status, 303);
+  assert.equal(readDraft(id).status, 'publishing');
+  response = await fetch(`${root}/review/${id}/publish`, { method: 'POST', redirect: 'manual', headers: { Cookie: cookie, 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ csrf }) });
+  assert.equal(response.status, 409);
+  response = await fetch(`${root}/api/drafts/${id}`, { headers: { Authorization: 'Bearer test-ingest-key' } });
+  assert.equal((await response.json()).content.summary, '已修改摘要');
+  response = await fetch(`${root}/api/drafts/${id}/result`, { method: 'POST', headers: { Authorization: 'Bearer test-ingest-key', 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'success', url: 'https://ysipo.com.tw/news.html' }) });
+  assert.equal(response.status, 200);
+  assert.equal(readDraft(id).status, 'published');
+  response = await fetch(`${root}/api/drafts`, { method: 'POST', headers: { Authorization: 'Bearer test-ingest-key', 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'news', content }) });
+  assert.deepEqual(await response.json(), { duplicate: true });
+});

@@ -2,6 +2,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
+const sharp = require('sharp');
 
 // ===== 密鑰載入：優先讀環境變數（GitHub Actions），本機則回退 config.js =====
 let config = {};
@@ -13,7 +14,7 @@ try {
 const NVIDIA_API_KEY = process.env.NVIDIA_API_KEY || config.NVIDIA_API_KEY;
 const CF_ZONE_ID     = process.env.CF_ZONE_ID     || config.CF_ZONE_ID;
 const CF_API_TOKEN   = process.env.CF_API_TOKEN   || config.CF_API_TOKEN;
-if (!NVIDIA_API_KEY || !CF_ZONE_ID || !CF_API_TOKEN) {
+if (require.main === module && (!NVIDIA_API_KEY || !CF_ZONE_ID || !CF_API_TOKEN)) {
   console.error('❌ 缺少密鑰：請設定環境變數或 scripts/config.js');
   process.exit(1);
 }
@@ -46,7 +47,8 @@ const MONTHS_EN = ['January','February','March','April','May','June',
 
 // 依週數輪替主題（可用命令列參數覆蓋：node generate-article.js "自訂主題"）
 function getCurrentTopic() {
-  if (process.argv[2]) return process.argv[2];
+  const customTopic = process.argv.slice(2).find((arg) => !arg.startsWith('--'));
+  if (customTopic) return customTopic;
   const weekNumber = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
   return TOPICS[weekNumber % TOPICS.length];
 }
@@ -145,8 +147,8 @@ function generateArticleImage(category, dateStr, timestamp, attempt = 0) {
     const body = JSON.stringify({
       prompt,
       mode: 'base',
-      width: 1024,
-      height: 576,
+      width: 1344,
+      height: 768,
       steps: 4,
       seed: Math.floor(Math.random() * 1000000),
     });
@@ -166,7 +168,7 @@ function generateArticleImage(category, dateStr, timestamp, attempt = 0) {
       (r) => {
         let b = '';
         r.on('data', (d) => (b += d));
-        r.on('end', () => {
+        r.on('end', async () => {
           try {
             if (r.statusCode !== 200) {
               console.log(`  ⚠️ 生圖 HTTP ${r.statusCode}：${b.slice(0, 200)}`);
@@ -175,7 +177,10 @@ function generateArticleImage(category, dateStr, timestamp, attempt = 0) {
             const json = JSON.parse(b);
             const b64 = json.artifacts && json.artifacts[0] && json.artifacts[0].base64;
             if (!b64) return resolve(null);
-            const imageBuffer = Buffer.from(b64, 'base64');
+            const imageBuffer = await sharp(Buffer.from(b64, 'base64'))
+              .resize(1280, 720, { fit: 'cover', position: 'centre' })
+              .jpeg({ quality: 88 })
+              .toBuffer();
             const dimensions = getImageDimensions(imageBuffer);
             if (!dimensions || Math.abs(dimensions.width / dimensions.height - 16 / 9) > 0.01) {
               const actual = dimensions ? `${dimensions.width}x${dimensions.height}` : '無法辨識';
@@ -205,16 +210,29 @@ function generateArticleImage(category, dateStr, timestamp, attempt = 0) {
       console.log('  ⚠️ 生圖連線失敗：' + e.message);
       resolve(null);
     });
+    req.setTimeout(45000, () => req.destroy(new Error('生圖服務逾時')));
     req.write(body);
     req.end();
   });
+}
+
+async function fallbackArticleImage(category, dateStr, timestamp) {
+  const number = (Math.floor(timestamp / (7 * 24 * 60 * 60 * 1000)) % 3) + 1;
+  const source = path.join(WEBSITE_DIR, 'assets', 'img', 'categories', `${category.slug}-${number}.jpg`);
+  const imageBuffer = await sharp(source).resize(1280, 720, { fit: 'cover', position: 'centre' }).jpeg({ quality: 88 }).toBuffer();
+  const imgDir = path.join(INSIGHTS_DIR, 'img');
+  fs.mkdirSync(imgDir, { recursive: true });
+  const filename = `article-${dateStr}-${timestamp}.jpg`;
+  const absFile = path.join(imgDir, filename);
+  fs.writeFileSync(absFile, imageBuffer);
+  return { htmlPath: `img/${filename}`, jsonPath: `insights/img/${filename}`, absFile, width: 1280, height: 720 };
 }
 
 // 呼叫 Nvidia API（通用）
 function callNvidiaAPI(messages) {
   return new Promise((resolve, reject) => {
     const body = JSON.stringify({
-      model: 'meta/llama-3.3-70b-instruct',
+      model: process.env.NVIDIA_TEXT_MODEL || 'nvidia/nemotron-3-super-120b-a12b',
       messages,
       temperature: 0.7,
       max_tokens: 2048
@@ -385,7 +403,7 @@ function textToHtml(text, title, dateStr, category, imagePath, imageWidth, image
   const englishUrl = `https://ysipo.com.tw/insights/${filenameEn}`;
   const absoluteImage = imagePath.startsWith('http')
     ? imagePath
-    : `https://ysipo.com.tw/${imagePath.replace(/^\.\.\//, '')}`;
+    : `https://ysipo.com.tw/insights/${imagePath.replace(/^\.\.\//, '')}`;
   return `<!DOCTYPE html>
 <html lang="zh-Hant-TW">
 <head>
@@ -446,7 +464,7 @@ function textToHtmlEn(text, titleEn, dateStr, category, imagePath, imageWidth, i
   const canonicalUrl = `https://ysipo.com.tw/insights/${filenameEn}`;
   const absoluteImage = imagePath.startsWith('http')
     ? imagePath
-    : `https://ysipo.com.tw/${imagePath.replace(/^\.\.\//, '')}`;
+    : `https://ysipo.com.tw/insights/${imagePath.replace(/^\.\.\//, '')}`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -548,7 +566,29 @@ async function main() {
       generatedImageFile = imgResult.absFile;
       console.log(`🖼️  AI 生圖成功：${imgResult.jsonPath}`);
     } else {
-      throw new Error('專屬配圖連續兩次生成失敗，已停止發布，避免使用重複的分類共用圖。');
+      imgResult = await fallbackArticleImage(category, dateStr, timestamp);
+      imagePath = imgResult.htmlPath;
+      imageField = imgResult.jsonPath;
+      generatedImageFile = imgResult.absFile;
+      console.log('⚠️ AI 生圖失敗，草稿使用既有分類素材；請在審稿頁確認封面');
+    }
+
+    if (process.argv.includes('--draft')) {
+      const draftFile = process.env.REVIEW_DRAFT_FILE;
+      if (!draftFile) throw new Error('缺少 REVIEW_DRAFT_FILE');
+      const dropTitle = (text) => text.trim().split('\n').slice(1).join('\n').trim();
+      fs.writeFileSync(draftFile, JSON.stringify({
+        type: 'article',
+        content: {
+          titleZh, titleEn,
+          bodyZh: dropTitle(articleZh), bodyEn: dropTitle(articleEn),
+          category: category.name,
+          imageBase64: fs.readFileSync(generatedImageFile).toString('base64'),
+          imageWidth: imgResult.width, imageHeight: imgResult.height,
+        },
+      }), 'utf8');
+      console.log('已產生待審文章，尚未發布');
+      return;
     }
 
     // 產生 HTML
@@ -638,4 +678,5 @@ async function main() {
   }
 }
 
-main();
+if (require.main === module) main();
+module.exports = { textToHtml, textToHtmlEn, extractSummary, categorizeArticle, purgeCloudflareCache };

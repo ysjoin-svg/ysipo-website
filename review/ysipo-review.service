@@ -1,0 +1,21 @@
+[Unit]
+Description=YSIPO review service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=yongsyu
+Group=yongsyu
+WorkingDirectory=/home/yongsyu/ysipo-review
+EnvironmentFile=/home/yongsyu/ysipo-review/review.env
+ExecStart=/usr/bin/node /home/yongsyu/ysipo-review/server.js
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/yongsyu/ysipo-review/data
+
+[Install]
+WantedBy=multi-user.target

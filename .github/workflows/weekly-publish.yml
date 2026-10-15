@@ -1,14 +1,14 @@
-name: Weekly Article Publish
+name: Weekly Article Draft
 
 # 每週一台北 09:00 發文，由 Ubuntu Server cron 觸發（GitHub 自身排程不可靠，已停用 schedule 避免雙跑）
 on:
   workflow_dispatch: {}    # 由 Ubuntu cron 觸發，也可在 Actions 頁面手動 Run
 
 permissions:
-  contents: write          # 讓內建 GITHUB_TOKEN 能 push 回 repo
+  contents: read
 
 jobs:
-  publish:
+  draft:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -19,21 +19,26 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Configure git identity
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Install image processor
+        run: npm ci
 
-      - name: Generate and publish article
+      - name: Generate article draft
         working-directory: scripts
         env:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
           CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-        run: node generate-article.js
+          REVIEW_DRAFT_FILE: ${{ runner.temp }}/article-draft.json
+        run: node generate-article.js --draft
 
-      - name: 寄送執行結果通知（成功 / 失敗都寄）
-        if: always()
+      - name: Submit for review
+        id: submit
+        env:
+          REVIEW_INGEST_KEY: ${{ secrets.REVIEW_INGEST_KEY }}
+        run: node scripts/submit-review-draft.js "${{ runner.temp }}/article-draft.json"
+
+      - name: Email owner full draft and review buttons
+        if: steps.submit.outputs.count != '0'
         uses: dawidd6/action-send-mail@v17
         with:
           server_address: smtp.gmail.com
@@ -41,14 +46,37 @@ jobs:
           secure: true
           username: ${{ secrets.MAIL_USERNAME }}
           password: ${{ secrets.MAIL_PASSWORD }}
-          from: 永旭自動發文 <${{ secrets.MAIL_USERNAME }}>
+          from: 永旭審稿 <${{ secrets.MAIL_USERNAME }}>
           to: taiejoin@hotmail.com
-          subject: ${{ job.status == 'success' && '[永旭] 自動發文成功' || '[永旭] 自動發文失敗，請檢查' }}
+          subject: '[永旭] 智財文章待審核'
+          html_body: file://${{ runner.temp }}/review-owner.html
+
+      - name: Email north office full draft and review buttons
+        if: steps.submit.outputs.count != '0'
+        uses: dawidd6/action-send-mail@v17
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          from: 永旭審稿 <${{ secrets.MAIL_USERNAME }}>
+          to: fish801113@gmail.com
+          subject: '[永旭] 智財文章待審核'
+          html_body: file://${{ runner.temp }}/review-north.html
+
+      - name: Notify both reviewers on failure
+        if: failure()
+        uses: dawidd6/action-send-mail@v17
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          from: 永旭審稿 <${{ secrets.MAIL_USERNAME }}>
+          to: taiejoin@hotmail.com,fish801113@gmail.com
+          subject: '[永旭] 智財文章草稿產生失敗'
           body: |
-            永旭網站每週自動發文 workflow 執行完成。
-
-            結果：${{ job.status }}
-            詳細紀錄：${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-            若結果為 success，新文章已發佈：https://ysipo.com.tw/insights.html
-            若結果為 failure，請點上方連結查看錯誤原因。
+            本週文章草稿未產生，也未發布。請查看工作紀錄：
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

@@ -1,5 +1,11 @@
 # 自動發文系統（GitHub Actions 版）
 
+> 2026-10-15 更新：目前採「產稿 → 雙信箱通知與網頁審稿 → 任一人核准 → 發布」。
+> 週一工作只產生待審草稿，不會直接上架。收件者為 taiejoin@hotmail.com、
+> fish801113@gmail.com；信中附完整中英文內容與審稿按鈕。細節見 `review/README.md`。
+> 原模型 `meta/llama-3.3-70b-instruct` 已停用，改用可用的 Nemotron 模型。
+> 下文描述舊版直接發布流程，僅供歷史參考。
+
 > 永旭網站每週一自動產生一篇智財文章（含 AI 即時生成的專屬配圖）發到 insights。
 > 2026-05-31 起已從 Windows 工作排程器**遷移到 GitHub Actions**，不再依賴本機開機。
 

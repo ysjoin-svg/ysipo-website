@@ -13,3 +13,6 @@ backup/
 # 生圖功能的測試產物（不上傳）
 scripts/flux-*.jpg
 scripts/test-flux.js
+
+# 審稿服務暫存草稿與驗證資料
+review/data/

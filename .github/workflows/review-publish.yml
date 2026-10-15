@@ -1,0 +1,53 @@
+name: Publish Reviewed Content
+
+on:
+  workflow_dispatch:
+    inputs:
+      draft_id:
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: reviewed-content-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - name: Install image processor
+        run: npm ci
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Publish approved draft
+        env:
+          REVIEW_INGEST_KEY: ${{ secrets.REVIEW_INGEST_KEY }}
+          CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: node scripts/publish-reviewed.js "${{ inputs.draft_id }}"
+      - name: Notify both reviewers on failure
+        if: failure()
+        uses: dawidd6/action-send-mail@v17
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          from: 永旭審稿 <${{ secrets.MAIL_USERNAME }}>
+          to: taiejoin@hotmail.com,fish801113@gmail.com
+          subject: '[永旭] 核准後發布失敗'
+          body: |
+            草稿已核准，但網站發布失敗。請查看工作紀錄後再重新發布：
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

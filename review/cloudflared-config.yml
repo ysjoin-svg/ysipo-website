@@ -1,0 +1,23 @@
+tunnel: a5f309ef-47c0-4c83-ba26-20727f3dce1a
+credentials-file: /etc/cloudflared/a5f309ef-47c0-4c83-ba26-20727f3dce1a.json
+
+# QUIC-FALLBACK-20260811：UDP7844(QUIC) 逾時但 TCP7844 與 443 皆通（實測 8/8），
+# 故強制走 http2(TCP7844)；並將網卡 MTU 降為 1400。
+protocol: http2
+edge-ip-version: "4"
+retries: 10
+
+ingress:
+  - hostname: app.ysipo.com.tw
+    service: http://localhost:80
+  - hostname: weight.ysipo.com.tw
+    service: http://localhost:8000
+  - hostname: lug.ysipo.com.tw
+    service: http://localhost:4000
+  - hostname: mj.ysipo.com.tw
+    service: http://localhost:4100
+  - hostname: ldns.ysipo.com.tw
+    service: http://localhost:4200
+  - hostname: review.ysipo.com.tw
+    service: http://localhost:4310
+  - service: http_status:404

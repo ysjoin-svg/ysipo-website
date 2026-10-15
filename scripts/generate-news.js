@@ -110,7 +110,7 @@ function summarize(title, source) {
       '注意：兩步驟只能擇一回覆，且只輸出 JSON。';
     const user = `新聞標題：「${title}」\n來源：${source}`;
     const payload = JSON.stringify({
-      model: 'meta/llama-3.3-70b-instruct',
+      model: process.env.NVIDIA_TEXT_MODEL || 'nvidia/nemotron-3-super-120b-a12b',
       messages: [{ role: 'system', content: sys }, { role: 'user', content: user }],
       temperature: 0.4,
       max_tokens: 400,
@@ -283,6 +283,25 @@ function writeOutput(count, titles) {
       console.log('原文：' + n.link);
     });
     console.log('\n[dry-run] 未寫入網站、未推送。');
+    return;
+  }
+
+  if (process.argv.includes('--draft')) {
+    const draftFile = process.env.REVIEW_DRAFT_FILE;
+    if (!draftFile) throw new Error('缺少 REVIEW_DRAFT_FILE');
+    const reviewDrafts = newItems.map((n) => ({
+      type: 'news',
+      content: {
+        title: n.displayTitle, summary: n.summary, source: n.source,
+        link: n.link, date: n.pubDate, origTitle: n.origTitle,
+      },
+    })).concat(pending.map((n) => ({
+      type: 'news',
+      content: { title: n.displayTitle, summary: n.summary, source: n.source, link: n.link, date: n.date, origTitle: n.origTitle },
+    })));
+    fs.writeFileSync(draftFile, JSON.stringify(reviewDrafts), 'utf8');
+    console.log(`已準備 ${reviewDrafts.length} 則待審新聞，尚未發布`);
+    writeOutput(reviewDrafts.length, reviewDrafts.map((n) => n.content.title).join('、'));
     return;
   }
 

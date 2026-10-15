@@ -1,0 +1,57 @@
+name: Weekly IP News Update
+
+# 每週四台北 09:00 發新聞，由 Ubuntu Server cron 觸發（GitHub 自身排程不可靠，已停用 schedule 避免雙跑）
+on:
+  workflow_dispatch: {}    # 由 Ubuntu cron 觸發，也可在 Actions 頁面手動 Run
+
+permissions:
+  contents: write
+
+jobs:
+  news:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch IP news drafts
+        id: gen
+        working-directory: scripts
+        env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: node generate-news.js
+
+      - name: 寄送結果通知（成功 / 失敗都寄）
+        if: always()
+        uses: dawidd6/action-send-mail@v17
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          from: 永旭智財新聞 <${{ secrets.MAIL_USERNAME }}>
+          to: taiejoin@hotmail.com
+          subject: ${{ job.status == 'success' && '[永旭] 智財新聞草稿待審' || '[永旭] 智財新聞草稿產生失敗，請檢查' }}
+          body: |
+            永旭網站每週智財新聞草稿已產生；尚未公開上架。
+
+            結果：${{ job.status }}
+            本週新增待審草稿 ${{ steps.gen.outputs.count }} 則：
+            ${{ steps.gen.outputs.added }}
+
+            審核：node scripts/manage-news.js pending
+            核准：node scripts/manage-news.js approve 編號
+            詳細紀錄：${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

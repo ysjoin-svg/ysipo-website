@@ -1,0 +1,37 @@
+name: Send Review Verification Code
+
+on:
+  workflow_dispatch:
+    inputs:
+      request_id:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - name: Fetch private one-time code
+        id: fetch
+        env:
+          REVIEW_INGEST_KEY: ${{ secrets.REVIEW_INGEST_KEY }}
+        run: node scripts/fetch-review-code.js "${{ inputs.request_id }}"
+      - name: Send code
+        uses: dawidd6/action-send-mail@v17
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          from: 永旭審稿 <${{ secrets.MAIL_USERNAME }}>
+          to: ${{ steps.fetch.outputs.recipient }}
+          subject: '[永旭] 審稿驗證碼'
+          body: file://${{ runner.temp }}/review-code.txt
