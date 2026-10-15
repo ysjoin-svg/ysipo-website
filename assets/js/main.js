@@ -356,6 +356,9 @@ function applyNavOffset() {
    Initialize All
    ────────────────────────────────────────────── */
 async function init() {
+  initArticleAnalytics();
+  initContentAnalytics();
+
   // Route to English partials for /en/ pages, Chinese partials for all others
   const path = window.location.pathname;
   if (path.includes('/en/') || /-en\.html$/i.test(path)) {
@@ -384,6 +387,104 @@ async function init() {
   initCounters();
   initSmoothScroll();
   initAOS();
+}
+
+function initArticleAnalytics() {
+  if (!document.querySelector('.ys-article-page') || window.gtag) return;
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function() { window.dataLayer.push(arguments); };
+  window.gtag('js', new Date());
+  window.gtag('config', 'G-2GEMQLB2JR');
+  var script = document.createElement('script');
+  script.async = true;
+  script.src = 'https://www.googletagmanager.com/gtag/js?id=G-2GEMQLB2JR';
+  document.head.appendChild(script);
+}
+
+function initContentAnalytics() {
+  if (typeof window.gtag !== 'function' || !('IntersectionObserver' in window)) return;
+  var articleGrid = document.getElementById('articles-grid');
+  var newsSections = document.querySelectorAll('[data-news-section]');
+  if (!articleGrid && !newsSections.length) return;
+
+  function hash(value) {
+    var result = 0x811c9dc5;
+    for (var i = 0; i < value.length; i++) {
+      result ^= value.charCodeAt(i);
+      result = Math.imul(result, 0x01000193);
+    }
+    return (result >>> 0).toString(16).padStart(8, '0');
+  }
+
+  function getItem(card) {
+    var isArticle = card.classList.contains('article-card');
+    var heading = card.querySelector('h2, h3');
+    if (!heading) return null;
+    var link = heading.querySelector('a[href]');
+    var title = heading.textContent.trim();
+    if (!title || /建置中|Coming Soon/i.test(title)) return null;
+    var source = link ? link.href : 'title:' + title;
+    var id = isArticle
+      ? 'a_' + hash(source.split('/').pop().replace(/-en\.html(?:\?.*)?$/i, '.html'))
+      : 'n_' + hash(source + '|' + title);
+    return {
+      listId: isArticle ? 'ysipo_articles' : 'ysipo_news',
+      item: { item_id: id, item_name: title }
+    };
+  }
+
+  var observed = new WeakSet();
+  var viewed = new WeakSet();
+  var pending = new Map();
+  var flushTimer;
+  function flushViews() {
+    pending.forEach(function(items, listId) {
+      window.gtag('event', 'view_item_list', {
+        item_list_id: listId,
+        items: items,
+        transport_type: 'beacon'
+      });
+    });
+    pending.clear();
+    flushTimer = null;
+  }
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (!entry.isIntersecting || entry.intersectionRatio < 0.5 || viewed.has(entry.target)) return;
+      var data = getItem(entry.target);
+      if (!data) return;
+      viewed.add(entry.target);
+      observer.unobserve(entry.target);
+      if (!pending.has(data.listId)) pending.set(data.listId, []);
+      pending.get(data.listId).push(data.item);
+      if (!flushTimer) flushTimer = setTimeout(flushViews, 250);
+    });
+  }, { threshold: 0.5 });
+
+  function scan() {
+    var cards = document.querySelectorAll('#articles-grid .article-card, [data-news-section] .news-item');
+    cards.forEach(function(card) {
+      if (!observed.has(card)) {
+        observed.add(card);
+        observer.observe(card);
+      }
+    });
+  }
+  scan();
+  if (articleGrid) new MutationObserver(scan).observe(articleGrid, { childList: true });
+
+  document.addEventListener('click', function(event) {
+    var link = event.target.closest('#articles-grid .article-card h2 a, #articles-grid .article-card h3 a, [data-news-section] .news-item h3 a');
+    if (!link) return;
+    var card = link.closest('.article-card, .news-item');
+    var data = card && getItem(card);
+    if (!data) return;
+    window.gtag('event', 'select_item', {
+      item_list_id: data.listId,
+      items: [data.item],
+      transport_type: 'beacon'
+    });
+  });
 }
 
 // Run when DOM is ready
