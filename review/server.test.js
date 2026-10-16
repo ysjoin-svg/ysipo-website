@@ -1,17 +1,48 @@
-const { test, after } = require('node:test');
+const { test, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const http = require('http');
 
 const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ysipo-review-test-'));
 process.env.NODE_ENV = 'test';
 process.env.REVIEW_DATA_DIR = dataDir;
 process.env.REVIEW_INGEST_KEY = 'test-ingest-key';
-const { server, readDraft } = require('./server');
+let server;
+let readDraft;
+const authState = { allowed: true, unavailable: false };
+const token = `header.${Buffer.from(JSON.stringify({ exp: Math.floor(Date.now() / 1000) + 3600 })).toString('base64url')}.signature`;
+const authServer = http.createServer(async (req, res) => {
+  if (authState.unavailable) { res.writeHead(503); return res.end(); }
+  res.setHeader('Content-Type', 'application/json');
+  if (req.url === '/api/auth/login' && req.method === 'POST') {
+    const parts = [];
+    for await (const part of req) parts.push(part);
+    const credentials = JSON.parse(Buffer.concat(parts).toString('utf8'));
+    if (credentials.username !== '10001' || credentials.password !== 'correct-password') {
+      res.writeHead(401);
+      return res.end('{}');
+    }
+    return res.end(JSON.stringify({ token }));
+  }
+  if (req.url === '/api/auth/content-analytics-access' && req.headers.authorization === `Bearer ${token}`) {
+    res.writeHead(authState.allowed ? 200 : 403);
+    return res.end(JSON.stringify({ allowed: authState.allowed }));
+  }
+  res.writeHead(404);
+  res.end('{}');
+});
+
+before(async () => {
+  await new Promise((resolve) => authServer.listen(0, '127.0.0.1', resolve));
+  process.env.IPMGR_AUTH_BASE_URL = `http://127.0.0.1:${authServer.address().port}`;
+  ({ server, readDraft } = require('./server'));
+});
 
 after(() => {
   server.close();
+  authServer.close();
   assert.equal(path.dirname(path.resolve(dataDir)), path.resolve(os.tmpdir()));
   fs.rmSync(dataDir, { recursive: true, force: true });
 });
@@ -72,7 +103,7 @@ test('review requires mailbox code, edits are saved, approval is single-use', as
   assert.equal((await submit()).status, 201);
 });
 
-test('traffic report requires mailbox code and protects report downloads', async () => {
+test('traffic report requires case system credentials and current permission for every download', async () => {
   const root = `http://127.0.0.1:${server.address().port}`;
   let response = await fetch(`${root}/traffic/report`, { redirect: 'manual' });
   assert.equal(response.status, 303);
@@ -80,16 +111,15 @@ test('traffic report requires mailbox code and protects report downloads', async
   response = await fetch(`${root}/traffic/report?download=articles`, { redirect: 'manual' });
   assert.equal(response.status, 303);
 
-  response = await fetch(`${root}/traffic/code`, { method: 'POST', body: new URLSearchParams({ email: 'other@example.com' }) });
-  assert.equal(response.status, 403);
   response = await fetch(`${root}/traffic/code`, { method: 'POST', body: new URLSearchParams({ email: 'fish801113@gmail.com' }) });
-  assert.equal(response.status, 200);
-  const codeFile = fs.readdirSync(dataDir).find((name) => name.endsWith('.code'));
-  response = await fetch(`${root}/api/codes/${codeFile.slice(0, 32)}`, { method: 'POST', headers: { Authorization: 'Bearer test-ingest-key' } });
-  assert.equal((await response.json()).code, '12345678');
-  response = await fetch(`${root}/traffic/verify`, { method: 'POST', body: new URLSearchParams({ email: 'fish801113@gmail.com', code: '00000000' }) });
+  assert.equal(response.status, 404);
+  response = await fetch(`${root}/traffic/login`, { method: 'POST', body: new URLSearchParams({ username: '10001', password: 'wrong' }) });
+  assert.equal(response.status, 401);
+  authState.allowed = false;
+  response = await fetch(`${root}/traffic/login`, { method: 'POST', body: new URLSearchParams({ username: '10001', password: 'correct-password' }) });
   assert.equal(response.status, 403);
-  response = await fetch(`${root}/traffic/verify`, { method: 'POST', redirect: 'manual', body: new URLSearchParams({ email: 'fish801113@gmail.com', code: '12345678' }) });
+  authState.allowed = true;
+  response = await fetch(`${root}/traffic/login`, { method: 'POST', redirect: 'manual', body: new URLSearchParams({ username: '10001', password: 'correct-password' }) });
   assert.equal(response.status, 303);
   const cookie = response.headers.get('set-cookie').split(';')[0];
 
@@ -113,6 +143,18 @@ test('traffic report requires mailbox code and protects report downloads', async
     assert.match(response.headers.get('content-type'), /text\/csv/);
     response = await fetch(`${root}/traffic/report?days=0`, { headers: { Cookie: cookie } });
     assert.equal(response.status, 400);
+    authState.allowed = false;
+    response = await fetch(`${root}/traffic/report?days=7&download=news`, { redirect: 'manual', headers: { Cookie: cookie } });
+    assert.equal(response.status, 303);
+    authState.allowed = true;
+    authState.unavailable = true;
+    response = await fetch(`${root}/traffic/report`, { headers: { Cookie: cookie } });
+    assert.equal(response.status, 503);
+    authState.unavailable = false;
+    response = await fetch(`${root}/traffic/logout`, { method: 'POST', redirect: 'manual', headers: { Cookie: cookie } });
+    assert.equal(response.status, 303);
+    response = await fetch(`${root}/traffic/report`, { redirect: 'manual', headers: { Cookie: cookie } });
+    assert.equal(response.status, 303);
   } finally {
     traffic.buildReport = original;
   }

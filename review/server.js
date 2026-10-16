@@ -9,16 +9,20 @@ const BASE_URL = process.env.REVIEW_BASE_URL || 'https://review.ysipo.com.tw';
 const INGEST_KEY = process.env.REVIEW_INGEST_KEY;
 const TOKEN_FILE = process.env.REVIEW_GITHUB_TOKEN_FILE;
 const REVIEWERS = ['taiejoin@hotmail.com', 'fish801113@gmail.com'];
+const IPMGR_AUTH_BASE_URL = process.env.IPMGR_AUTH_BASE_URL || 'http://127.0.0.1:3002';
 const sessions = new Map();
 const trafficSessions = new Map();
-const trafficCodes = new Map();
 const trafficReports = new Map();
-const trafficRequests = [];
+const trafficLoginAttempts = new Map();
 
 if (!INGEST_KEY || (!TOKEN_FILE && process.env.NODE_ENV !== 'test')) {
   throw new Error('REVIEW_INGEST_KEY and REVIEW_GITHUB_TOKEN_FILE are required');
 }
 fs.mkdirSync(DATA_DIR, { recursive: true, mode: 0o700 });
+const authBase = new URL(IPMGR_AUTH_BASE_URL);
+if (authBase.protocol !== 'http:' || authBase.hostname !== '127.0.0.1' || authBase.pathname !== '/') {
+  throw new Error('IPMGR_AUTH_BASE_URL must be a loopback HTTP origin');
+}
 
 const random = () => crypto.randomBytes(24).toString('base64url');
 const digest = (value) => crypto.createHash('sha256').update(value).digest('hex');
@@ -85,16 +89,41 @@ function sessionFor(req, id) {
 function trafficSessionFor(req) {
   const match = (req.headers.cookie || '').match(/(?:^|;\s*)ystraffic=([A-Za-z0-9_-]+)/);
   const session = match && trafficSessions.get(match[1]);
-  if (!session || session.expires < Date.now()) return null;
+  if (!session) return null;
+  if (session.expires < Date.now()) {
+    trafficSessions.delete(match[1]);
+    return null;
+  }
   return session;
+}
+
+async function caseAuth(endpoint, options = {}) {
+  return fetch(new URL(endpoint, authBase), {
+    ...options,
+    signal: AbortSignal.timeout(5000),
+  });
+}
+
+async function trafficAccess(session) {
+  try {
+    const response = await caseAuth('/api/auth/content-analytics-access', {
+      headers: { Authorization: `Bearer ${session.token}` },
+    });
+    if (response.status === 401 || response.status === 403) return 'denied';
+    if (!response.ok) return 'unavailable';
+    const access = await response.json();
+    return access.allowed === true ? 'allowed' : 'denied';
+  } catch {
+    return 'unavailable';
+  }
 }
 
 function trafficPage(title, body) {
   return page(title, body).replace('永旭智慧財產事務所 · 審稿', '永旭智慧財產事務所 · 內容成效');
 }
 
-function trafficLogin() {
-  return trafficPage('內容成效登入', `<h1>內容成效</h1><p>使用指定信箱取得一次性驗證碼。</p><form method="post" action="/traffic/code"><label for="email">信箱</label><input id="email" name="email" type="email" autocomplete="email" required><div class="row"><button type="submit">寄送驗證碼</button></div></form>`);
+function trafficLogin(error = '') {
+  return trafficPage('內容成效登入', `<h1>內容成效</h1><p>請使用承辦人系統的帳號與密碼登入。</p>${error ? `<p role="alert">${esc(error)}</p>` : ''}<form method="post" action="/traffic/login"><label for="username">帳號</label><input id="username" name="username" autocomplete="username" required maxlength="64"><label for="password">密碼</label><input id="password" name="password" type="password" autocomplete="current-password" required><div class="row"><button type="submit">登入</button></div></form>`);
 }
 
 function trafficModule(name) {
@@ -164,44 +193,69 @@ async function handler(req, res) {
   if (req.method === 'GET' && url.pathname === '/health') return send(res, 200, 'ok', 'text/plain');
 
   if (url.pathname === '/traffic' && req.method === 'GET') {
-    if (trafficSessionFor(req)) return send(res, 303, '', 'text/plain', { Location: '/traffic/report' });
+    const session = trafficSessionFor(req);
+    if (session && await trafficAccess(session) === 'allowed') return send(res, 303, '', 'text/plain', { Location: '/traffic/report' });
     return send(res, 200, trafficLogin());
   }
-  if (url.pathname === '/traffic/code' && req.method === 'POST') {
+  if (url.pathname === '/traffic/login' && req.method === 'POST') {
     if (req.headers.origin && req.headers.origin !== BASE_URL) return send(res, 403, 'Forbidden', 'text/plain');
-    const form = new URLSearchParams(await readBody(req, 1024));
-    const email = (form.get('email') || '').trim().toLowerCase();
-    if (!REVIEWERS.includes(email)) return send(res, 403, trafficPage('無法登入', '<h1>此信箱未開放查詢</h1>'));
+    const form = new URLSearchParams(await readBody(req, 4096));
+    const username = (form.get('username') || '').trim();
+    const password = form.get('password') || '';
+    if (!username || username.length > 64 || !password || password.length > 1024)
+      return send(res, 400, trafficLogin('請輸入有效的帳號與密碼。'));
     const now = Date.now();
-    const history = (trafficCodes.get(email)?.requests || []).filter((time) => now - time < 3600000);
-    while (trafficRequests.length && now - trafficRequests[0] > 3600000) trafficRequests.shift();
-    if (history.length >= 5 || trafficRequests.length >= 20) return send(res, 429, trafficPage('稍後再試', '<h1>驗證碼寄送次數已達上限，請一小時後再試</h1>'));
-    if (history.length && now - history[history.length - 1] < 60000) return send(res, 429, trafficPage('稍候再試', '<h1>請一分鐘後再寄送</h1>'));
-    const code = process.env.NODE_ENV === 'test' ? '12345678' : String(crypto.randomInt(10000000, 100000000));
-    const requestId = crypto.randomBytes(16).toString('hex');
-    const codeFile = path.join(DATA_DIR, `${requestId}.code`);
-    fs.writeFileSync(codeFile, JSON.stringify({ recipient: email, code, createdAt: now }), { mode: 0o600 });
-    try { await dispatchWorkflow('review-code.yml', { request_id: requestId }); }
-    catch (error) { fs.unlinkSync(codeFile); throw error; }
-    trafficCodes.set(email, { hash: digest(code), sentAt: now, attempts: 0, requests: history.concat(now) });
-    trafficRequests.push(now);
-    return send(res, 200, trafficPage('輸入驗證碼', `<h1>輸入驗證碼</h1><p>已寄送至 ${esc(email)}，10 分鐘內有效。</p><form method="post" action="/traffic/verify"><input type="hidden" name="email" value="${esc(email)}"><label for="code">8 位數驗證碼</label><input id="code" name="code" inputmode="numeric" pattern="[0-9]{8}" required><div class="row"><button type="submit">查看成效</button></div></form>`));
-  }
-  if (url.pathname === '/traffic/verify' && req.method === 'POST') {
-    if (req.headers.origin && req.headers.origin !== BASE_URL) return send(res, 403, 'Forbidden', 'text/plain');
-    const form = new URLSearchParams(await readBody(req, 1024));
-    const email = (form.get('email') || '').trim().toLowerCase();
-    const state = trafficCodes.get(email);
-    if (!state || Date.now() - state.sentAt > 600000 || state.attempts >= 5) return send(res, 403, trafficPage('驗證失敗', '<h1>驗證碼已失效，請重新寄送</h1>'));
-    state.attempts += 1;
-    if (digest(form.get('code') || '') !== state.hash) return send(res, 403, trafficPage('驗證失敗', '<h1>驗證碼錯誤，請返回上一頁重試</h1>'));
-    trafficCodes.delete(email);
+    for (const [key, attempts] of trafficLoginAttempts) {
+      const recent = attempts.filter((time) => now - time < 15 * 60000);
+      if (recent.length) trafficLoginAttempts.set(key, recent);
+      else trafficLoginAttempts.delete(key);
+    }
+    const accountKey = `account:${username.toLowerCase()}`;
+    const globalKey = 'global';
+    if ((trafficLoginAttempts.get(accountKey)?.length || 0) >= 5 ||
+        (trafficLoginAttempts.get(globalKey)?.length || 0) >= 50)
+      return send(res, 429, trafficLogin('嘗試次數過多，請 15 分鐘後再試。'));
+    trafficLoginAttempts.set(accountKey, [...(trafficLoginAttempts.get(accountKey) || []), now]);
+    trafficLoginAttempts.set(globalKey, [...(trafficLoginAttempts.get(globalKey) || []), now]);
+    let login;
+    try {
+      const response = await caseAuth('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+      if (response.status === 401 || response.status === 403)
+        return send(res, 401, trafficLogin('帳號、密碼或內容成效權限不正確。'));
+      if (!response.ok) return send(res, 503, trafficLogin('登入服務暫時無法使用，請稍後再試。'));
+      login = await response.json();
+    } catch {
+      return send(res, 503, trafficLogin('登入服務暫時無法使用，請稍後再試。'));
+    }
+    if (typeof login.token !== 'string') return send(res, 503, trafficLogin('登入服務暫時無法使用，請稍後再試。'));
+    const access = await trafficAccess({ token: login.token });
+    if (access === 'unavailable') return send(res, 503, trafficLogin('登入服務暫時無法使用，請稍後再試。'));
+    if (access !== 'allowed') return send(res, 403, trafficLogin('帳號、密碼或內容成效權限不正確。'));
+    let tokenExpiry;
+    try { tokenExpiry = JSON.parse(Buffer.from(login.token.split('.')[1], 'base64url').toString('utf8')).exp * 1000; }
+    catch { return send(res, 503, trafficLogin('登入服務暫時無法使用，請稍後再試。')); }
+    const expires = Math.min(tokenExpiry, Date.now() + 8 * 3600000);
+    if (!Number.isFinite(expires) || expires <= Date.now()) return send(res, 503, trafficLogin('登入服務暫時無法使用，請稍後再試。'));
     const sid = random();
-    trafficSessions.set(sid, { email, expires: Date.now() + 12 * 3600000 });
-    return send(res, 303, '', 'text/plain', { Location: '/traffic/report', 'Set-Cookie': `ystraffic=${sid}; HttpOnly; Secure; SameSite=Strict; Path=/traffic; Max-Age=43200` });
+    trafficSessions.set(sid, { token: login.token, expires });
+    return send(res, 303, '', 'text/plain', { Location: '/traffic/report', 'Set-Cookie': `ystraffic=${sid}; HttpOnly; Secure; SameSite=Strict; Path=/traffic; Max-Age=${Math.floor((expires - Date.now()) / 1000)}` });
+  }
+  if (url.pathname === '/traffic/logout' && req.method === 'POST') {
+    if (req.headers.origin && req.headers.origin !== BASE_URL) return send(res, 403, 'Forbidden', 'text/plain');
+    const match = (req.headers.cookie || '').match(/(?:^|;\s*)ystraffic=([A-Za-z0-9_-]+)/);
+    if (match) trafficSessions.delete(match[1]);
+    return send(res, 303, '', 'text/plain', { Location: '/traffic', 'Set-Cookie': 'ystraffic=; HttpOnly; Secure; SameSite=Strict; Path=/traffic; Max-Age=0' });
   }
   if (url.pathname === '/traffic/report' && req.method === 'GET') {
-    if (!trafficSessionFor(req)) return send(res, 303, '', 'text/plain', { Location: '/traffic' });
+    const session = trafficSessionFor(req);
+    if (!session) return send(res, 303, '', 'text/plain', { Location: '/traffic' });
+    const access = await trafficAccess(session);
+    if (access === 'denied') return send(res, 303, '', 'text/plain', { Location: '/traffic', 'Set-Cookie': 'ystraffic=; HttpOnly; Secure; SameSite=Strict; Path=/traffic; Max-Age=0' });
+    if (access === 'unavailable') return send(res, 503, trafficPage('服務暫時無法使用', '<h1>權限查核暫時無法使用</h1><p>請稍後再試。</p>'));
     const days = url.searchParams.has('days') ? Number(url.searchParams.get('days')) : 30;
     if (![7, 30, 90].includes(days)) return send(res, 400, trafficPage('查詢範圍錯誤', '<h1>請選擇 7、30 或 90 天</h1>'));
     const result = await trafficReport(days);
@@ -214,7 +268,7 @@ async function handler(req, res) {
     const { renderHtml } = trafficModule('traffic-report-core');
     const options = { nonce, articleDownload: `?days=${days}&download=articles`, newsDownload: `?days=${days}&download=news` };
     const html = renderHtml(result.report, result.dates, result.status, result.issues, options)
-      .replace('</header><main>', `<form method="get" action="/traffic/report" style="display:flex;gap:8px;align-items:center;margin-top:14px"><label for="days">查詢期間</label><select id="days" name="days" style="font:inherit;padding:7px"><option value="7" ${days === 7 ? 'selected' : ''}>最近 7 天</option><option value="30" ${days === 30 ? 'selected' : ''}>最近 30 天</option><option value="90" ${days === 90 ? 'selected' : ''}>最近 90 天</option></select><button type="submit" style="font:inherit;padding:7px 14px">查詢</button></form></header><main>`);
+      .replace('</header><main>', `<form method="get" action="/traffic/report" style="display:flex;gap:8px;align-items:center;margin-top:14px"><label for="days">查詢期間</label><select id="days" name="days" style="font:inherit;padding:7px"><option value="7" ${days === 7 ? 'selected' : ''}>最近 7 天</option><option value="30" ${days === 30 ? 'selected' : ''}>最近 30 天</option><option value="90" ${days === 90 ? 'selected' : ''}>最近 90 天</option></select><button type="submit" style="font:inherit;padding:7px 14px">查詢</button></form><form method="post" action="/traffic/logout"><button type="submit" style="font:inherit;padding:7px 14px">登出</button></form></header><main>`);
     return send(res, 200, html, 'text/html; charset=utf-8', { 'Content-Security-Policy': `default-src 'none'; style-src 'unsafe-inline'; script-src 'nonce-${nonce}'; img-src 'self' data:; form-action 'self'; base-uri 'none'` });
   }
 

@@ -37,7 +37,9 @@ ssh yongsyu@192.168.0.101 'systemctl is-active ysipo-review; curl -s http://127.
 
 ## 私人內容成效頁
 
-`https://review.ysipo.com.tw/traffic` 可用手機或電腦開啟，僅允許上述兩個收件信箱取得一次性驗證碼。登入有效 12 小時；報表與 CSV 下載都必須登入。可查最近 7、30、90 天，結果在伺服器記憶體快取 10 分鐘，不寫入公開網站或草稿目錄。驗證碼仍由 `review-code.yml` 寄送，不需要 GitHub 帳號。
+`https://review.ysipo.com.tw/traffic` 可用手機或電腦開啟，使用承辦人系統帳號密碼登入。管理員在承辦人系統「帳號管理」的「內容成效」欄設定權限；初始開放李宗穎（10001）與林家均（17005）。登入最長有效 8 小時；每次查詢及 CSV 下載均向承辦人系統重新查核帳號與權限，停用或撤權立即生效。可查最近 7、30、90 天，報表在伺服器記憶體快取 10 分鐘，不寫入公開網站或草稿目錄。只有審稿流程繼續使用郵件驗證碼。
+
+兩個服務須在同一台 Ubuntu 主機執行；審稿服務透過 `http://127.0.0.1:3002` 呼叫承辦人系統登入／查核 API，可用 `IPMGR_AUTH_BASE_URL` 指定其他 loopback 埠。密碼與承辦人系統 JWT 都不會傳回瀏覽器或寫入 Git。承辦人系統無法連線時採拒絕存取，不會顯示快取報表。
 
 部署時將 `scripts/traffic-report.js`、`scripts/traffic-report-core.js` 複製到審稿主機的 `scripts/`，在審稿主機用 `review/package-lock.json` 安裝唯讀查詢依賴。Google 服務帳戶 JSON 與 Cloudflare Analytics 唯讀 token 只能保留在主機私有檔案／環境變數；不可提交 Git 或送到瀏覽器。授權方法見 `scripts/traffic-report.md`。
 

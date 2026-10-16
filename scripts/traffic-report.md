@@ -1,6 +1,6 @@
 # 內容成效一鍵報表
 
-手機與其他電腦可開啟私人查詢頁：[review.ysipo.com.tw/traffic](https://review.ysipo.com.tw/traffic)，以兩位指定收件信箱之一收取驗證碼登入。報表和 CSV 不放在公開官網；查詢憑證只保存在審稿伺服器。伺服器首次授權仍須依下方步驟設定唯讀憑證。
+手機與其他電腦可開啟私人查詢頁：[review.ysipo.com.tw/traffic](https://review.ysipo.com.tw/traffic)，以承辦人系統帳號密碼登入，並由承辦人系統「帳號管理」的「內容成效」權限控制。報表和 CSV 不放在公開官網；查詢憑證只保存在審稿伺服器。伺服器首次授權仍須依下方步驟設定唯讀憑證。
 
 雙擊根目錄的 `traffic-report.cmd`，程式會讀取官網目前已上線的文章與新聞，查詢最近 30 天資料，並開啟 `reports/traffic-report.html`。同一資料夾會產生兩份 CSV。`reports/` 和本機憑證均已加入 `.gitignore`。
 
