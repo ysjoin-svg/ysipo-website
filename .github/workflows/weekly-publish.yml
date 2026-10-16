@@ -26,8 +26,6 @@ jobs:
         working-directory: scripts
         env:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
-          CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
-          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           REVIEW_DRAFT_FILE: ${{ runner.temp }}/article-draft.json
         run: node generate-article.js --draft
 

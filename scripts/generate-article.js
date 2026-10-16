@@ -14,9 +14,16 @@ try {
 const NVIDIA_API_KEY = process.env.NVIDIA_API_KEY || config.NVIDIA_API_KEY;
 const CF_ZONE_ID     = process.env.CF_ZONE_ID     || config.CF_ZONE_ID;
 const CF_API_TOKEN   = process.env.CF_API_TOKEN   || config.CF_API_TOKEN;
-if (require.main === module && (!NVIDIA_API_KEY || !CF_ZONE_ID || !CF_API_TOKEN)) {
-  console.error('❌ 缺少密鑰：請設定環境變數或 scripts/config.js');
-  process.exit(1);
+function missingCredentials(draftMode, credentials) {
+  const required = draftMode ? ['NVIDIA_API_KEY'] : ['NVIDIA_API_KEY', 'CF_ZONE_ID', 'CF_API_TOKEN'];
+  return required.filter((name) => !credentials[name]);
+}
+if (require.main === module) {
+  const missing = missingCredentials(process.argv.includes('--draft'), { NVIDIA_API_KEY, CF_ZONE_ID, CF_API_TOKEN });
+  if (missing.length) {
+    console.error(`❌ 缺少密鑰：${missing.join(', ')}；請設定環境變數或 scripts/config.js`);
+    process.exit(1);
+  }
 }
 const WEBSITE_DIR = path.resolve(__dirname, '..');
 const INSIGHTS_DIR = path.join(WEBSITE_DIR, 'insights');
@@ -250,6 +257,25 @@ async function fallbackArticleImage(category, dateStr, timestamp) {
 }
 
 // 呼叫 Nvidia API（通用）
+function parseNvidiaArticleResponse(body, statusCode) {
+  let parsed;
+  try {
+    parsed = JSON.parse(body);
+  } catch {
+    throw new Error(`Nvidia API 回應不是 JSON（HTTP ${statusCode}）`);
+  }
+  if (statusCode !== 200) {
+    const detail = String(parsed?.error?.message || parsed?.detail || '未提供錯誤說明').slice(0, 200);
+    throw new Error(`Nvidia API HTTP ${statusCode}：${detail}`);
+  }
+  const content = parsed?.choices?.[0]?.message?.content;
+  if (typeof content !== 'string' || !content.trim()) {
+    const reason = parsed?.choices?.[0]?.finish_reason || '未提供';
+    throw new Error(`AI 未回傳文章正文（finish_reason: ${reason}）；請檢查模型輸出與 token 上限`);
+  }
+  return content;
+}
+
 function callNvidiaAPI(messages) {
   return new Promise((resolve, reject) => {
     const body = JSON.stringify({
@@ -274,21 +300,18 @@ function callNvidiaAPI(messages) {
     const req = https.request(options, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
+      res.on('error', reject);
       res.on('end', () => {
         try {
-          const parsed = JSON.parse(data);
-          if (typeof parsed.choices?.[0]?.message?.content === 'string' && parsed.choices[0].message.content.trim()) {
-            resolve(parsed.choices[0].message.content);
-          } else {
-            reject(new Error('AI 未回傳文章正文：' + JSON.stringify({ status: res.statusCode, finish_reason: parsed.choices?.[0]?.finish_reason, detail: parsed.detail }).slice(0, 300)));
-          }
+          resolve(parseNvidiaArticleResponse(data, res.statusCode));
         } catch (e) {
-          reject(new Error('JSON 解析失敗: ' + data));
+          reject(e);
         }
       });
     });
 
     req.on('error', reject);
+    req.setTimeout(120000, () => req.destroy(new Error('Nvidia 產文逾時（120 秒）')));
     req.write(body);
     req.end();
   });
@@ -702,4 +725,4 @@ async function main() {
 }
 
 if (require.main === module) main();
-module.exports = { textToHtml, textToHtmlEn, extractSummary, categorizeArticle, purgeCloudflareCache };
+module.exports = { textToHtml, textToHtmlEn, extractSummary, categorizeArticle, purgeCloudflareCache, parseNvidiaArticleResponse, missingCredentials };
