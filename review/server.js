@@ -97,6 +97,15 @@ function trafficSessionFor(req) {
   return session;
 }
 
+function trafficLoginCsrf(req) {
+  return (req.headers.cookie || '').match(/(?:^|;\s*)__Host-ystraffic_csrf=([A-Za-z0-9_-]+)/)?.[1] || '';
+}
+
+function tokenMatches(given, expected) {
+  if (!/^[A-Za-z0-9_-]{32}$/.test(given || '') || !/^[A-Za-z0-9_-]{32}$/.test(expected || '')) return false;
+  return crypto.timingSafeEqual(Buffer.from(given), Buffer.from(expected));
+}
+
 async function caseAuth(endpoint, options = {}) {
   return fetch(new URL(endpoint, authBase), {
     ...options,
@@ -122,8 +131,8 @@ function trafficPage(title, body) {
   return page(title, body).replace('永旭智慧財產事務所 · 審稿', '永旭智慧財產事務所 · 內容成效');
 }
 
-function trafficLogin(error = '') {
-  return trafficPage('內容成效登入', `<h1>內容成效</h1><p>請使用承辦人系統的帳號與密碼登入。</p>${error ? `<p role="alert">${esc(error)}</p>` : ''}<form method="post" action="/traffic/login"><label for="username">帳號</label><input id="username" name="username" autocomplete="username" required maxlength="64"><label for="password">密碼</label><input id="password" name="password" type="password" autocomplete="current-password" required><div class="row"><button type="submit">登入</button></div></form>`);
+function trafficLogin(error = '', csrf = '') {
+  return trafficPage('內容成效登入', `<h1>內容成效</h1><p>請使用承辦人系統的帳號與密碼登入。</p>${error ? `<p role="alert">${esc(error)}</p>` : ''}<form method="post" action="/traffic/login"><input type="hidden" name="csrf" value="${esc(csrf)}"><label for="username">帳號</label><input id="username" name="username" autocomplete="username" required maxlength="64"><label for="password">密碼</label><input id="password" name="password" type="password" autocomplete="current-password" required><div class="row"><button type="submit">登入</button></div></form>`);
 }
 
 function trafficModule(name) {
@@ -195,15 +204,19 @@ async function handler(req, res) {
   if (url.pathname === '/traffic' && req.method === 'GET') {
     const session = trafficSessionFor(req);
     if (session && await trafficAccess(session) === 'allowed') return send(res, 303, '', 'text/plain', { Location: '/traffic/report' });
-    return send(res, 200, trafficLogin());
+    const csrf = random();
+    return send(res, 200, trafficLogin('', csrf), 'text/html; charset=utf-8', {
+      'Set-Cookie': `__Host-ystraffic_csrf=${csrf}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=600`,
+    });
   }
   if (url.pathname === '/traffic/login' && req.method === 'POST') {
-    if (req.headers.origin && req.headers.origin !== BASE_URL) return send(res, 403, 'Forbidden', 'text/plain');
     const form = new URLSearchParams(await readBody(req, 4096));
+    const csrf = trafficLoginCsrf(req);
+    if (!tokenMatches(form.get('csrf'), csrf)) return send(res, 303, '', 'text/plain', { Location: '/traffic' });
     const username = (form.get('username') || '').trim();
     const password = form.get('password') || '';
     if (!username || username.length > 64 || !password || password.length > 1024)
-      return send(res, 400, trafficLogin('請輸入有效的帳號與密碼。'));
+      return send(res, 400, trafficLogin('請輸入有效的帳號與密碼。', csrf));
     const now = Date.now();
     for (const [key, attempts] of trafficLoginAttempts) {
       const recent = attempts.filter((time) => now - time < 15 * 60000);
@@ -214,7 +227,7 @@ async function handler(req, res) {
     const globalKey = 'global';
     if ((trafficLoginAttempts.get(accountKey)?.length || 0) >= 5 ||
         (trafficLoginAttempts.get(globalKey)?.length || 0) >= 50)
-      return send(res, 429, trafficLogin('嘗試次數過多，請 15 分鐘後再試。'));
+      return send(res, 429, trafficLogin('嘗試次數過多，請 15 分鐘後再試。', csrf));
     trafficLoginAttempts.set(accountKey, [...(trafficLoginAttempts.get(accountKey) || []), now]);
     trafficLoginAttempts.set(globalKey, [...(trafficLoginAttempts.get(globalKey) || []), now]);
     let login;
@@ -225,27 +238,29 @@ async function handler(req, res) {
         body: JSON.stringify({ username, password }),
       });
       if (response.status === 401 || response.status === 403)
-        return send(res, 401, trafficLogin('帳號、密碼或內容成效權限不正確。'));
-      if (!response.ok) return send(res, 503, trafficLogin('登入服務暫時無法使用，請稍後再試。'));
+        return send(res, 401, trafficLogin('帳號、密碼或內容成效權限不正確。', csrf));
+      if (!response.ok) return send(res, 503, trafficLogin('登入服務暫時無法使用，請稍後再試。', csrf));
       login = await response.json();
     } catch {
-      return send(res, 503, trafficLogin('登入服務暫時無法使用，請稍後再試。'));
+      return send(res, 503, trafficLogin('登入服務暫時無法使用，請稍後再試。', csrf));
     }
-    if (typeof login.token !== 'string') return send(res, 503, trafficLogin('登入服務暫時無法使用，請稍後再試。'));
+    if (typeof login.token !== 'string') return send(res, 503, trafficLogin('登入服務暫時無法使用，請稍後再試。', csrf));
     const access = await trafficAccess({ token: login.token });
-    if (access === 'unavailable') return send(res, 503, trafficLogin('登入服務暫時無法使用，請稍後再試。'));
-    if (access !== 'allowed') return send(res, 403, trafficLogin('帳號、密碼或內容成效權限不正確。'));
+    if (access === 'unavailable') return send(res, 503, trafficLogin('登入服務暫時無法使用，請稍後再試。', csrf));
+    if (access !== 'allowed') return send(res, 403, trafficLogin('帳號、密碼或內容成效權限不正確。', csrf));
     let tokenExpiry;
     try { tokenExpiry = JSON.parse(Buffer.from(login.token.split('.')[1], 'base64url').toString('utf8')).exp * 1000; }
-    catch { return send(res, 503, trafficLogin('登入服務暫時無法使用，請稍後再試。')); }
+    catch { return send(res, 503, trafficLogin('登入服務暫時無法使用，請稍後再試。', csrf)); }
     const expires = Math.min(tokenExpiry, Date.now() + 8 * 3600000);
-    if (!Number.isFinite(expires) || expires <= Date.now()) return send(res, 503, trafficLogin('登入服務暫時無法使用，請稍後再試。'));
+    if (!Number.isFinite(expires) || expires <= Date.now()) return send(res, 503, trafficLogin('登入服務暫時無法使用，請稍後再試。', csrf));
     const sid = random();
-    trafficSessions.set(sid, { token: login.token, expires });
+    trafficSessions.set(sid, { token: login.token, csrf: random(), expires });
     return send(res, 303, '', 'text/plain', { Location: '/traffic/report', 'Set-Cookie': `ystraffic=${sid}; HttpOnly; Secure; SameSite=Strict; Path=/traffic; Max-Age=${Math.floor((expires - Date.now()) / 1000)}` });
   }
   if (url.pathname === '/traffic/logout' && req.method === 'POST') {
-    if (req.headers.origin && req.headers.origin !== BASE_URL) return send(res, 403, 'Forbidden', 'text/plain');
+    const session = trafficSessionFor(req);
+    const form = new URLSearchParams(await readBody(req, 1024));
+    if (!session || !tokenMatches(form.get('csrf'), session.csrf)) return send(res, 303, '', 'text/plain', { Location: '/traffic' });
     const match = (req.headers.cookie || '').match(/(?:^|;\s*)ystraffic=([A-Za-z0-9_-]+)/);
     if (match) trafficSessions.delete(match[1]);
     return send(res, 303, '', 'text/plain', { Location: '/traffic', 'Set-Cookie': 'ystraffic=; HttpOnly; Secure; SameSite=Strict; Path=/traffic; Max-Age=0' });
@@ -268,7 +283,7 @@ async function handler(req, res) {
     const { renderHtml } = trafficModule('traffic-report-core');
     const options = { nonce, articleDownload: `?days=${days}&download=articles`, newsDownload: `?days=${days}&download=news` };
     const html = renderHtml(result.report, result.dates, result.status, result.issues, options)
-      .replace('</header><main>', `<form method="get" action="/traffic/report" style="display:flex;gap:8px;align-items:center;margin-top:14px"><label for="days">查詢期間</label><select id="days" name="days" style="font:inherit;padding:7px"><option value="7" ${days === 7 ? 'selected' : ''}>最近 7 天</option><option value="30" ${days === 30 ? 'selected' : ''}>最近 30 天</option><option value="90" ${days === 90 ? 'selected' : ''}>最近 90 天</option></select><button type="submit" style="font:inherit;padding:7px 14px">查詢</button></form><form method="post" action="/traffic/logout"><button type="submit" style="font:inherit;padding:7px 14px">登出</button></form></header><main>`);
+      .replace('</header><main>', `<form method="get" action="/traffic/report" style="display:flex;gap:8px;align-items:center;margin-top:14px"><label for="days">查詢期間</label><select id="days" name="days" style="font:inherit;padding:7px"><option value="7" ${days === 7 ? 'selected' : ''}>最近 7 天</option><option value="30" ${days === 30 ? 'selected' : ''}>最近 30 天</option><option value="90" ${days === 90 ? 'selected' : ''}>最近 90 天</option></select><button type="submit" style="font:inherit;padding:7px 14px">查詢</button></form><form method="post" action="/traffic/logout"><input type="hidden" name="csrf" value="${esc(session.csrf)}"><button type="submit" style="font:inherit;padding:7px 14px">登出</button></form></header><main>`);
     return send(res, 200, html, 'text/html; charset=utf-8', { 'Content-Security-Policy': `default-src 'none'; style-src 'unsafe-inline'; script-src 'nonce-${nonce}'; img-src 'self' data:; form-action 'self'; base-uri 'none'` });
   }
 

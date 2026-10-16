@@ -113,13 +113,20 @@ test('traffic report requires case system credentials and current permission for
 
   response = await fetch(`${root}/traffic/code`, { method: 'POST', body: new URLSearchParams({ email: 'fish801113@gmail.com' }) });
   assert.equal(response.status, 404);
-  response = await fetch(`${root}/traffic/login`, { method: 'POST', body: new URLSearchParams({ username: '10001', password: 'wrong' }) });
+  response = await fetch(`${root}/traffic/login`, { method: 'POST', redirect: 'manual', body: new URLSearchParams({ username: '10001', password: 'correct-password' }) });
+  assert.equal(response.status, 303);
+  assert.equal(response.headers.get('location'), '/traffic');
+  response = await fetch(`${root}/traffic`);
+  const csrfCookie = response.headers.get('set-cookie').split(';')[0];
+  const loginCsrf = (await response.text()).match(/name="csrf" value="([^"]+)"/)[1];
+  const credentials = (password) => new URLSearchParams({ csrf: loginCsrf, username: '10001', password });
+  response = await fetch(`${root}/traffic/login`, { method: 'POST', headers: { Cookie: csrfCookie, Origin: 'null' }, body: credentials('wrong') });
   assert.equal(response.status, 401);
   authState.allowed = false;
-  response = await fetch(`${root}/traffic/login`, { method: 'POST', body: new URLSearchParams({ username: '10001', password: 'correct-password' }) });
+  response = await fetch(`${root}/traffic/login`, { method: 'POST', headers: { Cookie: csrfCookie }, body: credentials('correct-password') });
   assert.equal(response.status, 403);
   authState.allowed = true;
-  response = await fetch(`${root}/traffic/login`, { method: 'POST', redirect: 'manual', body: new URLSearchParams({ username: '10001', password: 'correct-password' }) });
+  response = await fetch(`${root}/traffic/login`, { method: 'POST', redirect: 'manual', headers: { Cookie: csrfCookie, Origin: 'null' }, body: credentials('correct-password') });
   assert.equal(response.status, 303);
   const cookie = response.headers.get('set-cookie').split(';')[0];
 
@@ -138,6 +145,7 @@ test('traffic report requires case system credentials and current permission for
     assert.match(html, /尚未設定唯讀憑證/);
     assert.match(html, /script nonce=/);
     assert.match(html, /download=articles/);
+    const logoutCsrf = html.match(/action="\/traffic\/logout"><input type="hidden" name="csrf" value="([^"]+)"/)[1];
     response = await fetch(`${root}/traffic/report?days=7&download=articles`, { headers: { Cookie: cookie } });
     assert.equal(response.status, 200);
     assert.match(response.headers.get('content-type'), /text\/csv/);
@@ -151,7 +159,7 @@ test('traffic report requires case system credentials and current permission for
     response = await fetch(`${root}/traffic/report`, { headers: { Cookie: cookie } });
     assert.equal(response.status, 503);
     authState.unavailable = false;
-    response = await fetch(`${root}/traffic/logout`, { method: 'POST', redirect: 'manual', headers: { Cookie: cookie } });
+    response = await fetch(`${root}/traffic/logout`, { method: 'POST', redirect: 'manual', headers: { Cookie: cookie, Origin: 'null' }, body: new URLSearchParams({ csrf: logoutCsrf }) });
     assert.equal(response.status, 303);
     response = await fetch(`${root}/traffic/report`, { redirect: 'manual', headers: { Cookie: cookie } });
     assert.equal(response.status, 303);
