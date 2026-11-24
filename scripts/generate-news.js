@@ -297,7 +297,10 @@ async function main() {
 
   const shortlisted = shortlistCandidates(candidates, MAX_NEWS * 2);
   console.log(`🔎 近 ${RECENT_DAYS} 天、未上架過的候選 ${candidates.length} 則，檢查前 ${shortlisted.length} 則，最多產生 ${MAX_NEWS} 則草稿`);
-  const newItems = await summarizeCandidates(shortlisted, createNvidiaTextClient(NVIDIA_API_KEY), MAX_NEWS);
+  const complete = createNvidiaTextClient(NVIDIA_API_KEY, {
+    defaultModels: ['nvidia/nemotron-3.5-bolt-e4b', 'nvidia/nemotron-3.5-lightning-30b-a3b'],
+  });
+  const newItems = await summarizeCandidates(shortlisted, complete, MAX_NEWS);
 
   if (DRY) {
     newItems.forEach((n) => {

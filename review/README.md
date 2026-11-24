@@ -37,7 +37,7 @@ ssh yongsyu@192.168.0.101 'systemctl is-active ysipo-review; curl -s http://127.
 
 ## 產稿模型維護
 
-文章與新聞共用 `scripts/nvidia-text.js`。模型名稱可在 GitHub 的 Settings → Secrets and variables → Actions → Variables 設為 `NVIDIA_TEXT_MODEL` 和 `NVIDIA_TEXT_FALLBACK_MODEL`。未設定時使用程式內建的 Nemotron 3.5 Lightning 和 Bolt。API 金鑰仍由 GitHub Secret 提供。遇到模型下架時可更新 Variables，無須重新部署。
+文章與新聞共用 `scripts/nvidia-text.js`。模型名稱可在 GitHub 的 Settings → Secrets and variables → Actions → Variables 設定。文章使用 `NVIDIA_TEXT_MODEL`、`NVIDIA_TEXT_FALLBACK_MODEL`，預設依序為 Nemotron 3.5 Lightning、Bolt。新聞使用 `NVIDIA_NEWS_MODEL`、`NVIDIA_NEWS_FALLBACK_MODEL`，預設依序為 Bolt、Lightning。API 金鑰仍由 GitHub Secret 提供。遇到模型下架時可更新 Variables，無須重新部署。
 
 暫時性連線錯誤、逾時、限流或伺服器錯誤會短暫等待後重試一次。若模型仍失敗、端點已下架或輸出格式不符，改用備援。兩個模型都無法產稿時，排程會寄出流程失敗通知。新聞沒有合格候選項目時會正常結束，若有摘要錯誤且產出為零則告警。
 

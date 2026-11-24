@@ -33,8 +33,8 @@ jobs:
         working-directory: scripts
         env:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
-          NVIDIA_TEXT_MODEL: ${{ vars.NVIDIA_TEXT_MODEL }}
-          NVIDIA_TEXT_FALLBACK_MODEL: ${{ vars.NVIDIA_TEXT_FALLBACK_MODEL }}
+          NVIDIA_TEXT_MODEL: ${{ vars.NVIDIA_NEWS_MODEL }}
+          NVIDIA_TEXT_FALLBACK_MODEL: ${{ vars.NVIDIA_NEWS_FALLBACK_MODEL }}
           REVIEW_DRAFT_FILE: ${{ runner.temp }}/news-drafts.json
         run: node generate-news.js --draft
 

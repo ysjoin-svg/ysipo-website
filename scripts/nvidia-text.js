@@ -27,10 +27,10 @@ function parseCompletion(body, status) {
   return content;
 }
 
-function createNvidiaTextClient(apiKey, { env = process.env, request = fetch, wait = delay, warn = console.warn } = {}) {
+function createNvidiaTextClient(apiKey, { env = process.env, request = fetch, wait = delay, warn = console.warn, defaultModels = [DEFAULT_MODEL, DEFAULT_FALLBACK] } = {}) {
   const models = [...new Set([
-    env.NVIDIA_TEXT_MODEL?.trim() || DEFAULT_MODEL,
-    env.NVIDIA_TEXT_FALLBACK_MODEL?.trim() || DEFAULT_FALLBACK,
+    env.NVIDIA_TEXT_MODEL?.trim() || defaultModels[0],
+    env.NVIDIA_TEXT_FALLBACK_MODEL?.trim() || defaultModels[1],
   ])];
 
   return async function complete(messages, { temperature, maxTokens, label, validate = (content) => content, timeoutMs = 75_000 }) {
