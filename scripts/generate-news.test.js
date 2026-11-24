@@ -1,8 +1,15 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { summarizeCandidates } = require('./generate-news');
+const { shortlistCandidates, summarizeCandidates } = require('./generate-news');
 
 const candidates = [{ title: '專利公告一', source: '來源' }, { title: '專利公告二', source: '來源' }];
+
+test('official announcements are considered before newer media headlines', () => {
+  const recentMedia = { source: '媒體', pubDate: '2026-11-24' };
+  const latestOfficial = { source: '經濟部', pubDate: '2026-11-22' };
+  const olderOfficial = { source: '智慧財產局', pubDate: '2026-11-20' };
+  assert.deepEqual(shortlistCandidates([olderOfficial, recentMedia, latestOfficial], 2), [latestOfficial, olderOfficial]);
+});
 
 test('empty feed and editorial skips can finish with no drafts', async () => {
   assert.deepEqual(await summarizeCandidates([], () => assert.fail('不應呼叫模型')), []);

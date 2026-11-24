@@ -55,6 +55,7 @@ const SOURCE_MAP = {
   'moea.gov.tw': '經濟部智慧財產局',
   'tipo.gov.tw': '經濟部智慧財產局',
 };
+const OFFICIAL_SOURCES = /^(?:經濟部(?:智慧財產局)?|智慧財產局|經濟部智慧財產局（TIPO）|USPTO|EUIPO|EPO|WIPO|JPO|KIPO|CNIPA|(?:www\.)?(?:tipo|moea)\.gov\.tw)$/i;
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 
 function decodeEntities(s) {
@@ -98,6 +99,7 @@ function summarize(title, source, complete) {
       '(b) 只是報導特定公司的訴訟賠償金額、勝敗或上訴等個案結果，不具通用的警示或教育意義（例如僅講「某公司被判賠X萬、上訴到底」）；' +
       '(c) 屬八卦、醜聞或與智財專業無關的爭執。' +
       '【第二步｜改寫】否則（包括官方公告、法規修正、制度介紹，以及「具教育或警示意義的專利／商標案例」），' +
+      '明確涉及申請流程或制度更新（例如專利優先權文件電子交換）應摘要，即使原標題很短。' +
       '請用繁體中文、台灣慣用語改寫成中立、專業的智財新聞摘要：' +
       '1) 一個精簡標題（不超過 30 字，不照抄原標題，不聳動）；' +
       '2) 2-3 句客觀摘要（不超過 120 字）：交代「是誰、發生什麼、對權利人或申請人有何意義或提醒」；' +
@@ -158,6 +160,13 @@ async function summarizeCandidates(candidates, complete, limit = candidates.leng
 function withinRecent(pubDate) {
   const t = Date.parse(pubDate);
   return !isNaN(t) && (Date.now() - t) <= RECENT_DAYS * 86400 * 1000;
+}
+
+function shortlistCandidates(candidates, limit) {
+  const isOfficial = (candidate) => Number(OFFICIAL_SOURCES.test((candidate.source || '').trim()));
+  return [...candidates].sort((a, b) => (
+    isOfficial(b) - isOfficial(a) || Date.parse(b.pubDate) - Date.parse(a.pubDate)
+  )).slice(0, limit);
 }
 
 function loadPublished() {
@@ -276,7 +285,7 @@ async function main() {
   const knownTitles = new Set([...published, ...pending].map(p => normalizeTitle(p.origTitle || p.displayTitle)));
   const knownLinks = new Set([...published, ...pending].map(p => p.link).filter(Boolean));
 
-  // 去重(標題) → 篩近期 → 排除已上架過 → 新到舊
+  // 去重（標題）→ 篩近期 → 排除已上架過
   const seen = new Set();
   const candidates = all.filter((n) => {
     if (!n.title || seen.has(n.title)) return false;
@@ -284,9 +293,9 @@ async function main() {
     const st = (n.source || '') + ' ' + (n.title || '');
     if (SOURCE_BLOCKLIST.some((k) => st.includes(k))) return false;      // 濾掉同業事務所來源
     return withinRecent(n.pubDate) && !knownTitles.has(normalizeTitle(n.title)) && !knownLinks.has(n.link);
-  }).sort((a, b) => Date.parse(b.pubDate) - Date.parse(a.pubDate));
+  });
 
-  const shortlisted = candidates.slice(0, MAX_NEWS * 2);
+  const shortlisted = shortlistCandidates(candidates, MAX_NEWS * 2);
   console.log(`🔎 近 ${RECENT_DAYS} 天、未上架過的候選 ${candidates.length} 則，檢查前 ${shortlisted.length} 則，最多產生 ${MAX_NEWS} 則草稿`);
   const newItems = await summarizeCandidates(shortlisted, createNvidiaTextClient(NVIDIA_API_KEY), MAX_NEWS);
 
@@ -354,4 +363,4 @@ if (require.main === module) {
     process.exitCode = 1;
   });
 }
-module.exports = { parseSummary, summarizeCandidates };
+module.exports = { shortlistCandidates, summarizeCandidates };
