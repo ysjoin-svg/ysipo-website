@@ -179,7 +179,6 @@ function generateArticleImage(category, dateStr, timestamp, attempt = 0) {
       width: 1344,
       height: 768,
       steps: 4,
-      seed: Math.floor(Math.random() * 1000000),
     });
 
     const req = https.request(

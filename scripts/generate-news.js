@@ -109,6 +109,7 @@ function summarize(title, source, complete) {
   return complete([{ role: 'system', content: sys }, { role: 'user', content: user }], {
     temperature: 0.4,
     maxTokens: 800,
+    timeoutMs: 40_000,
     label: '新聞摘要',
     validate: parseSummary,
   });
@@ -129,7 +130,7 @@ function parseSummary(text) {
   return { title: result.title.trim(), summary: result.summary.trim() };
 }
 
-async function summarizeCandidates(candidates, complete) {
+async function summarizeCandidates(candidates, complete, limit = candidates.length) {
   const items = [];
   const failures = [];
   for (const candidate of candidates) {
@@ -146,6 +147,7 @@ async function summarizeCandidates(candidates, complete) {
       continue;
     }
     items.push({ ...candidate, displayTitle: summary.title, summary: summary.summary, origTitle: candidate.title });
+    if (items.length === limit) break;
   }
   if (failures.length && !items.length) {
     throw new Error(`本次未能產生待審新聞，${failures.length} 則摘要發生錯誤：${[...new Set(failures)].join('；')}`);
@@ -284,8 +286,9 @@ async function main() {
     return withinRecent(n.pubDate) && !knownTitles.has(normalizeTitle(n.title)) && !knownLinks.has(n.link);
   }).sort((a, b) => Date.parse(b.pubDate) - Date.parse(a.pubDate));
 
-  console.log(`🔎 近 ${RECENT_DAYS} 天、未上架過的候選 ${candidates.length} 則，取前 ${MAX_NEWS} 則改寫`);
-  const newItems = await summarizeCandidates(candidates.slice(0, MAX_NEWS), createNvidiaTextClient(NVIDIA_API_KEY));
+  const shortlisted = candidates.slice(0, MAX_NEWS * 2);
+  console.log(`🔎 近 ${RECENT_DAYS} 天、未上架過的候選 ${candidates.length} 則，檢查前 ${shortlisted.length} 則，最多產生 ${MAX_NEWS} 則草稿`);
+  const newItems = await summarizeCandidates(shortlisted, createNvidiaTextClient(NVIDIA_API_KEY), MAX_NEWS);
 
   if (DRY) {
     newItems.forEach((n) => {

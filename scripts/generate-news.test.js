@@ -28,3 +28,13 @@ test('an individually failed summary does not discard a valid draft', async () =
     { ...candidates[1], origTitle: candidates[1].title, displayTitle: '公告摘要', summary: '公開資訊' },
   ]);
 });
+
+test('an editorial skip leaves room for the next candidate without exceeding the draft limit', async () => {
+  let count = 0;
+  const drafts = await summarizeCandidates([...candidates, { title: '第三則', source: '來源' }], () => {
+    if (++count === 1) return { skip: true };
+    return { title: '公告摘要', summary: '公開資訊' };
+  }, 1);
+  assert.equal(count, 2);
+  assert.equal(drafts[0].origTitle, candidates[1].title);
+});

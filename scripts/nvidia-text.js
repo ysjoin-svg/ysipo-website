@@ -33,7 +33,7 @@ function createNvidiaTextClient(apiKey, { env = process.env, request = fetch, wa
     env.NVIDIA_TEXT_FALLBACK_MODEL?.trim() || DEFAULT_FALLBACK,
   ])];
 
-  return async function complete(messages, { temperature, maxTokens, label, validate = (content) => content }) {
+  return async function complete(messages, { temperature, maxTokens, label, validate = (content) => content, timeoutMs = 75_000 }) {
     if (!apiKey) throw new Error('缺少 NVIDIA_API_KEY');
     const failures = [];
     for (const model of models) {
@@ -44,7 +44,7 @@ function createNvidiaTextClient(apiKey, { env = process.env, request = fetch, wa
           try {
             response = await request('https://integrate.api.nvidia.com/v1/chat/completions', {
               method: 'POST',
-              signal: AbortSignal.timeout(75_000),
+              signal: AbortSignal.timeout(timeoutMs),
               headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json', Accept: 'application/json' },
               body: JSON.stringify({ model, messages, temperature, max_tokens: maxTokens, chat_template_kwargs: { enable_thinking: false } }),
             });
