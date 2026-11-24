@@ -2,7 +2,12 @@ name: Weekly Article Draft
 
 # 每週一台北 09:00 發文，由 Ubuntu Server cron 觸發（GitHub 自身排程不可靠，已停用 schedule 避免雙跑）
 on:
-  workflow_dispatch: {}    # 由 Ubuntu cron 觸發，也可在 Actions 頁面手動 Run
+  workflow_dispatch:
+    inputs:
+      verify_only:
+        description: '只驗證產稿，結果留在 GitHub runner'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -10,6 +15,7 @@ permissions:
 jobs:
   draft:
     runs-on: ubuntu-latest
+    timeout-minutes: 12
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -22,21 +28,27 @@ jobs:
       - name: Install image processor
         run: npm ci
 
+      - name: Test article draft logic
+        run: node --test scripts/generate-article.test.js
+
       - name: Generate article draft
         working-directory: scripts
         env:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          NVIDIA_TEXT_MODEL: ${{ vars.NVIDIA_TEXT_MODEL }}
+          NVIDIA_TEXT_FALLBACK_MODEL: ${{ vars.NVIDIA_TEXT_FALLBACK_MODEL }}
           REVIEW_DRAFT_FILE: ${{ runner.temp }}/article-draft.json
         run: node generate-article.js --draft
 
       - name: Submit for review
+        if: ${{ !inputs.verify_only }}
         id: submit
         env:
           REVIEW_INGEST_KEY: ${{ secrets.REVIEW_INGEST_KEY }}
         run: node scripts/submit-review-draft.js "${{ runner.temp }}/article-draft.json"
 
       - name: Email owner full draft and review buttons
-        if: steps.submit.outputs.count != '0'
+        if: steps.submit.outcome == 'success' && steps.submit.outputs.count != '0'
         uses: dawidd6/action-send-mail@v17
         with:
           server_address: smtp.gmail.com
@@ -50,7 +62,7 @@ jobs:
           html_body: file://${{ runner.temp }}/review-owner.html
 
       - name: Email north office full draft and review buttons
-        if: steps.submit.outputs.count != '0'
+        if: steps.submit.outcome == 'success' && steps.submit.outputs.count != '0'
         uses: dawidd6/action-send-mail@v17
         with:
           server_address: smtp.gmail.com
@@ -64,7 +76,7 @@ jobs:
           html_body: file://${{ runner.temp }}/review-north.html
 
       - name: Notify both reviewers on failure
-        if: failure()
+        if: failure() && !inputs.verify_only
         uses: dawidd6/action-send-mail@v17
         with:
           server_address: smtp.gmail.com
@@ -74,7 +86,7 @@ jobs:
           password: ${{ secrets.MAIL_PASSWORD }}
           from: 永旭審稿 <${{ secrets.MAIL_USERNAME }}>
           to: taiejoin@hotmail.com,fish801113@gmail.com
-          subject: '[永旭] 智財文章草稿產生失敗'
+          subject: '[永旭] 智財文章草稿流程失敗'
           body: |
-            本週文章草稿未產生，也未發布。請查看工作紀錄：
+            本週文章草稿流程發生錯誤，請在工作紀錄確認產稿、送審或寄信的失敗步驟：
             ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

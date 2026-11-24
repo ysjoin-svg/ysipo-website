@@ -2,7 +2,12 @@ name: Weekly IP News Draft
 
 # 每週四台北 09:00 發新聞，由 Ubuntu Server cron 觸發（GitHub 自身排程不可靠，已停用 schedule 避免雙跑）
 on:
-  workflow_dispatch: {}    # 由 Ubuntu cron 觸發，也可在 Actions 頁面手動 Run
+  workflow_dispatch:
+    inputs:
+      verify_only:
+        description: '只驗證產稿，結果留在 GitHub runner'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -10,6 +15,7 @@ permissions:
 jobs:
   news:
     runs-on: ubuntu-latest
+    timeout-minutes: 16
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -19,18 +25,21 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Test news draft logic
+        run: node --test scripts/generate-news.test.js
+
       - name: Generate news drafts
         id: generate
         working-directory: scripts
         env:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
-          CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
-          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          NVIDIA_TEXT_MODEL: ${{ vars.NVIDIA_TEXT_MODEL }}
+          NVIDIA_TEXT_FALLBACK_MODEL: ${{ vars.NVIDIA_TEXT_FALLBACK_MODEL }}
           REVIEW_DRAFT_FILE: ${{ runner.temp }}/news-drafts.json
         run: node generate-news.js --draft
 
       - name: Submit for review
-        if: steps.generate.outputs.count != '0'
+        if: ${{ !inputs.verify_only && steps.generate.outputs.count != '0' }}
         id: submit
         env:
           REVIEW_INGEST_KEY: ${{ secrets.REVIEW_INGEST_KEY }}
@@ -65,7 +74,7 @@ jobs:
           html_body: file://${{ runner.temp }}/review-north.html
 
       - name: Notify both reviewers on failure
-        if: failure()
+        if: failure() && !inputs.verify_only
         uses: dawidd6/action-send-mail@v17
         with:
           server_address: smtp.gmail.com
@@ -75,7 +84,7 @@ jobs:
           password: ${{ secrets.MAIL_PASSWORD }}
           from: 永旭審稿 <${{ secrets.MAIL_USERNAME }}>
           to: taiejoin@hotmail.com,fish801113@gmail.com
-          subject: '[永旭] 智財新聞草稿產生失敗'
+          subject: '[永旭] 智財新聞草稿流程失敗'
           body: |
-            本週智財新聞草稿未產生，也未發布。請查看工作紀錄：
+            本週新聞草稿流程發生錯誤，請在工作紀錄確認擷取、摘要、送審或寄信的失敗步驟：
             ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

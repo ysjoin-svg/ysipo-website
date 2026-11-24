@@ -7,6 +7,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
+const { createNvidiaTextClient } = require('./nvidia-text');
 
 // ===== 密鑰：env 優先，本機回退 config.js =====
 let config = {};
@@ -14,7 +15,6 @@ try { config = require('./config'); } catch (e) {}
 const NVIDIA_API_KEY = process.env.NVIDIA_API_KEY || config.NVIDIA_API_KEY;
 const CF_ZONE_ID     = process.env.CF_ZONE_ID     || config.CF_ZONE_ID;
 const CF_API_TOKEN   = process.env.CF_API_TOKEN   || config.CF_API_TOKEN;
-if (!NVIDIA_API_KEY) { console.error('❌ 缺少 NVIDIA_API_KEY'); process.exit(1); }
 
 const WEBSITE_DIR = path.resolve(__dirname, '..');
 const NEWS_HTML = path.join(WEBSITE_DIR, 'news.html');
@@ -57,14 +57,6 @@ const SOURCE_MAP = {
 };
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 
-function httpsGet(url) {
-  return new Promise((resolve, reject) => {
-    https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (r) => {
-      let d = ''; r.on('data', c => (d += c)); r.on('end', () => resolve(d));
-    }).on('error', reject);
-  });
-}
-
 function decodeEntities(s) {
   return s.replace(/<!\[CDATA\[|\]\]>/g, '')
     .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
@@ -78,7 +70,13 @@ function esc(s) {
 async function fetchRSS(query) {
   const url = 'https://news.google.com/rss/search?q=' + encodeURIComponent(query) +
     '&hl=zh-TW&gl=TW&ceid=TW:zh-Hant';
-  const xml = await httpsGet(url);
+  const response = await fetch(url, {
+    headers: { 'User-Agent': 'Mozilla/5.0' },
+    signal: AbortSignal.timeout(12_000),
+  });
+  if (!response.ok) throw new Error(`RSS HTTP ${response.status}`);
+  const xml = await response.text();
+  if (!/<rss\b/i.test(xml)) throw new Error('RSS 回應格式錯誤');
   return [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].map((m) => {
     const block = m[1];
     const pick = (re) => { const x = block.match(re); return x ? decodeEntities(x[1]).trim() : ''; };
@@ -92,9 +90,8 @@ async function fetchRSS(query) {
 }
 
 // 用 LLM 把新聞標題改寫成中立、專業的智財新聞摘要
-function summarize(title, source) {
-  return new Promise((resolve) => {
-    const sys =
+function summarize(title, source, complete) {
+  const sys =
       '你是台灣智慧財產權事務所的新聞編輯。' +
       '【第一步｜過濾】若這則新聞符合以下任一，請只回覆 {"skip":true}，不要改寫：' +
       '(a) 與專利、商標、著作權、智慧財產權無關；' +
@@ -108,36 +105,52 @@ function summarize(title, source) {
       '避免「旨在／促進發展／展現成果」這類空泛套話；不杜撰未提及的細節；不用「軟件/網絡/信息/質量」等中國用語；' +
       '只以 JSON 回覆 {"title":"...","summary":"..."}。' +
       '注意：兩步驟只能擇一回覆，且只輸出 JSON。';
-    const user = `新聞標題：「${title}」\n來源：${source}`;
-    const payload = JSON.stringify({
-      model: process.env.NVIDIA_TEXT_MODEL || 'nvidia/nemotron-3-super-120b-a12b',
-      messages: [{ role: 'system', content: sys }, { role: 'user', content: user }],
-      temperature: 0.4,
-      max_tokens: 400,
-      chat_template_kwargs: { enable_thinking: false },
-    });
-    const req = https.request({
-      hostname: 'integrate.api.nvidia.com',
-      path: '/v1/chat/completions',
-      method: 'POST',
-      headers: {
-        Authorization: 'Bearer ' + NVIDIA_API_KEY,
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(payload),
-      },
-    }, (r) => {
-      let b = ''; r.on('data', (c) => (b += c)); r.on('end', () => {
-        try {
-          const txt = JSON.parse(b).choices[0].message.content;
-          const obj = JSON.parse(txt.match(/\{[\s\S]*\}/)[0]);
-          if (obj.skip) { resolve({ skip: true }); return; }
-          resolve({ title: obj.title, summary: obj.summary });
-        } catch (e) { resolve(null); }
-      });
-    });
-    req.on('error', () => resolve(null));
-    req.write(payload); req.end();
+  const user = `新聞標題：「${title}」\n來源：${source}`;
+  return complete([{ role: 'system', content: sys }, { role: 'user', content: user }], {
+    temperature: 0.4,
+    maxTokens: 800,
+    label: '新聞摘要',
+    validate: parseSummary,
   });
+}
+
+function parseSummary(text) {
+  let result;
+  try {
+    result = JSON.parse(text.trim().replace(/^```(?:json)?\s*|\s*```$/gi, ''));
+  } catch {
+    throw new Error('新聞摘要不是有效的 JSON');
+  }
+  if (result?.skip === true) return { skip: true };
+  if (typeof result?.title !== 'string' || !result.title.trim() || result.title.length > 200 ||
+      typeof result.summary !== 'string' || !result.summary.trim() || result.summary.length > 1500) {
+    throw new Error('新聞摘要缺少有效的標題或摘要');
+  }
+  return { title: result.title.trim(), summary: result.summary.trim() };
+}
+
+async function summarizeCandidates(candidates, complete) {
+  const items = [];
+  const failures = [];
+  for (const candidate of candidates) {
+    let summary;
+    try {
+      summary = await summarize(candidate.title, candidate.source, complete);
+    } catch (error) {
+      failures.push(error.message);
+      console.warn(`新聞摘要失敗：${candidate.title}（${error.message}）`);
+      continue;
+    }
+    if (summary.skip) {
+      console.log('依編輯規則略過：' + candidate.title);
+      continue;
+    }
+    items.push({ ...candidate, displayTitle: summary.title, summary: summary.summary, origTitle: candidate.title });
+  }
+  if (failures.length && !items.length) {
+    throw new Error(`本次未能產生待審新聞，${failures.length} 則摘要發生錯誤：${[...new Set(failures)].join('；')}`);
+  }
+  return items;
 }
 
 function withinRecent(pubDate) {
@@ -242,13 +255,20 @@ function writeOutput(count, titles) {
   fs.appendFileSync(process.env.GITHUB_OUTPUT, `added<<NEWS_EOF\n${titles || '(本週無新增)'}\nNEWS_EOF\n`);
 }
 
-(async () => {
+async function main() {
+  if (!NVIDIA_API_KEY) throw new Error('缺少 NVIDIA_API_KEY');
   console.log('📡 抓取智財新聞（Google News RSS）...');
   let all = [];
+  let successfulQueries = 0;
   for (const q of QUERIES) {
-    try { all = all.concat(await fetchRSS(q)); }
-    catch (e) { console.log('  查詢失敗：' + q); }
+    try {
+      all = all.concat(await fetchRSS(q));
+      successfulQueries++;
+    } catch (error) {
+      console.warn(`RSS 查詢失敗：${q}（${error.message}）`);
+    }
   }
+  if (!successfulQueries) throw new Error('所有新聞 RSS 查詢都失敗');
   const published = loadPublished();
   const pending = loadPending();
   const knownTitles = new Set([...published, ...pending].map(p => normalizeTitle(p.origTitle || p.displayTitle)));
@@ -265,15 +285,7 @@ function writeOutput(count, titles) {
   }).sort((a, b) => Date.parse(b.pubDate) - Date.parse(a.pubDate));
 
   console.log(`🔎 近 ${RECENT_DAYS} 天、未上架過的候選 ${candidates.length} 則，取前 ${MAX_NEWS} 則改寫`);
-  const picked = candidates.slice(0, MAX_NEWS);
-
-  const newItems = [];
-  for (const n of picked) {
-    const s = await summarize(n.title, n.source);
-    if (!s) { console.log('  ⚠️ 摘要失敗，略過：' + n.title); continue; }
-    if (s.skip) { console.log('  ⏭️  AI 判定為醜聞式個案/無關，跳過：' + n.title); continue; }
-    newItems.push({ ...n, displayTitle: s.title, summary: s.summary, origTitle: n.title });
-  }
+  const newItems = await summarizeCandidates(candidates.slice(0, MAX_NEWS), createNvidiaTextClient(NVIDIA_API_KEY));
 
   if (DRY) {
     newItems.forEach((n) => {
@@ -331,4 +343,12 @@ function writeOutput(count, titles) {
     execSync(`git -C "${WEBSITE_DIR}" push origin master`, { stdio: 'inherit' });
     console.log('📤 待審草稿已推送到 GitHub（網站未變更）');
   } catch (e) { console.log('⚠️ Git 推送失敗：' + e.message); }
-})();
+}
+
+if (require.main === module) {
+  main().catch((error) => {
+    console.error(error.message);
+    process.exitCode = 1;
+  });
+}
+module.exports = { parseSummary, summarizeCandidates };

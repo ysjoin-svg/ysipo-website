@@ -35,6 +35,14 @@ gh run list --workflow=review-publish.yml --limit 5
 ssh yongsyu@192.168.0.101 'systemctl is-active ysipo-review; curl -s http://127.0.0.1:4310/health'
 ```
 
+## 產稿模型維護
+
+文章與新聞共用 `scripts/nvidia-text.js`。模型名稱可在 GitHub 的 Settings → Secrets and variables → Actions → Variables 設為 `NVIDIA_TEXT_MODEL` 和 `NVIDIA_TEXT_FALLBACK_MODEL`。未設定時使用程式內建的 Nemotron 3.5 Lightning 和 Bolt。API 金鑰仍由 GitHub Secret 提供。遇到模型下架時可更新 Variables，無須重新部署。
+
+暫時性連線錯誤、逾時、限流或伺服器錯誤會短暫等待後重試一次。若模型仍失敗、端點已下架或輸出格式不符，改用備援。兩個模型都無法產稿時，排程會寄出流程失敗通知。新聞沒有合格候選項目時會正常結束，若有摘要錯誤且產出為零則告警。
+
+更換模型後可在 GitHub Actions 勾選 `verify_only` 手動執行文章與新聞工作。這個模式驗證產稿，跳過送審與所有郵件。若新聞紀錄顯示無候選或所有候選均被篩掉，請確認紀錄是否有成功的摘要 API 呼叫。例行排程仍照常送審。
+
 ## 私人內容成效頁
 
 `https://review.ysipo.com.tw/traffic` 可用手機或電腦開啟，使用承辦人系統帳號密碼登入。管理員在承辦人系統「承辦人管理」的「內容成效」欄設定權限；初始開放李宗穎（10001）與林家均（17005）。登入最長有效 8 小時；每次查詢及 CSV 下載均向承辦人系統重新查核帳號與權限，停用或撤權立即生效。可查最近 7、30、90 天，報表在伺服器記憶體快取 10 分鐘，不寫入公開網站或草稿目錄。只有審稿流程繼續使用郵件驗證碼。

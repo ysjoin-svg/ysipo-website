@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 const sharp = require('sharp');
+const { createNvidiaTextClient } = require('./nvidia-text');
 
 // ===== 密鑰載入：優先讀環境變數（GitHub Actions），本機則回退 config.js =====
 let config = {};
@@ -256,67 +257,6 @@ async function fallbackArticleImage(category, dateStr, timestamp) {
   return { htmlPath: `img/${filename}`, jsonPath: `insights/img/${filename}`, absFile, width: 1280, height: 720 };
 }
 
-// 呼叫 Nvidia API（通用）
-function parseNvidiaArticleResponse(body, statusCode) {
-  let parsed;
-  try {
-    parsed = JSON.parse(body);
-  } catch {
-    throw new Error(`Nvidia API 回應不是 JSON（HTTP ${statusCode}）`);
-  }
-  if (statusCode !== 200) {
-    const detail = String(parsed?.error?.message || parsed?.detail || '未提供錯誤說明').slice(0, 200);
-    throw new Error(`Nvidia API HTTP ${statusCode}：${detail}`);
-  }
-  const content = parsed?.choices?.[0]?.message?.content;
-  if (typeof content !== 'string' || !content.trim()) {
-    const reason = parsed?.choices?.[0]?.finish_reason || '未提供';
-    throw new Error(`AI 未回傳文章正文（finish_reason: ${reason}）；請檢查模型輸出與 token 上限`);
-  }
-  return content;
-}
-
-function callNvidiaAPI(messages) {
-  return new Promise((resolve, reject) => {
-    const body = JSON.stringify({
-      model: process.env.NVIDIA_TEXT_MODEL || 'nvidia/nemotron-3-super-120b-a12b',
-      messages,
-      temperature: 0.7,
-      max_tokens: 4096,
-      chat_template_kwargs: { enable_thinking: false },
-    });
-
-    const options = {
-      hostname: 'integrate.api.nvidia.com',
-      path: '/v1/chat/completions',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${NVIDIA_API_KEY}`,
-        'Content-Length': Buffer.byteLength(body)
-      }
-    };
-
-    const req = https.request(options, (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('error', reject);
-      res.on('end', () => {
-        try {
-          resolve(parseNvidiaArticleResponse(data, res.statusCode));
-        } catch (e) {
-          reject(e);
-        }
-      });
-    });
-
-    req.on('error', reject);
-    req.setTimeout(120000, () => req.destroy(new Error('Nvidia 產文逾時（120 秒）')));
-    req.write(body);
-    req.end();
-  });
-}
-
 // 中文文章 prompt
 function buildZhMessages(topic) {
   return [
@@ -433,6 +373,14 @@ function extractTitle(text) {
     .replace(/\*\*/g, '')
     .replace(/={3,}/g, '')
     .trim();
+}
+
+function validateArticleText(text) {
+  const article = text.trim();
+  if (!extractTitle(article) || !article.split('\n').slice(1).some((line) => line.trim())) {
+    throw new Error('文章需要標題及正文');
+  }
+  return article;
 }
 
 // 取得摘要
@@ -576,9 +524,11 @@ async function main() {
 
     // 中英文 API 並行呼叫
     console.log('🤖 呼叫 Nvidia API（中文 + 英文並行）...');
+    const complete = createNvidiaTextClient(NVIDIA_API_KEY);
+    const options = { temperature: 0.7, maxTokens: 4096, validate: validateArticleText };
     const [articleZh, articleEn] = await Promise.all([
-      callNvidiaAPI(buildZhMessages(topic)),
-      callNvidiaAPI(buildEnMessages(topic))
+      complete(buildZhMessages(topic), { ...options, label: '中文文章' }),
+      complete(buildEnMessages(topic), { ...options, label: '英文文章' }),
     ]);
     console.log('✅ 中英文文章產出完成');
 
@@ -725,4 +675,4 @@ async function main() {
 }
 
 if (require.main === module) main();
-module.exports = { textToHtml, textToHtmlEn, extractSummary, categorizeArticle, purgeCloudflareCache, parseNvidiaArticleResponse, missingCredentials };
+module.exports = { textToHtml, textToHtmlEn, extractSummary, categorizeArticle, purgeCloudflareCache, missingCredentials };
